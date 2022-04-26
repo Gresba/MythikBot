@@ -6,6 +6,7 @@ import Bot.Embeds;
 import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -15,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MemberJoinGuildEvent extends ListenerAdapter {
     @Override
@@ -28,6 +32,63 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         Statement statement = SQLConnection.getStatement();
 
         SQLConnection.addDefaultUser(guild, member);
+
+        // User Joins
+
+        // View Current invites in the guild
+        List<Invite> invites = guild.retrieveInvites().complete();
+
+        HashMap<String, Invite> invitesHashMap = new HashMap<>();
+
+        for (Invite invite: invites)
+        {
+            invitesHashMap.put(invite.getCode(), invite);
+        }
+
+        try {
+            PreparedStatement getInvitesQuery = statement.getConnection().prepareStatement("SELECT * FROM Invites");
+            ResultSet savedInvites = getInvitesQuery.executeQuery();
+            while(savedInvites.next())
+            {
+                String inviteCode = savedInvites.getString(1);
+
+                if(!invitesHashMap.containsKey(inviteCode))
+                {
+                    PreparedStatement removeInviteQuery = statement.getConnection().prepareStatement("DELETE FROM Invites WHERE Code = ?");
+
+                    removeInviteQuery.setString(1, inviteCode);
+
+                    removeInviteQuery.executeUpdate();
+                }else{
+                    Invite invite = invitesHashMap.get(inviteCode);
+
+                    int inviteCount = invite.getUses();
+                    int savedInviteUses = savedInvites.getInt(2);
+
+                    if(inviteCount != savedInviteUses)
+                    {
+                        // UPDATE COUNT FOR THE USER
+
+                        // UPDATE the invite count
+                    }
+                }
+
+                guild.retrieveInvites().complete().get(0)
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Get invites in the database
+        for (Invite invite: invites)
+        {
+
+        }
+
+        // Compare the invites to the values in the database
+            // If any of the values are different that means that is the invite link that was used
+
+        // Incrememnt Counter for inviter
 
         int createdMinusJoinedEpochSeconds = (int)(member.getTimeJoined().toEpochSecond() - member.getTimeCreated().toEpochSecond());
 
