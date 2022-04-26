@@ -1,5 +1,7 @@
 package Shoppy;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,12 +24,18 @@ public class ShoppyConnection {
         domainURL = "https://shoppy.gg/api/v1/";
     }
 
-    public HttpResponse<String> getShoppyItem(String endPoint, String iD) throws IOException, InterruptedException {
-        request = HttpRequest.newBuilder()
-                .GET()
-                .header("Authorization", ShoppyAPIKey)
-                .uri(URI.create(domainURL + endPoint + "/" + iD))
-                .build();
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    public ShoppyOrder getShoppyOrder(String iD) throws IOException, InterruptedException {
+        try {
+            request = HttpRequest.newBuilder()
+                    .GET()
+                    .header("Authorization", ShoppyAPIKey)
+                    .uri(URI.create(domainURL + "orders/" + iD))
+                    .build();
+            Gson gson = new Gson();
+            return gson.fromJson(client.send(request, HttpResponse.BodyHandlers.ofString()).body(), ShoppyOrder.class);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

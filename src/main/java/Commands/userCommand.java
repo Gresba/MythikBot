@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static Bot.Embeds.embed;
 import static Bot.SQLConnection.getStatement;
 
 public class userCommand extends ListenerAdapter {
@@ -47,9 +46,6 @@ public class userCommand extends ListenerAdapter {
             {
                 String messageLowerCase = messageString.toLowerCase();
 
-                /*****************************************************************************************************/
-                // Storing Last 100 Messages
-                /*****************************************************************************************************/
                 MessageObj messageObj = new MessageObj(messageId, messageString, member.getId(), message.getTimeCreated().toZonedDateTime());
 
                 if(messageObj.getMessageCount() > 100)
@@ -59,38 +55,37 @@ public class userCommand extends ListenerAdapter {
                     String poppedId = botProperty.getMessageHistoryQueue().poll();
                     botProperty.getMessageHistory().remove(poppedId);
                 }
+                // Add the messages to the queue and hashMap
+                botProperty.getMessageHistory().put(messageId, messageObj);
+                botProperty.getMessageHistoryQueue().add(messageId);
 
                 if(messageArr[0].equalsIgnoreCase(botPrefix + "buttfuck"))
                 {
                     if(channel.getId().equalsIgnoreCase("945942089869443082") && member.getRoles().contains(guild.getRoleById("945941329656041482"))){
                         String accountsSent = "";
 
-                        String updateStatusQuery = "UPDATE accounts SET status = 'SELECTED' WHERE AccountType = 'UnbannedNFA' LIMIT " + 1;
-                        String retrieveAccountsQuery = "SELECT * FROM accounts WHERE status = 'SELECTED'";
-                        String deleteQuery = "DELETE FROM accounts WHERE status = 'SELECTED'";
+                        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE AccountType = 'NFA/SFA [Unbanned]' LIMIT 1";
 
-                        statement.executeUpdate(updateStatusQuery);
+                        String deleteQuery = "DELETE FROM accounts WHERE AccountType = 'NFA/SFA [Unbanned]' LIMIT 1";
 
                         ResultSet resultSet = statement.executeQuery(retrieveAccountsQuery);
 
                         while (resultSet.next())
                         {
-                            accountsSent += resultSet.getString(4);
+                            accountsSent += resultSet.getString(1);
                         }
 
                         // Sending the Embed with the products to the member through DMs
-                        Embeds.sendEmbed(Embeds.GENERATOR, member, accountsSent);
+                        Embeds.sendEmbed(Embeds.GENERATOR.getEmbed()
+                                .addField("**Alt**", accountsSent, false), member, true);
 
                         statement.executeUpdate(deleteQuery);
 
-                        Embeds.sendEmbed(Embeds.GENSUCCESS, channel);
+                        Embeds.sendEmbed(Embeds.GENSUCCESS.getEmbed(), channel, false);
                     }else{
-                        Embeds.sendEmbed(Embeds.GENFAIL, channel);
+                        Embeds.sendEmbed(Embeds.GENFAIL.getEmbed(), channel, false);
                     }
                 }
-                // Add the messages to the queue and hashMap
-                botProperty.getMessageHistory().put(messageId, messageObj);
-                botProperty.getMessageHistoryQueue().add(messageId);
 
 //                if(messageArr[0].equalsIgnoreCase(botPrefix + "orders"))
 //                {

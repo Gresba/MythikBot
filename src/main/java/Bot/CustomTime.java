@@ -111,13 +111,13 @@ public class CustomTime {
         if(months != 0)
             result += months + " month ";
         if(days != 0)
-            result += days + " days ";;
+            result += days + " days ";
         if(hours != 0)
-            result += hours + " hours ";;
+            result += hours + " hours ";
         if(minutes != 0)
-            result += minutes + " minutes ";;
+            result += minutes + " minutes ";
         if(seconds != 0)
-            result += seconds + " seconds";;
+            result += seconds + " seconds";
         return result;
     }
 }

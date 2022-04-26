@@ -1,10 +1,25 @@
 package Shoppy;
 
+import Bot.Embeds;
+import Bot.SQLConnection;
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.exceptions.ContextException;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 
 public class ShoppyOrder {
+    private Statement statement;
+
     private String id;
     private String email;
     private String pay_id;
@@ -43,29 +58,176 @@ public class ShoppyOrder {
 
     public ShoppyOrder()
     {
-
+        statement = SQLConnection.getStatement();
     }
 
-    public EmbedBuilder sendOrderEmbed(ShoppyOrder order)
+    public EmbedBuilder sendOrderEmbed()
     {
         boolean paidBoolean = false;
-        if(order.getPaid_at() != null)
+        if(this.getPaid_at() != null)
             paidBoolean = true;
-
-        EmbedBuilder orderEmbed = new EmbedBuilder()
-                .setTitle("**Better Alts Order**")
-                .setDescription("**Order ID:** " + order.getId())
-                .setColor(7419530)
-                .addField("**Product Name:**", order.getProduct().getTitle(), false)
-                .addField("**Price:**", "$" + (order.getPrice() * order.getQuantity()), true)
-                .addField("**Quantity:**", order.getQuantity() + "", true)
-                .addField("**Payment Method:**", order.getGateway(), true)
-                .addField("**Paid:**", "" + paidBoolean, true)
-                .addField("**Customer Email:**", order.getEmail(), true)
-                .addField("**Order Placed:**", order.getCreated_at().toString(), true);
+        EmbedBuilder orderEmbed = new EmbedBuilder();
+        try{
+            orderEmbed.setTitle("**Better Alts Order**")
+                    .setColor(7419530)
+                    .addField("**Order ID:**", this.id, false)
+                    .addField("**Product Name:**", this.getProduct().getTitle(), false)
+                    .addField("**Price:**", "$" + (this.getPrice() * this.getQuantity()), true)
+                    .addField("**Quantity:**", this.getQuantity() + "", true)
+                    .addField("**Payment Method:**", this.getGateway(), true)
+                    .addField("**Paid:**", "" + paidBoolean, true)
+                    .addField("**Customer Email:**", this.getEmail(), true)
+                    .addField("**Order Placed:**", this.getCreated_at().toString(), true);
+        }catch (NullPointerException e){
+            orderEmbed.setTitle("**Better Alts Order**")
+                    .setDescription("That order ID does not exist!");
+        }
         return orderEmbed;
     }
 
+    public String getAccountList(ShoppyOrder orderObject, int amount, Guild guild)
+    {
+        String accounts = "";
+        String accountType = orderObject.getProduct().getTitle();
+        System.out.println("ACCOUNT TYPE: " + accountType);
+        if(amount == 0)
+            amount = orderObject.getQuantity();
+
+        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE AccountType = '" + accountType + "' LIMIT " + amount;
+
+        String deleteQuery = "DELETE FROM accounts WHERE AccountType = '" + accountType + "' LIMIT " + amount;
+
+
+//        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE (AccountType = '" + accountType + "' AND GuildId = '" + guild.getId() + "') LIMIT " + amount;
+
+//        String deleteQuery = "DELETE FROM accounts WHERE (AccountType = '" + accountType + "' AND GuildId = '" + guild.getId() + "') LIMIT " + amount;
+        ResultSet resultSet = null;
+        try {
+            resultSet = statement.executeQuery(retrieveAccountsQuery);
+
+            while (resultSet.next()) {
+
+                String account = resultSet.getString(1);
+
+                accounts += account + "\n";
+
+                System.out.println(account);
+            }
+
+            statement.executeUpdate(deleteQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return accounts;
+    }
+
+    public void sendProductInformation(String orderID, Member member, TextChannel channel, Guild guild, int amount) throws IOException, InterruptedException {
+        ShoppyConnection shoppyConnection = new ShoppyConnection();
+        try {
+            ShoppyOrder orderObject = shoppyConnection.getShoppyOrder(orderID);
+            String accounts = null;
+            if (orderObject.getPaid_at() != null) {
+                PrintStream outputFile = new PrintStream("output");
+                accounts = getAccountList(orderObject, amount, guild);
+
+                if (accounts != null) {
+                    EmbedBuilder orderEmbed = new EmbedBuilder()
+                            .setTitle("**Better Alts Order**")
+                            .addField("**Order ID:**", orderID, false)
+                            .setDescription(setOrderDescription(orderObject.getProduct().getTitle()));
+
+                    if (accounts.length() < 1000) {
+                        // Add products to the description
+                        orderEmbed.addField("Alts", accounts, false);
+                    }
+
+                    Embeds.sendEmbed(orderEmbed, member, false);
+                    Embeds.sendEmbed(orderEmbed, guild.getMemberById("639094715605581852"), false);
+
+                    if (accounts.length() >= 1000) {
+                        outputFile.print(accounts);
+                        // Add products to a text file
+                        member.getUser().openPrivateChannel().flatMap(privateChannel ->
+                                privateChannel.sendFile(new File("output"), "message.txt")
+                        ).queue();
+                        guild.getMemberById("639094715605581852").getUser().openPrivateChannel().flatMap(privateChannel ->
+                                privateChannel.sendFile(new File("output"), "message.txt")
+                        ).queue();
+                    }
+                }
+            }
+
+            File outputFileDelete = new File("output");
+            outputFileDelete.delete();
+
+            // Add customer role to the user
+            guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
+        } catch (IllegalArgumentException e){
+            channel.sendMessage("That order ID does not exist!").queue();
+            e.printStackTrace();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (Exception e){
+            channel.sendMessage("**[ERROR]** Unable to send the product. Maybe customer DMs are off?").queue();
+            e.printStackTrace();
+        }
+    }
+
+    public boolean requiresVerification(Member member, String paymentMethod)
+    {
+        if (paymentMethod.equalsIgnoreCase("LTC") || paymentMethod.equalsIgnoreCase("BTC") || paymentMethod.equalsIgnoreCase("ETH")) {
+            return false;
+        }
+
+        try {
+            PreparedStatement selectVerifiedUser = statement.getConnection().prepareStatement("SELECT * FROM WhiteList WHERE MemberID = ?");
+            selectVerifiedUser.setString(1, member.getId());
+
+            ResultSet resultSet = selectVerifiedUser.executeQuery();
+            if(resultSet.next())
+                return false;
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    public String setOrderDescription(String accountType)
+    {
+        if(accountType.toLowerCase().contains("mfa")) {
+            return "Thank you for ordering " + accountType + "\n" +
+                    """
+                    **Format:** email:emailPassword
+                    **Minecraft Password:** Wanker!!22
+                    **Mail Site:** yahoo.com or mail.com (Check the domain of your account)
+                    **Security Questions:** a a a
+                    **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
+                    **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM
+                    *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
+                    *If the account requires migration, then migrate it.*
+                    """;
+        }else if(accountType.toLowerCase().contains("Unbanned") ){
+            return "Thank you for ordering " + accountType + "\n" +
+                    "**Format:** email:password:username\n" +
+                    "Use VyprVPN to avoid getting them security banned on Hypixel";
+        }else if(accountType.toLowerCase().contains("hypixel") || accountType.toLowerCase().contains("nfa")){
+            return "Thank you for ordering " + accountType + "\n" +
+                    "**Format:** email:password:username";
+        }else if(accountType.toLowerCase().contains("vypr")){
+            return "Thank you for ordering " + accountType + "\n" +
+                    "**Format:** email:password\n" +
+                    "**Note:** Don't change password or you may lose access fast";
+        }else if(accountType.contains("Yahoo")){
+            return "Thank you for ordering " + accountType + "\n" +
+                    "**Format:** email:password | Total Mails: <number of mails>\n" +
+                    "Log into the email at yahoo.com";
+        }else{
+            return  "There was an issue with the order, created a ticket in the discord server";
+        }
+    }
 
     public ShoppyProduct getProduct() {
         return product;

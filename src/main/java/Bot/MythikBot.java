@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -15,7 +14,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.sql.*;
 
 import static Bot.SQLConnection.getStatement;
@@ -23,7 +21,9 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
 public class MythikBot {
 
-    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
+    private static JDA jda;
+
+    public static void main(String[] args) throws SQLException{
         Statement statement = getStatement();
 
         String importGuilds = "SELECT GuildID FROM Guilds";
@@ -63,22 +63,22 @@ public class MythikBot {
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("MYTHIK_BOT_API_KEY"))
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS);;
-
-        JDA jda = null;
+                .enableIntents(GatewayIntent.GUILD_MEMBERS);
 
         jdaBuilder.addEventListeners(
-                new channelDeleteEvent(),
-                new adminCommand(),
-                new reactionEvent(),
-                new memberJoinGuildEvent(),
+                new DeleteChannelEvent(),
+                new ReactionEvent(),
+                new MemberJoinGuildEvent(),
                 new userCommand(),
-                new messageAutoResponse(),
-                new deleteMessageEvent(),
-                new guildJoinEvent(),
-                new memberLeaveGuildEvent(),
-                new StaffSlash(),
-                new buttonClick()
+                new MessageAutoResponse(),
+                new DeleteMessageEvent(),
+                new JoinGuildEvent(),
+                new MemberLeaveGuildEvent(),
+                new StaffSlashCommand(),
+                new ButtonClick(),
+                new UserSlashCommand(),
+                new ModalInteractionEvent(),
+                new OwnerSlashCommand()
                 );
 
         try {
@@ -89,7 +89,7 @@ public class MythikBot {
 
             CommandListUpdateAction commands = jda.updateCommands();
 
-            // User accessible slash commands
+            // USER accessible slash commands
             commands.addCommands(
                     Commands.slash("eth", "Get Mythik's Ethereum Address"),
 
@@ -105,29 +105,128 @@ public class MythikBot {
 
                     Commands.slash("venmo", "Get Mythik's Venmo Tag"),
 
-                    Commands.slash("cashapp", "Get Mythik's CashApp Tag")
+                    Commands.slash("cashapp", "Get Mythik's CashApp Tag"),
+
+                    // HELP command
+                    Commands.slash("help", "How to use the discord bot")
+                            .addOptions(new OptionData(STRING, "category", "The category for help")
+                                    .setRequired(false))
             );
 
+            // STAFF accessible commands
             commands.addCommands(
+                    // BAN command
+                    Commands.slash("ban", "Ban a user from this server")
+                            .addOptions(new OptionData(USER, "user", "The user to ban")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "reason", "The reason for the ban")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(INTEGER, "delete_days", "Messages to delete for the past days")
+                                    .setRequired(true)),
+
+                    // MUTE command
+                    Commands.slash("mute", "Mute a user")
+                            .addOptions(new OptionData(USER, "user", "The user to mute")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "reason", "The reason for the mute")
+                                    .setRequired(true)),
+
+                    // UNMUTE command
+                    Commands.slash("unmute", "Unmute a user")
+                            .addOptions(new OptionData(USER, "user", "The user to unmute")
+                                    .setRequired(true)),
+
+                    // KICK command
+                    Commands.slash("kick", "Kick a user")
+                            .addOptions(new OptionData(USER, "user", "The user to kick")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "reason", "The reason for the kick")
+                                    .setRequired(true)),
+
+                    // WARN command
+                    Commands.slash("warn", "Warn a user")
+                            .addOptions(new OptionData(USER, "user", "The user to warn")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "reason", "The reason for the warning")
+                                    .setRequired(true)),
+
+                    // NUKE command
                     Commands.slash("nuke", "Nuke the channel"),
 
+                    // AUTONUKE command
                     Commands.slash("autonuke", "Turn nuke a channel")
                             .addOptions(new OptionData(INTEGER, "minutes", "How many minutes")),
 
-                    Commands.slash("generateticket", "Generate a ticket in the channel you run this command."),
-
-                    Commands.slash("mute", "Mute a user in the server. Requires administrator permissions."),
-
+                    // ORDER command
                     Commands.slash("order", "View details about an order")
                             .addOptions(new OptionData(STRING, "order_id", "The order ID")
                                             .setRequired(true))
                             .addOptions(new OptionData(BOOLEAN, "on_off", "Turn auto-nuke on or off")
                                             .setRequired(false)),
 
+                    // CARDCHECK command
                     Commands.slash("cardcheck", "Send card check message")
                             .addOptions(new OptionData(STRING, "last_four_digits", "The last 4 digits of the card")
                                             .setRequired(true)),
 
+                    // DELETERESPONSE command
+                    Commands.slash("deleteresponse", "Delete a response to a trigger word")
+                            .addOptions(new OptionData(STRING, "trigger_word", "The trigger words to delete response to")
+                                    .setRequired(true)),
+
+                    // CLOSE command
+                    Commands.slash("close", "Close the ticket"),
+
+                    // OPENTICKET command
+                    Commands.slash("openticket", "Allow the creator of the ticket to speak")
+                            .addOptions(new OptionData(USER, "target_user", "Person to open the ticket for", true)),
+                    // SEND command
+                    Commands.slash("send", "Send a product to a user")
+                            .addOptions(new OptionData(STRING, "order_id", "The order ID", true))
+                            .addOptions(new OptionData(USER, "target_user", "Person to send it to", true)),
+
+                    // DIRECTIONSLIST command
+                    Commands.slash("directionslist", "Get a list of all directions and what they are for"),
+
+                    // DIRECTIONS command
+                    Commands.slash("directions", "Get the directions for a specific direction")
+                            .addOptions(new OptionData(STRING, "direction_name", "The direction you want to read", true, true)),
+
+                    // STAFFHELP command
+                    Commands.slash("staffhelp", "How to use staff features"),
+
+                    // ADDUSER command
+                    Commands.slash("add_user", "Add a user to the database")
+                            .addOptions(new OptionData(USER, "member", "The member to add to the database", true))
+            );
+
+            // OWNER Slash Commands
+            commands.addCommands(
+                    // GENERATETICKET command
+                    Commands.slash("generateticket", "Generate a ticket in the channel you run this command."),
+
+                    // REPLACE command
+                    Commands.slash("replace", "Send replacements for an order")
+                            .addOptions(new OptionData(STRING, "order_id", "The order ID")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(USER, "target_user", "Person to send it to")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(INTEGER, "replacement_amount", "Amount of replacements to send")
+                                    .setRequired(true)),
+
+                    // WHITELIST add/remove command
+                    Commands.slash("whitelist", "Add/Remove member to the verification whitelist")
+                            .addOptions(new OptionData(STRING, "action", "Add or remove a member")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(USER, "target_member", "The member to add/remove")
+                                    .setRequired(true)),
+
+                    // UPLOAD command
+                    Commands.slash("upload", "Upload a product to the database")
+                            .addOptions(new OptionData(STRING, "account_type", "The type of product to upload")
+                                    .setRequired(true)),
+
+                    // ADDRESPONSE command
                     Commands.slash("addresponse", "Add a response to a trigger word")
                             .addOptions(new OptionData(STRING, "trigger", "The word(s) that will trigger the response")
                                     .setRequired(true))
@@ -142,62 +241,16 @@ public class MythikBot {
                             .addOptions(new OptionData(BOOLEAN, "direct_match", "Does the trigger word have to directly match or be in the message. Default false")
                                     .setRequired(false)),
 
-                    Commands.slash("deleteresponse", "Delete a response to a trigger word")
-                            .addOptions(new OptionData(STRING, "trigger_word", "The trigger words to delete response to")
+                    // DELETEDM command
+                    Commands.slash("deletedm", "Delete DMs with the target member")
+                            .addOptions(new OptionData(USER, "target_member", "The member to delete the DMs with")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(INTEGER, "amount_to_delete", "The amount of messages to delete")
                                     .setRequired(true)),
 
-                    Commands.slash("close", "Close the ticket"),
-
-                    Commands.slash("openticket", "Allow the creator of the ticket to speak")
-                            .addOptions(new OptionData(USER, "target_user", "Person to open the ticket for")
-                                    .setRequired(true)),
-                    Commands.slash("send", "Send a product to a user")
-                            .addOptions(new OptionData(STRING, "product_name", "The name of the product")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(INTEGER, "amount", "The amount to send")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(USER, "target_user", "Person to send it to")
-                                    .setRequired(true)),
-                    Commands.slash("help", "How to use the discord bot")
-                            .addOptions(new OptionData(STRING, "category", "The category for help")
-                                    .setRequired(false))
-            );
-
-            // Moderation Slash Commands
-            commands.addCommands(
-                    // Ban command
-                    Commands.slash("ban", "Ban a user from this server")
-                            .addOptions(new OptionData(USER, "user", "The user to ban") // USER type allows to include members of the server or other users by id
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the ban")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(INTEGER, "delete_days", "Messages to delete for the past days")
-                                    .setRequired(true)),
-
-                    // Mute command
-                    Commands.slash("mute", "Mute a user")
-                            .addOptions(new OptionData(USER, "user", "The user to mute")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the mute")
-                                    .setRequired(true)),
-
-                    // Unmute command
-                    Commands.slash("unmute", "Unmute a user")
-                            .addOptions(new OptionData(USER, "user", "The user to unmute")
-                                    .setRequired(true)),
-
-                    // Kick command
-                    Commands.slash("kick", "Kick a user")
-                            .addOptions(new OptionData(USER, "user", "The user to kick")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the kick")
-                                    .setRequired(true)),
-
-                    // Warn command
-                    Commands.slash("warn", "Warn a user")
-                            .addOptions(new OptionData(USER, "user", "The user to warn")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the warning")
+                    // REMOVEORDER command
+                    Commands.slash("removeorder", "Remove an order from the database")
+                            .addOptions(new OptionData(STRING, "order_id", "The order id to remove from the database")
                                     .setRequired(true))
 
             );
