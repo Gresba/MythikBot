@@ -1,6 +1,7 @@
 package Bot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
@@ -96,10 +97,10 @@ public enum Embeds {
                 .setTitle("Skyblock Coins")
                 .addField("**Prices**",
                         """
-                                100+ million: $0.19/mil
-                                300+ million: $0.17/mil
-                                500+ million: $0.15/mil
-                                1 billion+: $0.14/mil""", false)
+                                100+ million: $0.20/mil
+                                300+ million: $0.18/mil
+                                500+ million: $0.17/mil
+                                1 billion+: $0.15/mil""", false)
                 .addField("**Payment Methods**",
                         """
                                 Crypto (Any Type)
@@ -138,6 +139,7 @@ public enum Embeds {
                 .setColor(Color.CYAN)
                 .setDescription("If this answers your question then please close the ticket")
                 .addField("**Nitro**", "We do not accept nitro as any sort of payment and it can not be used to gain any types of rewards.", false)
+                .addField("**Steam**", "We do not accept steam gift cards/balance as a payment method", false)
                 .addField("**PayPal**", "Create a ticket to purchase and type PayPal as the payment method", false)
                 .addField("**Restocked**", "There is no estimated time of restock for any product. To be alert for restocks go to #store and react to the proper message", false)
                 .addField("**Warranty**", """
@@ -145,6 +147,10 @@ public enum Embeds {
                         During that warranty you have to confirm whether your products are working or we can not give you any reimbursements.
                         Leaving or commenting any negative feedback in any way before contacting support about the issue will remove any warranty.
                         """, false);
+        }
+
+        public EmbedBuilder getEmbed(JDA jda) {
+
         }
     },
 

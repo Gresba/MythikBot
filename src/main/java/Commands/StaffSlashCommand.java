@@ -271,25 +271,25 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                     // Get the options
                     String orderID = event.getOption("order_id").getAsString();
-                    Member targetMemer = event.getOption("target_user").getAsMember();
+                    Member targetMember = event.getOption("target_user").getAsMember();
 
                     // Check if the admin is sending accounts to himself
-                    if(!targetMemer.getId().equalsIgnoreCase(event.getMember().getId())) {
+                    if(!targetMember.getId().equalsIgnoreCase(event.getMember().getId())) {
                         try {
                             java.util.Date date = new java.util.Date();
                             java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 
-                            SQLConnection.addDefaultUser(guild, event.getOption("member").getAsMember());
+                            SQLConnection.addDefaultUser(guild, targetMember);
 
                             // Insert the order into the database so the same order cannot be claimed twice
                             PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
                             insertOrder.setString(1, orderID);
-                            insertOrder.setString(2, targetMemer.getId());
+                            insertOrder.setString(2, targetMember.getId());
                             insertOrder.setDate(3, sqlDate);
                             insertOrder.executeUpdate();
 
-                            shoppyOrder.sendProductInformation(orderID, targetMemer, channel, guild, 0);
-                            event.reply("Accounts successfully sent. Check your DMs! " + targetMemer.getAsMention()).queue();
+                            shoppyOrder.sendProductInformation(orderID, targetMember, channel, guild, 0);
+                            event.reply("Accounts successfully sent. Check your DMs! " + targetMember.getAsMention()).queue();
                         } catch (IOException | InterruptedException e) {
                             event.reply("**[LOG]** There was an issue with sending the product").queue();
                             e.printStackTrace();

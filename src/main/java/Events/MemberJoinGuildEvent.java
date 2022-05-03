@@ -65,15 +65,13 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
                     int inviteCount = invite.getUses();
                     int savedInviteUses = savedInvites.getInt(2);
 
-                    if(inviteCount != savedInviteUses)
+                    if(inviteCount > savedInviteUses)
                     {
                         // UPDATE COUNT FOR THE USER
 
                         // UPDATE the invite count
                     }
                 }
-
-                guild.retrieveInvites().complete().get(0)
             }
         } catch (SQLException e) {
             e.printStackTrace();

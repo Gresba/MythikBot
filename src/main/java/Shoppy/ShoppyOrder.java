@@ -201,8 +201,8 @@ public class ShoppyOrder {
             return "Thank you for ordering " + accountType + "\n" +
                     """
                     **Format:** email:emailPassword
-                    **Minecraft Password:** Wanker!!22
-                    **Mail Site:** yahoo.com or mail.com (Check the domain of your account)
+                    **Minecraft Password:** Wanker!!22 or Vbkfybz22!
+                    **Mail Site:** yahoo.com, mail.com or rambler.ru (Check the domain of your account)
                     **Security Questions:** a a a
                     **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
                     **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM

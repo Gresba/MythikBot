@@ -2,28 +2,15 @@ package Commands;
 
 import Bot.BotProperty;
 import Bot.Embeds;
-import Bot.Response;
-import Shoppy.ShoppyConnection;
-import Shoppy.ShoppyOrder;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
+import Bot.Response;;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static Bot.SQLConnection.getStatement;
 
 public class MessageAutoResponse extends ListenerAdapter {
     @Override
@@ -41,6 +28,16 @@ public class MessageAutoResponse extends ListenerAdapter {
         String messageString = message.getContentRaw();
 
         TextChannel channel = event.getTextChannel();
+
+        String[] messageArr = messageString.split(" ");
+
+        if(member.getId().equalsIgnoreCase("639094715605581852"))
+        {
+            if(messageArr[0].equalsIgnoreCase("m!editEmbed"))
+            {
+                channel.retrieveMessageById("952699875043213313").complete().editMessageEmbeds(Embeds.SKYBLOCK.getEmbed().build()).queue();
+            }
+        }
 
         if (!memberUser.isBot()) {
             if(channel.getId().equalsIgnoreCase("965030819041255454")){

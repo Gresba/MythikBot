@@ -154,7 +154,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
                                     // Delete and print the accounts
                                     for (Message msg : messages) {
-                                        System.out.println(msg.getEmbeds().get(0).getFields().get(1).getValue());
                                         msg.delete().queue();
                                     }
                                 }

@@ -24,7 +24,7 @@ public class SQLConnection {
 
     public static void addDefaultUser(Guild guild, Member member){
         try {
-            PreparedStatement insertUserIntoDb = statement.getConnection().prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement insertUserIntoDb = statement.getConnection().prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             // Guild ID
             insertUserIntoDb.setString(1, guild.getId());
@@ -44,6 +44,9 @@ public class SQLConnection {
             // Invites
             insertUserIntoDb.setInt(6, 0);
 
+            // Inviter
+            insertUserIntoDb.setString(7, "");
+
             insertUserIntoDb.executeUpdate();
 
 
@@ -60,7 +63,8 @@ public class SQLConnection {
 
                 ResultSet mutedOutput = checkMuted.executeQuery();
 
-                boolean muted = mutedOutput.next();
+                mutedOutput.next();
+                boolean muted = mutedOutput.getBoolean(1);
 
                 // If the user was muted before then mute them again
                 if (muted)

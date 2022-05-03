@@ -46,6 +46,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
             try {
                 // Getting the order that connects to the order ID
                 ShoppyOrder order = shoppyConnection.getShoppyOrder(orderId);
+
                 EmbedBuilder productDescriptionEmbed = order.sendOrderEmbed();
 
                 // If the order is for claiming an order
