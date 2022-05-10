@@ -4,6 +4,7 @@ import Bot.BotProperty;
 import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ public class DeleteChannelEvent extends ListenerAdapter {
         Statement statement = SQLConnection.getStatement();
 
         BotProperty botProperty = new BotProperty();
+
         event.getGuild().retrieveAuditLogs().type(ActionType.CHANNEL_DELETE).limit(1).queue(
                 list -> {
                     EmbedBuilder deletedChannelEmbed = new EmbedBuilder()

@@ -1,13 +1,12 @@
 package Bot;
 
-import Commands.*;
+import BotCommands.*;
 import Events.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -39,24 +38,6 @@ public class MythikBot {
             String importGuildResponses = "SELECT * FROM Responses WHERE GuildId = '" + guildId + "'";
             ResultSet responsesResults = statement2.executeQuery(importGuildResponses);
 
-            while (responsesResults.next())
-            {
-                String triggerWord = responsesResults.getString(1);
-                String response = responsesResults.getString(2);
-                boolean deleteMsg = responsesResults.getBoolean(3);
-                int deleteMsgDelay = responsesResults.getInt(4);
-                String containsOrMatches = responsesResults.getString(5);
-
-                try {
-                    // Populating response members
-//                    Response responseObj = new Response(containsOrMatches, response, deleteMsg, deleteMsgDelay);
-
-//                    BotProperty.getResponseHashMap().put(triggerWord, responseObj);
-                } catch (Exception e){
-                    System.out.println("[Bot Log]: Error with inserting responses into ResponseHashMap");
-                    e.printStackTrace();
-                }
-            }
             statement2.close();
         }
 
@@ -69,7 +50,7 @@ public class MythikBot {
                 new DeleteChannelEvent(),
                 new ReactionEvent(),
                 new MemberJoinGuildEvent(),
-                new userCommand(),
+                new UserCommand(),
                 new MessageAutoResponse(),
                 new DeleteMessageEvent(),
                 new JoinGuildEvent(),

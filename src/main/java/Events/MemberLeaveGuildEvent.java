@@ -14,7 +14,6 @@ public class MemberLeaveGuildEvent extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         Member member = event.getMember();
-        Guild guild = event.getGuild();
 
         BotProperty botProperty = new BotProperty();
 

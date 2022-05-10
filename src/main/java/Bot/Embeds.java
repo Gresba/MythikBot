@@ -1,99 +1,101 @@
 package Bot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 
-public enum Embeds {
+public class Embeds {
 
-    // Embed that is sent to a channel whenever a member needs help with the bot
-    HELP {
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**Better Alts Help**")
-                .setColor(Color.CYAN)
-                .setDescription("Help for using the Better Alts bot")
-                .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
-                .addField("**Staff Commands**", "Run /staffhelp to view staff commands", false)
-                .addField("**User Commands**", "Run /userhelp to view user commands", false)
-                .addField("**Customer Commands**", "Run /customerhelp to view customer commands", false)
-                .addField("**Frequently Asked Questions**", "Run /faq to view questions that might have been answered", false)
-                .addField("**Questions/Problems**", "Create a #ticket if you have any questions or problems", false);
-        }
-    },
+    public Embeds()
+    {
 
-    // Embed to show the server rules
-    RULES {
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                    .setTitle("**__Official Better Alts Server Rules__**")
-                    .setDescription("Read and follow all rules")
-                    .setColor(Color.BLACK)
+    }
 
-                    .addField("**General**",
-                            """
-                                    **1.1)** No talking about selling/buying products not related to this server
-                                    **1.2)** No spamming/ghost pinging
-                                    **1.3)** No releasing anyone's information without consent
-                                    **1.4)** No sending NSFW or gore contents
-                                    **1.5)** No comments that will discourage a user from buying
-                                    **1.6)** No advertising unless you have permission
-                                    **1.7)** No pinging staff members unless it's about an order
-                                    **1.8)** No mass pinging
-                                    **1.9)** Use channels according to their purpose
-                                    **1.10)** Don't ask for free stuff""", false)
-                    .addField("**Invites**",
-                            """
-                                    **2.1)** No creating fake accounts for giveaways or invite rewards
-                                    **2.2)** No j4j invites for rewards
-                                    **2.3)** Invite source must be shown for rewards
-                                    """, false)
-                    .addField("**Purchases**",
-                            "**3.1)** Don't leave bad feedback in chat or store before talking to us\n" +
-                                    "*This may result in no replacements/refunds*", false)
-                    .addField("**Punishments**",
-                            """
-                                    - Ban
-                                    - Mute
-                                    - Warning
-                                    - Order Taken Away
-                                    - Ban from future giveaways
-                                    *You may receive any of these punishments for breaking a rule*""", false)
-                    .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG");
-        }
-    },
+    /**
+     * The logo for the url of the Better Alts bot
+     */
+    private static final String logoUrl = "https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG";
 
-    RESTOCKALERTS{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Restock Roles")
-                .addField("React to get alerts for the specific product",
-                        """
-                                MFA - :e_mail:
-                                Skyblock - :cloud:
-                                Hypixel LvL21+/Ranked - :evergreen_tree:
-                                Hypixel Unbanned NFA/SFA Mix - :heart:
-                                NFA Banned - :red_square:
-                                SFA Banned - 
-                                VyprVPN - :alien:
-                                Special MFA - :heart_eyes_cat:
-                                Migrated Unbanned NFA - :white_check_mark:
-                                Migrated Banned NFA - :peach:
-                                Yahoo FA - :yin_yang:""", false)
-                .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
-                .setColor(Color.CYAN);
-        }
-    },
+    /**
+     * Embed that is sent to a channel whenever a member needs help with the bot
+     */
+    public static final EmbedBuilder HELP = new EmbedBuilder()
+            .setTitle("**__Better Alts Help__**")
+            .setColor(Color.CYAN)
+            .setDescription("Assistance for Better Alts bot")
+            .setThumbnail(logoUrl)
+            .addField("**Staff Commands**", "Run /staffhelp to view staff commands", false)
+            .addField("**User Commands**", "Run /userhelp to view user commands", false)
+            .addField("**Customer Commands**", "Run /customerhelp to view customer commands", false)
+            .addField("**Frequently Asked Questions**", "Run /faq to view questions that might have been answered", false)
+            .addField("**Questions/Problems**", "Create a #ticket if you have any questions or problems", false);
 
-    SKYBLOCK{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to show the server rules
+     */
+    public static final EmbedBuilder RULES = new EmbedBuilder()
+            .setTitle("**__Official Better Alts Server Rules__**")
+            .setDescription("Read and follow all rules")
+            .setColor(Color.BLACK)
+
+            .addField("**General**",
+                    """
+                            **1.1)** No talking about selling/buying products not related to Better Alts
+                            **1.2)** No spamming/ghost pinging
+                            **1.3)** No releasing anyone's information without consent
+                            **1.4)** No sending NSFW or gore contents
+                            **1.5)** No comments that will discourage another user from buying
+                            **1.6)** No advertising unless you have permission
+                            **1.7)** No pinging staff members unless it's about an order
+                            **1.8)** No mass pinging
+                            **1.9)** Use channels according to their purpose
+                            **1.10)** Don't ask for free stuff
+                            """, false)
+            .addField("**Invites**",
+                    """
+                            **2.1)** No creating fake accounts for giveaways or invite rewards
+                            **2.2)** No j4j invites for rewards
+                            **2.3)** Invite source must be shown for rewards
+                            """, false)
+            .addField("**Purchases**",
+                    "**3.1)** Don't leave bad feedback in chat or store before talking to us\n" +
+                            "*This may result in no replacements/refunds*", false)
+            .addField("**Punishments**",
+                    """
+                            - Ban
+                            - Mute
+                            - Warning
+                            - Order Taken Away
+                            - Ban from future giveaways
+                            *You may receive any of these punishments for breaking a rule*""", false)
+            .setThumbnail(logoUrl);
+
+    /**
+     * Embed to show restock roles
+     */
+    public static final EmbedBuilder RESTOCK_ALERTS = new EmbedBuilder()
+            .setTitle("Restock Roles")
+            .addField("React to get alerts for the specific product",
+                    """
+                            MFA - :e_mail:
+                            Skyblock - :cloud:
+                            Hypixel LvL21+/Ranked - :evergreen_tree:
+                            Hypixel Unbanned NFA/SFA Mix - :heart:
+                            NFA Banned - :red_square:
+                            SFA Banned - :
+                            VyprVPN - :alien:
+                            Special MFA - :heart_eyes_cat:
+                            Migrated Unbanned NFA - :white_check_mark:
+                            Migrated Banned NFA - :peach:
+                            Yahoo FA - :yin_yang:""", false)
+            .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
+            .setColor(Color.CYAN);
+
+    /**
+     * Embed to show skyblock prices and how to purchase it
+     */
+    public static final EmbedBuilder SKYBLOCK_PRICES = new EmbedBuilder()
                 .setTitle("Skyblock Coins")
                 .addField("**Prices**",
                         """
@@ -110,55 +112,46 @@ public enum Embeds {
                                 **PayPal**
                                 To use PayPal create a ticket""", false)
                 .addField("**How to buy**", "Open a ticket and click Purchase", false)
-                .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
+                .setThumbnail(logoUrl)
                 .setColor(Color.YELLOW);
-        }
-    },
 
-    GIVEAWAY {
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Giveaway Role")
+    /**
+     * Embed to tell people how to get the giveaway role
+     */
+    public static final EmbedBuilder GIVEAWAY = new EmbedBuilder()
+                .setTitle("**__Better Alts Giveaway__**")
 
                 .addField("React to be alerted for future giveaways\n",
                         "Giveaway Role - :gift:\n", true)
                 .addField("Note",
-                        "*No replacements for giveaways*", false)
+                        "*No replacements for giveaways. If you complain about about something you received in a giveaway not working. You will be banned.*", false)
                 .addField("**Remove role**", "*Remove your reaction to remove the role from your role list*", false)
                 .setColor(Color.ORANGE)
-                .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG");
-        }
-    },
+                .setThumbnail(logoUrl);
 
-    FAQ{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Frequently Asked Questions")
+    /**
+     * Embed to tell show people answers to frequently asked questions
+     */
+    public static final EmbedBuilder FAQ = new EmbedBuilder()
+                .setTitle("**__Frequently Asked Questions__**")
                 .setColor(Color.CYAN)
                 .setDescription("If this answers your question then please close the ticket")
                 .addField("**Nitro**", "We do not accept nitro as any sort of payment and it can not be used to gain any types of rewards.", false)
                 .addField("**Steam**", "We do not accept steam gift cards/balance as a payment method", false)
                 .addField("**PayPal**", "Create a ticket to purchase and type PayPal as the payment method", false)
                 .addField("**Restocked**", "There is no estimated time of restock for any product. To be alert for restocks go to #store and react to the proper message", false)
+                .addField("**Orders/Replacements**", "Close this ticket and make a new ticket for an order", false)
                 .addField("**Warranty**", """
                         All products have a 24 hour warranty. Except MFAs which have a 1 hour warranty. 
                         During that warranty you have to confirm whether your products are working or we can not give you any reimbursements.
-                        Leaving or commenting any negative feedback in any way before contacting support about the issue will remove any warranty.
+                        Leaving or commenting any negative feedback in any way before giving support a chance to resolve the issue will remove any warranty.
                         """, false);
-        }
 
-        public EmbedBuilder getEmbed(JDA jda) {
-
-        }
-    },
-
-    AUTONUKE{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Better Alts Moderation")
+    /**
+     * Embed to tell people that the channel is in auto-nuke mode and the reason
+     */
+    public static final EmbedBuilder AUTO_NUKE = new EmbedBuilder()
+                .setTitle("**__Better Alts Moderation__**")
                 .setDescription("Channel is nuked every 30 minutes. Create a ticket if you have any questions.")
                 .addField("**Reason**", """
                         Channel is nuked because staff members can't always moderate the chat and this is the best way to keep the chat completely clean so we do not get punished by discord.
@@ -166,43 +159,12 @@ public enum Embeds {
                         *Feedback is only removed if you break one of our terms of services.*
                         """, false)
                 .setColor(Color.BLACK);
-        }
-    },
 
-    SPONSORSHIP{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setColor(Color.RED)
-                .setTitle("Better Alts Ticket")
-                .setDescription("Youtuber/Partnership Requirements")
-                .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
-                .addField("**Youtuber:**", """
-                            - 3 Unbanned NFAs for every 100 Views
-                            - If you have more than 1k views per video. $7 per video.
-                            - Rewards are given after the video is posted
-                            
-                            **Video Requirements**
-                            - https://betteralts.com and an invite to the discord server must be in the video description
-                            - It must be **clear** that you are being sponsored by Better Alts
-                        """, false)
-                .addField("**Partnership:**", """
-                            - Server with 1,000+ channel members
-                            - Real communities or shops, not join for rewards server
-                        """, false)
-                .addField("**What to do now:**", """
-                            - If you can't meet the requirements, then close this ticket
-                            - If you can then send the invite to the server or publish the video and send the link to the video.
-                        """, false);
-        }
-    },
-
-
-    PAYMENTMETHODS{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Better Alts Tickets")
+    /**
+     * Embed to show users all the payment methods
+     */
+    public static final EmbedBuilder PAYMENT_METHODS = new EmbedBuilder()
+                .setTitle("__Better Alts Tickets__")
                 .setColor(Color.BLUE)
                 .setDescription("Please choose a payment method")
                 .addField("**Payment Methods**",
@@ -213,40 +175,37 @@ public enum Embeds {
                                 Amazon Gift Card (40% Fee)
                                           
                                 **PayPal**
-                                To use PayPal contact @Blacman, @AdeaS or @@Flipfudge""", false);
-        }
-    },
+                                Create a new ticket -> Click \"Purchase\" -> Type only "PayPal" as the payment method
+                                """, false);
 
-    TICKETCLOSED{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Better Alts Tickets")
+    /**
+     * Embed to tell a user their ticket was closed
+     */
+    public static final EmbedBuilder TICKET_CLOSED = new EmbedBuilder()
+                .setTitle("__Better Alts Tickets__")
                 .setColor(Color.RED)
                 .setDescription("Your ticket has been closed. If you have anymore issues then please make another ticket!");
-        }
-    },
 
-    TICKETREASON{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**Choose Reason**")
+    /**
+     * Embed to show a user the options for a ticket
+     */
+    public static final EmbedBuilder TICKET_REASON = new EmbedBuilder()
+                .setTitle("**__Better Alts Tickets__**")
                 .setDescription("""
+                        Please choose a reason for creating this ticket
+                        
                         **Order** - Claim Order/Replacements
                         **Partnership** - Requirements or steps for sponsorship or partnership
                         **Purchase** - Purchase an item
                         **General** - Ask a general questions and see FAQ
                         **Close** - Close the ticket
                         """);
-        }
-    },
 
-    CHOOSEORDERREASON{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("Better Alts Ticket")
+    /**
+     * Embed to show user the choices for an order ticket
+     */
+    public static final EmbedBuilder CHOOSE_ORDER_REASON = new EmbedBuilder()
+                .setTitle("__Better Alts Ticket__")
                 .setDescription("""
                     Please choose one of the reasons
                     **Claim Order** - Claim an order that you made
@@ -254,24 +213,19 @@ public enum Embeds {
                     
                     If it has passed 24 hours since your order was sent, you will **NOT** receive replacements/refunds
                     """);
-        }
-    },
 
-    FETCHINGORDER{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**Better Alts Tickets**")
+    /**
+     * Embed to tell the user their order is being fetched
+     */
+    public static final EmbedBuilder FETCHING_ORDER = new EmbedBuilder()
+                .setTitle("**__Better Alts Tickets__**")
                 .setDescription("Fetching your order...");
-        }
-    },
 
-    // HELP
-    USERHELP{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**User Command Help**")
+    /**
+     * Embed to show user commands with the bot
+     */
+    public static final EmbedBuilder USER_HELP = new EmbedBuilder()
+                .setTitle("**__User Command Help__**")
                 .setDescription("User commands and descriptions")
                 .addField("**Commands**",
                         """
@@ -284,106 +238,92 @@ public enum Embeds {
                                 /cashapp - Mythik's CashApp Username
                                 /venmo - Mythik's Venmo Username
                                 """, false);
-        }
-    },
 
-    CUSTOMERHELP{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**Customer Command Help**")
+    /**
+     * Embed to show customers commands with the bot
+     */
+    public static final EmbedBuilder CUSTOMER_HELP = new EmbedBuilder()
+                .setTitle("**__Customer Command Help__**")
                 .setDescription("Customer commands and descriptions")
                 .addField("**Commands",
                         """
                                 /orders - View orders and amount spent
-                                /registerorder - Claim an order and add it to your profile
+                                /registerorder - Add an order to your profile
                                 """, false);
-        }
-    },
 
-    STAFFHELP{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                    .setTitle("**Admin Command Help**")
-                    .setDescription("Admin commands and descriptions")
-                    .addField("**Moderation**",
-                            """
-                                    /ban - Ban a member
-                                    /kick - Kick a member
-                                    /mute - Mute a member
-                                    /unmute - Unmute a member
-                                    /warn - Warn a member
-                                    /autonuke - Autonuke a channel
-                                    /nuke - nuke a channel
-                                    """, false)
-                    .addField("**Tickets**",
-                            """
-                                    /send - Send a product
-                                    /close - Close a ticket
-                                    /order - Check an order
-                                    /cardcheck - Ask user to verify their card
-                                    /openticket - Open a ticket for a user
-                                    """, false)
-                    .addField("**Directions**",
-                            """
-                                    *Run the* /directionslist *command to see all directions options*
-                                    /directions - View the directions to different scenarios
-                                    """, false);
-        }
-    },
+    /**
+     * Embed to show staff commands and how to use the bot
+     */
+    public static final EmbedBuilder STAFF_HELP = new EmbedBuilder()
+                .setTitle("**__Admin Command Help__**")
+                .setDescription("Admin commands and descriptions")
+                .addField("**Moderation**",
+                        """
+                                /ban - Ban a member
+                                /kick - Kick a member
+                                /mute - Mute a member
+                                /unmute - Unmute a member
+                                /warn - Warn a member
+                                /autonuke - Autonuke a channel
+                                /nuke - nuke a channel
+                                """, false)
+                .addField("**Tickets**",
+                        """
+                                /send - Send a product
+                                /close - Close a ticket
+                                /order - Check an order
+                                /cardcheck - Ask user to verify their card
+                                /openticket - Open a ticket for a user
+                                """, false)
+                .addField("**Directions**",
+                        """
+                                *Run the* /directionslist *command to see all directions options*
+                                /directions - View the directions to different scenarios
+                                """, false);
 
-    DIRECTIONS{
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-                    .setTitle("**Directions**")
-                    .setDescription("Directions Category. Use this with the /directions (category): Command")
-                    .addField("**Tickets Direction List:**",
-                            """
-                                    ClaimTicket - How to claim a ticket as a staff member
-                                    SendOrder - How to send a user an order
-                                    FraudulentCheck - How to verify an order/What to check for
-                                    Replacements - How to send replacements
-                                    Unknown - What to do in an unknown situation
-                                    """,
-                            false)
-                    .addField("**Order Issue Directions List:**",
-                            """
-                                    UnbannedProductIssue - How to deal with issue with unbanned products
-                                    MinecraftMFAIssue - How to deal with issues with Minecraft MFA
-                                    Unknown - What to do in an unknown situation
-                                    """,
-                            false)
-                    .addField("**General Direction List:**",
-                            """
-                                    ChatModeration - How to moderate chat
-                                    GeneralQuestions - What to do when a ticket about a general question is asked
-                                    Unknown - What to do in an unknown situation
-                                    """, false)
-                    .addField("**Note**", "If you mess up even once you will be fired and not receive any payouts. Make sure you read and follow all directions", false);
-        }
+    /**
+     * Embed to show staff a list of different directions
+     */
+    public static final EmbedBuilder DIRECTIONS = new EmbedBuilder()
+                .setTitle("**__Directions__**")
+                .setDescription("Directions Category. Use this with the /directions (category): Command")
+                .addField("**Tickets Direction List:**",
+                        """
+                                ClaimTicket - How to claim a ticket as a staff member
+                                SendOrder - How to send a user an order
+                                FraudulentCheck - How to verify an order/What to check for
+                                Replacements - How to send replacements
+                                Unknown - What to do in an unknown situation
+                                """,
+                        false)
+                .addField("**Order Issue Directions List**",
+                        """
+                                UnbannedProductIssue - How to deal with issue with unbanned products
+                                MinecraftMFAIssue - How to deal with issues with Minecraft MFA
+                                Unknown - What to do in an unknown situation
+                                """,
+                        false)
+                .addField("**General Direction List**",
+                        """
+                                ChatModeration - How to moderate chat
+                                GeneralQuestions - What to do when a ticket about a general question is asked
+                                Unknown - What to do in an unknown situation
+                                """, false)
+                .addField("**Note**", "If you mess up even once you will be fired and not receive any payouts. Make sure you read and follow all directions", false);
 
-    },
-
-    CLAIMTICKET{
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-                    .setTitle("**How to Claim Ticket**")
+    /**
+     * Embed to show staff how to claim a ticket
+     */
+    public static final EmbedBuilder CLAIM_TICKET = new EmbedBuilder()
+                    .setTitle("**__How to Claim Ticket__**")
                     .setDescription("When a user creates a ticket you will be able to claim the ticket to get paid for it")
                     .addField("**How?**", "Run the command /claim which will assign the ticket to you", false);
-        }
-    },
 
-    SENDORDER{
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-                    .setTitle("**How to Send Order**")
+    /**
+     * Embed to show staff how to send an order
+     */
+    public static final EmbedBuilder SEND_ORDER = new EmbedBuilder()
+                    .setTitle("**__How to Send Order__**")
                     .setDescription("Directions on steps to take before and while sending an order")
                     .addField("**How?**", """
                             **1** - Log into stripe and copy and paste the order ID into the Stripe dashboard
@@ -393,15 +333,12 @@ public enum Embeds {
                             **5** - The command is /send <ORDERID> <MEMBER>
                             **MAKE SURE THE MEMBER IS THE ONE PINGED INSIDE THE ORDER DETAILS MESSAGE.** There can be two people with the same name.
                             """, false);
-        }
-    },
 
-    FRAUDULENTCHECK{
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-                    .setTitle("**How to check if an order is fraudulent**")
+    /**
+     * Embed to show staff how to check if an order is potentially fraudulent
+     */
+    public static final EmbedBuilder FRAUDULENT_CHECK = new EmbedBuilder()
+                    .setTitle("**__How to check if an order is fraudulent__**")
                     .setDescription("How to check if an order is potentially fraudulent. **ONLY** check for the four things listed. Do **NOT** check fraud score")
                     .addField("**What to check for**",
                             """
@@ -416,107 +353,81 @@ public enum Embeds {
                         - "Number of cards previously associated with this device ID (last 7 days)" >= 3
                         - "Checkout behavior" - If (Card Number/Expiration Date/CVC) = "Pasted"
                         **3** - Make sure the last 4 digits in the card match
-                        **4** - If the customer doesn't send a picture of their card tell them they have to wait for Mythik and ping me
-                """, false);
-        }
-    },
+                        **4** - If the customer doesn't send a picture of their card tell them they have to wait for Mythik and ping me""", false);
 
-    REPLACEMENTS{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                    .setTitle("**How to send replacements**")
-                    .setDescription("As of now this is only available for Mythik");
-        }
-    },
+    /**
+     * Embed to show staff how to send replacements
+     */
+    public static final EmbedBuilder REPLACEMENTS = new EmbedBuilder()
+        .setTitle("**__How to send replacements__**")
+        .setDescription("As of now this is only available for Mythik");
 
-    UNKNOWN{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                    .setTitle("**Directions Not Listed?**")
-                    .setDescription("Stop whatever you're doing. Let Mythik know what the situation is. Don't do anything else");
-        }
-    },
+    /**
+     * Embed to show staff what to do in an unknown situation
+     */
+    public static final EmbedBuilder UNKNOWN = new EmbedBuilder()
+            .setTitle("**__Directions Not Listed?__**")
+            .setDescription("Stop whatever you're doing. Let Mythik know what the situation is. Don't do anything else");
 
-    UNBANNEDPRODUCTISSUE{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
-                .setTitle("**Issue with Unbanned Product**")
-                .setDescription("How to deal with inquiries related to Unbanned Products")
+    /**
+     * Embed to show staff how to deal with an issue with unbanned products
+     */
+    public static final EmbedBuilder UNBANNED_PRODUCT_ISSUE = new EmbedBuilder()
+                .setTitle("**__Issue with Unbanned Product__**")
+                .setDescription("Dealing with inquiries related to Unbanned Products")
                     .addField("**Steps:**",
                             """
-                            **1** - First run the command /openticket <MEMBER> and make sure that you know the exact problem.
-                                - Example: Is it a login issue? A Banned Issue?
-                            **2** - Make sure it isn't passed the warranty. 24 hours for all products except MFAs
-                                - If it passed the warranty, tell the customer "Sorry it has passed your warranty and we can't do anything about this".
-                                *Don't do anything else after that, tell the customer to wait for Mythik to get on if they rant*   
-                            **3** - Make sure they're logging in with the right mode
-                                - Example: If the product is a migrated account, make sure they're using Microsoft Login and same for Mojang
-                                - If the account really doesn't login or requires migration, ping Mythik and tell the customer they needs to wait for Mythik.
-                            **4** - If it's a ban issue make sure the customer didn't get the account banned
-                                - If it is a security ban, go to https://plancke.io and search up the username of the account
+                            **1** - Run /openticket and figure out the exact problem.
+                            **2** - Check if warranty is passed
+                            **3** - Make sure they're logging in with the right mode (Microsoft/Mojang)
+                            **4** - Ban issue: Confirm the customer didn't get the account banned
+                                - Go to https://plancke.io and lookup the username
                                 - Check the last login and if it is after the customer purchased tell them
-                                    "It looks like the account was security banned after you purchased. This usually means that your IP was marked as suspicious by Hypixel
-                                    We're sorry, but we cannot provide any replacements for this. However, we recommend using Vypr VPN to avoid this in the future"
+                                    "It looks like the account was banned after you purchased. This usually means that your IP was marked as suspicious by Hypixel
+                                    Unfortunately, but we cannot replacements for this. However, we recommend using Vypr VPN to avoid this in the future"
                                 - If the account was last logged in before their purchase then ping Mythik and tell the customer they need to wait for Mythik. 
-                            **5** - If the alts sent to the customer is blank that means there was no stock as the time the product was sent and tell them to wait for Mythik    
+                            **5** - If the alts sent to the customer is blank there was no stock at the time the product was sent and tell them to wait for Mythik    
                             """,
                             false);
-        }
-    },
 
-    MINECRAFTMFAISSUE
-    {
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-                .setTitle("**Issue with MFA**")
+    /**
+     * Embed to show staff how to deal with issues about a MFA
+     */
+    public static final EmbedBuilder MINECRAFT_MFA_ISSUE = new EmbedBuilder()
+                .setTitle("**__Issue with MFA__**")
                 .setDescription("How to deal with inquiries related to Minecraft MFAs")
                 .addField("**Steps**",
                         """
                             **1** - First run the command /openticket <MEMBER> and make sure that you know the exact problem.
-                            **2** - Make sure it isn't passed the warranty. 24 hours for all products except MFAs
-                                - If it passed the warranty, tell the customer "Sorry it has passed your warranty and we can't do anything about this".
-                                *Don't do anything else after that, tell the customer to wait for Mythik to get on if they rant*
+                            **2** - Check if warranty is passed
                             **3** - If the account doesn't sign into the email
                                 - Make sure they're signing into the right email. Ask them to send **only** the email of the account and check which domain it is
                                 - Make sure they're entering the right information. The format is usually email:emailPassword - <Additional Information>
                                 - If they're doing everything correct, ping Mythik and tell the customer to wait
                             **4** - No emails from Mojang
-                                - Ask the customer for the login details and sign into the account and verify that there are no emails from Mojang. If this is true, ping Mythik and tell the customer to wait
+                                - Ask the customer for the login details and sign into the account and verify that there are no emails from Mojang
                             **5** - Email can't be moved
                                 - Tell the customer to migrate the account to microsoft and watch the video on how to change the email for Microsoft accounts
                                 """, false);
-        }
-    },
 
-    CHATMODERATION
-    {
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
-               .setTitle("**How to moderation chat**")
-                    .setDescription("What to look for and how to moderation chat")
-                    .addField("**Steps**",
-                            """
-                                    **1** - Is the chat being auto-nuked every 30 minutes? If not run the /autonuke Minutes: 30 command in the channel
-                                    **2** - Check if anyone is breaking any rules. If they are pinging then warn them. If it is any other rule breaking, mute them and delete their message.
-                                    **3** - If anyone needs help then tell them to create a ticket 
-                                    **4** - Make sure everyone is using the channels according to their purchase.
-                                    """, false);
-        }
-    },
+    /**
+     * Embed to show staff how to moderate chat
+     */
+    public static final EmbedBuilder CHAT_MODERATION = new EmbedBuilder()
+                .setTitle("**How to moderation chat**")
+                .setDescription("What to look for and how to moderation chat")
+                .addField("**Steps**",
+                        """
+                                **1** - Is the chat being auto-nuked every 30 minutes? If not run the /autonuke Minutes: 30 command in the channel
+                                **2** - Check if anyone is breaking any rules. If they are pinging then warn them. If it is any other rule breaking, mute them and delete their message.
+                                **3** - If anyone needs help then tell them to create a ticket 
+                                **4** - Make sure everyone is using the channels according to their purchase.
+                                """, false);
 
-    GENERALQUESTIONS
-    {
-        @Override
-        public EmbedBuilder getEmbed()
-        {
-            return new EmbedBuilder()
+    /**
+     * Embed to show staff how to moderate chat
+     */
+    public static final EmbedBuilder GENERAL_QUESTIONS = new EmbedBuilder()
                     .setTitle("**General Question Tickets**")
                     .setDescription("How to deal with general tickets")
                     .addField("**How to respond**",
@@ -525,64 +436,52 @@ public enum Embeds {
                                     **2** - Tell the customer to read FAQ if that doesn't work then let them ask the question
                                     **3** - Use common sense to answer the question. If you don't know the answer ping Mythik and tell the customer to wait for Mythik to respond
                                     """, false);
-        }
-    },
 
-    // Moderation
-    KICK{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+
+    /**
+     * Embed to tell a user they got kicked
+     */
+    public static final EmbedBuilder KICK = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
                 .setDescription("You have been **KICKED**!")
                 .setFooter("Better Alts Moderation");
-        }
-    },
 
-    WARNING{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they received a warning
+     */
+    public static final EmbedBuilder WARNING = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
                 .setDescription("You have been **WARNED!**")
                 .setFooter("Better Alts Moderation");
-        }
-    },
 
-    MUTE{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they got muted
+     */
+    public static final EmbedBuilder MUTED = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
                 .setDescription("You have been **MUTED**!")
                 .setFooter("Better Alts Moderation");
-        }
-    },
 
-    UNMUTE{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they got unmuted
+     */
+    public static final EmbedBuilder UNMUTED = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
                 .setDescription("You have been **UNNMUTED**!")
                 .setFooter("Better Alts Moderation");
-        }
-    },
 
-    BAN{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they got banned
+     */
+    public static final EmbedBuilder BANNED = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
                 .setDescription("You have been **BANNED**!")
                 .setFooter("Better Alts Moderation");
-        }
-    },
 
-    ALTDETECTION{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they got detected as an alt
+     */
+    public static final EmbedBuilder ALT_DETECTION = new EmbedBuilder()
                 .setTitle("Better Alts Security")
                 .setColor(Color.BLACK)
                 .setDescription("""
@@ -590,23 +489,19 @@ public enum Embeds {
                         You will be able to join in 24 hours
                         """)
                 .setFooter("Better Alts Security");
-        }
-    },
 
-    // Generator
-    GENSUCCESS{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+
+    /**
+     * Embed to tell a user they successfully generated an alt
+     */
+    public static final EmbedBuilder GEN_SUCCESS = new EmbedBuilder()
                 .setTitle("**Better Alts Account Gen**")
                 .setDescription("Unbanned NFA sent to your DMs! Enjoy :)");
-        }
-    },
 
-    GENFAIL{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+    /**
+     * Embed to tell a user they could not generate an alt and how to
+     */
+    public static final EmbedBuilder GEN_FAILURE = new EmbedBuilder()
                 .setTitle("**Better Alts Account Gen**")
                 .setDescription("""
                         You do not have permissions to run this command!
@@ -616,18 +511,15 @@ public enum Embeds {
                         $50 for the gen needed! Make a ticket for this!
                         *If you paid then make a ticket and send order ID*""")
                 .setColor(Color.RED);
-        }
-    },
 
-    GENERATOR{
-        @Override
-        public EmbedBuilder getEmbed() {
-            return new EmbedBuilder()
+
+    /**
+     * Embed that is sent to the user when they generate an alt
+     */
+    public static final EmbedBuilder GENERATOR = new EmbedBuilder()
                 .setTitle("**Better Alts Account Gen**")
                 .setDescription("Unbanned NFA/SFA")
                 .setFooter("Better Alts Account Gen");
-        }
-    };
 
     /**
      * Send a private message with a specified embed to a member
@@ -644,6 +536,8 @@ public enum Embeds {
             embedBuilder.addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
                     .addField("**Store**", "https://betteralts.com", false);
         }
+
+        member.getUser().openPrivateChannel().complete().getId();
 
         member.getUser().openPrivateChannel().flatMap(privateChannel ->
             privateChannel.sendMessageEmbeds(embedBuilder.build())
@@ -667,6 +561,4 @@ public enum Embeds {
 
         textChannel.sendMessageEmbeds(embedBuilder.build()).queue();
     }
-
-    public abstract EmbedBuilder getEmbed();
 }

@@ -4,11 +4,11 @@ import Bot.BotProperty;
 import Bot.CustomTime;
 import Bot.Embeds;
 import Bot.SQLConnection;
+import CustomObjects.CustomMember;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,14 +25,16 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         BotProperty botProperty = new BotProperty();
 
         System.out.println("[Log] User Joined: " + event.getMember().getUser().getName());
-        Member member = event.getMember();
+
+        CustomMember customMember = new CustomMember(event.getJDA(), event.getMember().getId(), event.getGuild().getId());
+
+        Member member = customMember.getMember();
+
         Guild guild = event.getGuild();
 
         Statement statement = SQLConnection.getStatement();
 
         SQLConnection.addDefaultUser(guild, member);
-
-        // User Joins
 
         // View Current invites in the guild
         List<Invite> invites = guild.retrieveInvites().complete();
@@ -44,6 +45,8 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         {
             invitesHashMap.put(invite.getCode(), invite);
         }
+
+        event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
 
         try {
             PreparedStatement getInvitesQuery = statement.getConnection().prepareStatement("SELECT * FROM Invites");
@@ -93,7 +96,7 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         // Check if the account is an alt. 86400 epoch seconds = 1 day.
         if(createdMinusJoinedEpochSeconds < 12000 || member.getUser().getName().toLowerCase().contains("NFT"))
         {
-            Embeds.sendEmbed(Embeds.ALTDETECTION.getEmbed(), member, true);
+            customMember.sendPrivateMessage(Embeds.ALT_DETECTION);
 
             event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById("934749962057699339")).queue();
         }

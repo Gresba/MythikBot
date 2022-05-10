@@ -1,8 +1,12 @@
 package Events;
 
+import Bot.SQLConnection;
+import CustomObjects.CustomChannel;
+import CustomObjects.CustomMember;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -30,16 +34,22 @@ public class ModalInteractionEvent extends ListenerAdapter {
         // Declaring regular variables
         Statement statement = getStatement();
 
+        CustomChannel customChannel = new CustomChannel(event.getJDA(), event.getTextChannel().getId());
+
         TextChannel channel = event.getTextChannel();
 
-        Member member = event.getMember();
-
         Guild guild = event.getGuild();
+
+        JDA jda = event.getJDA();
+
+        CustomMember member = new CustomMember(jda, event.getMember().getId(), guild.getId());
+        CustomMember guildOwner = new CustomMember(jda, "639094715605581852", guild.getId());
+
         // Checking if the modal is either for a replacement or claiming order
         if (event.getModalId().equals("claim-order-modal") || event.getModalId().equals("replacement-modal"))
         {
             // Getting the order ID
-            String orderId = event.getValue("order-id").getAsString();
+            String orderId = event.getValue("order-id").getAsString().strip();
 
             // Connecting to shoppy
             ShoppyConnection shoppyConnection = new ShoppyConnection();
@@ -51,9 +61,9 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                 // If the order is for claiming an order
                 if (event.getModalId().equals("claim-order-modal")){
+
                         // If the payment method is crypto then just send the product
-                        System.out.println(order.requiresVerification(member, order.getGateway()));
-                        if (!order.requiresVerification(member, order.getGateway())) {
+//                        if (!order.requiresVerification(member, order.getGateway())) {
                             try {
                                 java.util.Date date = new java.util.Date();
                                 java.sql.Date sqlDate = new java.sql.Date(date.getTime());
@@ -61,12 +71,16 @@ public class ModalInteractionEvent extends ListenerAdapter {
                                 // Insert the order into the database so the same order cannot be claimed twice
                                 PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
                                 insertOrder.setString(1, orderId);
-                                insertOrder.setString(2, member.getId());
+                                insertOrder.setString(2, member.getMember().getId());
                                 insertOrder.setDate(3, sqlDate);
                                 insertOrder.executeUpdate();
 
-                                order.sendProductInformation(orderId, member, channel, guild, 0);
-                                event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getAsMention()).queue();
+                                String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
+
+                                member.sendProduct(orderId, accounts);
+                                guildOwner.sendProduct(orderId, accounts);
+
+                                event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                             } catch (IOException | InterruptedException e) {
                                 channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
                                 e.printStackTrace();
@@ -81,10 +95,10 @@ public class ModalInteractionEvent extends ListenerAdapter {
                                 event.reply("**[ERROR]** There was an issue with registering the order to the database").queue();
                                 e.printStackTrace();
                             }
-                        }
+//                        }
 
                         productDescriptionEmbed
-                                .addField("**User**", member.getAsMention(), false)
+                                .addField("**User**", member.getMember().getAsMention(), false)
                                 .addField("**What to do now**", """
                                         First, thank you for choosing Better Alts!
                                         
@@ -100,7 +114,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     String replacementReason = event.getValue("replacement-reason").getAsString();
 
                     productDescriptionEmbed
-                        .addField("**User**", member.getAsMention(), false)
+                        .addField("**User**", member.getMember().getAsMention(), false)
                         .addField("**Replacement Amount**", replacementAmount, false)
                         .addField("**Replacement Reason**", replacementReason, false)
                         .addField("**What to do now**", """
@@ -114,6 +128,8 @@ public class ModalInteractionEvent extends ListenerAdapter {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e) {
+                event.getHook().sendMessage("That is not a valid order ID. Please put in just your order id.").queue();
             }
         }else if(event.getModalId().equals("purchase-modal")){
             String purchaseItemName = event.getValue("purchase-item-name").getAsString();
@@ -150,23 +166,27 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                 channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
             }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
-                channel.sendMessage(member.getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
+                channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
             }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){
-                channel.sendMessage(member.getAsMention() + " we do not accept paysafe card as a payment method! Close the ticket when you see this.").queue();
+                channel.sendMessage(member.getMember().getAsMention() + " we do not accept paysafe card as a payment method! Close the ticket when you see this.").queue();
             }
         }else if(event.getModalId().equals("sponsorship-partnership")){
             String email = event.getValue("email").getAsString();
             String channelLink = event.getValue("channel-link").getAsString();
             String discordLink = event.getValue("discord-link").getAsString();
+            String sponsorshipService = event.getValue("sponsorship-service").getAsString();
+            String sponsorshipPayment = event.getValue("sponsorship-payment").getAsString();
 
             EmbedBuilder partnershipEmbed = new EmbedBuilder()
                     .setTitle("**Sponsorship/Partnership Application**")
-                    .setAuthor(member.getUser().getAsTag())
+                    .setAuthor(member.getMember().getUser().getAsTag())
                     .setColor(Color.CYAN)
-                    .addField("**User**", member.getAsMention(), false)
+                    .addField("**User**", member.getMember().getAsMention(), false)
                     .addField("**Email**", email, false)
                     .addField("**Youtube Channel Link**", channelLink, false)
-                    .addField("**Discord Channel Link**", discordLink, false);
+                    .addField("**Discord Channel Link**", discordLink, false)
+                    .addField("**Service**", sponsorshipService, false)
+                    .addField("**Payment**", sponsorshipPayment, false);
             event.getHook().editOriginalEmbeds(partnershipEmbed.build()).queue();
         }
     }

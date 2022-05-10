@@ -9,7 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ShoppyConnection {
-    private final String ShoppyAPIKey;
+    private static final String ShoppyAPIKey;
 
     private static HttpClient client;
 
@@ -17,14 +17,13 @@ public class ShoppyConnection {
 
     private static HttpRequest request;
 
-    public ShoppyConnection() {
+    static {
         ShoppyAPIKey = System.getenv("SHOPPY_API_KEY");
         client = HttpClient.newHttpClient();
-
         domainURL = "https://shoppy.gg/api/v1/";
     }
 
-    public ShoppyOrder getShoppyOrder(String iD) throws IOException, InterruptedException {
+    public static ShoppyOrder getShoppyOrder(String iD) throws IOException, InterruptedException {
         try {
             request = HttpRequest.newBuilder()
                     .GET()
