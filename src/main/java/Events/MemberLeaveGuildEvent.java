@@ -28,5 +28,15 @@ public class MemberLeaveGuildEvent extends ListenerAdapter {
         joinEmbed.setFooter("Member ID: " + member.getId());
 
         botProperty.storeLog(event.getJDA(), joinEmbed, "Left");
+
+        // Check the inviter associated with the user and decrement the count of that user in the database
+            // Get the inviter of the user
+
+            // Get the inviters invite count
+
+            // Decrement the ivnite count
+
+            // Assign the new value into the database
+
     }
 }

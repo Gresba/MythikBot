@@ -125,7 +125,6 @@ public class SQLConnection {
 
         // Execute the query
         updateMuteQuery.executeUpdate();
-
     }
 
     /**

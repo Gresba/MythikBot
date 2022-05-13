@@ -39,6 +39,7 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         // View Current invites in the guild
         List<Invite> invites = guild.retrieveInvites().complete();
 
+        // Put all the current invites into a hashMap
         HashMap<String, Invite> invitesHashMap = new HashMap<>();
 
         for (Invite invite: invites)
@@ -49,14 +50,19 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
 
         try {
+            // Get all the invites from the database
             PreparedStatement getInvitesQuery = statement.getConnection().prepareStatement("SELECT * FROM Invites");
+
+            // Loop through the invites
             ResultSet savedInvites = getInvitesQuery.executeQuery();
             while(savedInvites.next())
             {
                 String inviteCode = savedInvites.getString(1);
 
+                // If the invite from the database is not in the hashmap remove it from the database because it means the invite expired
                 if(!invitesHashMap.containsKey(inviteCode))
                 {
+                    // Build a query to delete the invite from the db
                     PreparedStatement removeInviteQuery = statement.getConnection().prepareStatement("DELETE FROM Invites WHERE Code = ?");
 
                     removeInviteQuery.setString(1, inviteCode);
@@ -70,9 +76,14 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
 
                     if(inviteCount > savedInviteUses)
                     {
-                        // UPDATE COUNT FOR THE USER
+                        // Get the invite count of the user associated with that invite code.
 
-                        // UPDATE the invite count
+                        // Increment that count
+
+                        // Update the invite count for the user associated with that invite
+
+                        // Set the uses for that invite code to the new invite
+
                     }
                 }
             }
