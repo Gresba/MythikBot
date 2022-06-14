@@ -12,13 +12,7 @@ public class ReactionEvent extends ListenerAdapter {
         if(event.getMember() == null)
             return;
 
-        if(event.getMessageId().equals("934736207701762088"))
-        {
-            if(event.getReactionEmote().getEmoji().equals("✅"))
-            {
-                event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
-            }
-        }else if(event.getMessageId().equals("938330535145635861")) {
+        if(event.getMessageId().equals("938330535145635861")) {
             Role role = null;
             // MFA
             if(event.getReactionEmote().getEmoji().equals("\uD83D\uDCE7"))

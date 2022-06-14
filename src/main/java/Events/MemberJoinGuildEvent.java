@@ -73,17 +73,24 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
 
                     int inviteCount = invite.getUses();
                     int savedInviteUses = savedInvites.getInt(2);
-
                     if(inviteCount > savedInviteUses)
                     {
-                        // Get the invite count of the user associated with that invite code.
+                        String inviterId = invite.getInviter().getId();
 
+                        // Get the invite count of the user associated with that invite code.
                         // Increment that count
+
+                        String incrementInviterInviteCount = "Update Users SET Invites = Invites + 1 WHERE MemberID = '" + inviterId + "'";
+
+                        String incrementInviteCodeCounter = "UPDATE Invites SET InviteCount = InviteCount + 1 WHERE Code = '" + inviteCode + "'";
+                        statement.executeUpdate(incrementInviterInviteCount);
+                        statement.executeUpdate(incrementInviteCodeCounter);
 
                         // Update the invite count for the user associated with that invite
 
                         // Set the uses for that invite code to the new invite
-
+                        String updateUserInviter = "UPDATE Users SET Inviter = '" + inviterId + "' WHERE MemberId = '" + member.getId() + "'";
+                        statement.executeUpdate(updateUserInviter);
                     }
                 }
             }

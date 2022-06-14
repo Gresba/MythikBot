@@ -10,8 +10,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class MessageAutoResponse extends ListenerAdapter {
@@ -31,19 +35,59 @@ public class MessageAutoResponse extends ListenerAdapter {
 
         TextChannel channel = event.getTextChannel();
 
-        String[] messageArr = messageString.split(" ");
+        String[] messageArr = messageString.split("/");
 
-        if(member.getId().equalsIgnoreCase("639094715605581852"))
+        Statement statement = SQLConnection.getStatement();
+
+        if(member.getId().equalsIgnoreCase("976956826472050689"))
         {
             if(messageArr[0].equalsIgnoreCase("m!editEmbed"))
             {
-                channel.retrieveMessageById("934736207701762088").complete().editMessageEmbeds(Embeds.RULES.build()).setActionRow(
+                guild.getTextChannelById("953923167305465916").retrieveMessageById("953923565894402048").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
+                guild.getTextChannelById("934489170456494161").retrieveMessageById("934736207701762088").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
+            }else if(messageArr[0].equals("m!loadInvites1")){
+                System.out.println("Invitesfeasfd");
+                guild.retrieveInvites().queue(
+                        invites ->
+                        {
+                            String query = "INSERT INTO Invites (Code, InviteCount, MemberID) VALUES";
 
-                ).queue();
-            }else if(messageArr[0].equalsIgnoreCase("m!addUser")){
-                Member target_member = message.getMentionedMembers().get(0);
+                            for (Invite invite: invites)
+                            {
+                                query += "('" + invite.getCode() + "', " + invite.getUses() + ", '" + invite.getInviter().getId() + "'),";
+                            }
+                            query = query.substring(0, query.length() - 1) + ";";
+                            try {
+                                statement.executeUpdate(query);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
+            }else if(messageArr[0].equalsIgnoreCase("m!test")){
 
-                SQLConnection.addDefaultUser(guild, target_member);
+                Calendar calendar = Calendar.getInstance();
+                java.util.Date date = calendar.getTime();
+                long time = date.getTime();
+
+                // Insert the order into the database so the same order cannot be claimed twice
+                PreparedStatement insertOrder = null;
+                try {
+                    Timestamp timestamp = new Timestamp(time);
+                    System.out.println(calendar.getTimeInMillis());
+                    insertOrder = statement.getConnection().prepareStatement("INSERT INTO Test VALUES (?)");
+                    insertOrder.setTimestamp(1, timestamp);
+                    insertOrder.executeUpdate();
+
+                    PreparedStatement statement1 = statement.getConnection().prepareStatement("SELECT * FROM Test");
+                    ResultSet result = statement1.executeQuery();
+                    while(result.next())
+                    {
+                        System.out.println(result.getTimestamp(1).getTime());
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

@@ -1,9 +1,11 @@
 package BotCommands;
 
+import Bot.BotProperty;
 import Bot.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomMember;
 import Shoppy.ShoppyOrder;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,10 +16,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class OwnerSlashCommand extends ListenerAdapter {
     @Override
@@ -26,14 +30,9 @@ public class OwnerSlashCommand extends ListenerAdapter {
         if (!event.getChannelType().isGuild() || event.getMember() == null)
             return;
         Guild guild = event.getGuild();
-
         JDA jda = event.getJDA();
-
         Member sender = event.getMember();
-
-        TextChannel channel = event.getTextChannel();
-        CustomMember guildOwner = new CustomMember(jda, "639094715605581852", guild.getId());
-
+        CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getServerOwnerId(), guild.getId());
         Statement statement = SQLConnection.getStatement();
 
         // If the sender is the bot then exit
@@ -41,7 +40,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
             return;
 
         // If the send contains the role "Owner" then allow them to use this command
-        if (sender.getRoles().contains(guild.getRoleById("938989740177383435"))) {
+        if (sender.getId().equalsIgnoreCase(guildOwner.getMember().getId())) {
             event.deferReply().queue();
 
             switch (event.getName()) {
@@ -49,32 +48,38 @@ public class OwnerSlashCommand extends ListenerAdapter {
                 // UPLOAD a product into the database
                 case "upload" -> {
                     String accountType = event.getOption("account_type").getAsString();
-
-                    Scanner inputFile = null;
                     try {
-                        inputFile = new Scanner(new File("input.txt"));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    String query = "INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES";
-                    int accountNumber = 1;
+                        File inputFile = event.getOption("input_file").getAsAttachment().downloadToFile().get();
+                        Scanner input = new Scanner(inputFile);
 
-                    // Build the query
-                    while (inputFile.hasNext()) {
-                        String accountInfo = inputFile.nextLine();
-                        System.out.println("Account Number " + accountNumber + ": " + accountInfo);
+                        String query = "INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES";
+                        int accountNumber = 0;
 
-                        query += "('" + accountInfo + "', '" + accountType + "', '" + guild.getId() + "'),";
-                        accountNumber++;
-                    }
+                        // Build the query
+                        while (input.hasNext()) {
+                            String accountInfo = input.nextLine();
+                            System.out.println("Account Number " + accountNumber + ": " + accountInfo);
 
-                    // Replace the last character ',' with a ';'
-                    query = query.substring(0, query.length() - 1) + ";";
+                            query += "('" + accountInfo + "', '" + accountType + "', '" + guild.getId() + "'),";
+                            accountNumber++;
 
-                    // Execute the query to upload the alts. Let the user know if it was successful
-                    try {
+                            // Replace the last character ',' with a ';'
+                            query = query.substring(0, query.length() - 1) + ";";
+                        }
+
+                        inputFile.delete();
+
                         statement.executeUpdate(query);
-                        event.getHook().sendMessage(accountType + " successfully uploaded!").setEphemeral(true).queue();
+                        event.getHook().sendMessage(accountNumber + " " + accountType + " successfully uploaded!").setEphemeral(true).queue();
+                    } catch (InterruptedException e) {
+                        event.getHook().sendMessage("**[ERROR]** Interrupted exception").setEphemeral(true).queue();
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        event.getHook().sendMessage("**[ERROR]** Execution exception").setEphemeral(true).queue();
+                        e.printStackTrace();
+                    } catch (FileNotFoundException e) {
+                        event.getHook().sendMessage("**[ERROR]** File not found exception").setEphemeral(true).queue();
+                        e.printStackTrace();
                     } catch (SQLException e) {
                         event.getHook().sendMessage("**[ERROR]** Accounts could not be uploaded").setEphemeral(true).queue();
                         e.printStackTrace();
@@ -83,8 +88,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
                 // REPLACE an order
                 case "replace" -> {
-                    ShoppyOrder shoppyOrder = new ShoppyOrder();
-
                     String orderID = event.getOption("order_id").getAsString();
                     CustomMember member = new CustomMember(jda, event.getOption("target_user").getAsMember().getId(), guild.getId());
                     int replacementAmount = (int) event.getOption("replacement_amount").getAsLong();
@@ -205,7 +208,8 @@ public class OwnerSlashCommand extends ListenerAdapter {
                 // SCANFILE scan a file
                 case "scanfile" -> {
                     // The path of the file
-                    File folder = new File("C:\\Users\\paulk\\Downloads\\2022-04-02_20-18-38\\2022-04-02_20-18-38\\2022-04-02 20-18-38\\Capture");
+                    String filePath = event.getOption("filepath").getAsString();
+                    File folder = new File(filePath);
                     File[] listOfFiles = folder.listFiles();
 
                     try {
@@ -225,6 +229,44 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         event.getHook().sendMessage("There was an issue with scanning the files").setEphemeral(true).queue();
                         e.printStackTrace();
                     }
+                }
+
+                //
+                case "orderdetails" -> {
+                    String orderId = event.getOption("order_id").getAsString();
+                    Member member = event.getOption("target_member").getAsMember();
+
+                    // Open DMs with the user
+                    guild.getMemberById(member.getId()).getUser().openPrivateChannel().queue(
+                            privateChannel -> {
+
+                                // Get the amount of messages
+                                privateChannel.getHistory().retrievePast(100).queue(
+                                    messages -> {
+
+                                        // Delete and print the accounts
+                                        for (Message msg : messages) {
+                                            if(msg.getEmbeds().get(0).getFields().get(0).getValue().equalsIgnoreCase(orderId))
+                                            {
+                                                System.out.println(msg.getEmbeds().get(0).getFields().get(1).getValue());
+
+                                                EmbedBuilder embedBuilder = new EmbedBuilder()
+                                                        .setTitle("Retrieved Order")
+                                                                .addField("Order ID", orderId, false)
+                                                                        .addField("Alts", msg.getEmbeds().get(0).getFields().get(1).getValue(), false);
+                                                guildOwner.sendPrivateMessage(
+                                                        embedBuilder
+                                                );
+
+                                                event.getHook().sendMessage("Got order").setEphemeral(true).queue();
+                                            }
+                                        }
+                                    }
+                                );
+                            }
+                    );
+
+                    event.getHook().sendMessage("Failed to get order").setEphemeral(true).queue();
                 }
             }
         } else {

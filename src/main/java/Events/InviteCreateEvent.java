@@ -22,6 +22,7 @@ public class InviteCreateEvent extends ListenerAdapter {
         User inviter = event.getInvite().getInviter();
 
         Invite invite = event.getInvite();
+        System.out.println("invite created: " + invite.getCode());
 
         try {
             PreparedStatement addInviteQuery = statement.getConnection().prepareStatement("INSERT INTO Invites VALUES (?, ?, ?)");
@@ -35,6 +36,5 @@ public class InviteCreateEvent extends ListenerAdapter {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        super.onGuildInviteCreate(event);
     }
 }

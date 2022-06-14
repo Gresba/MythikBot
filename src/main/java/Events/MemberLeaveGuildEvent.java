@@ -1,6 +1,7 @@
 package Events;
 
 import Bot.BotProperty;
+import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MemberLeaveGuildEvent extends ListenerAdapter {
     @Override
@@ -30,9 +33,25 @@ public class MemberLeaveGuildEvent extends ListenerAdapter {
         botProperty.storeLog(event.getJDA(), joinEmbed, "Left");
 
         // Check the inviter associated with the user and decrement the count of that user in the database
-            // Get the inviter of the user
+        String getInviterIDQuery = "SELECT Inviter FROM Users WHERE MemberId = '" + member.getId() + "'";
 
-            // Get the inviters invite count
+        // Get the inviter of the user
+
+        try {
+            ResultSet inviterIDResult = SQLConnection.getStatement().executeQuery(getInviterIDQuery);
+            String inviterId = "";
+            while (inviterIDResult.next())
+            {
+                inviterId = inviterIDResult.getString(1);
+            }
+
+            String incrementInviterInviteCount = "Update Users SET Invites = Invites - 1 WHERE MemberID = '" + inviterId + "'";
+
+            SQLConnection.getStatement().executeUpdate(incrementInviterInviteCount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Get the inviters invite count
 
             // Decrement the ivnite count
 

@@ -1,11 +1,13 @@
 package Bot;
 
 import BotCommands.*;
+import BotObjects.GuildObject;
 import Events.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -25,20 +27,21 @@ public class MythikBot {
     public static void main(String[] args) throws SQLException{
         Statement statement = getStatement();
 
-        String importGuilds = "SELECT GuildID FROM Guilds";
+        ResultSet guildInfo = SQLConnection.getGuildInfo();
 
-        ResultSet guildsResults = statement.executeQuery(importGuilds);
-
-        while(guildsResults.next())
+        // Loading the information about a guild
+        while(guildInfo.next())
         {
-            Statement statement2 = getStatement();
+            // Populating the data of the guild
+            String guildId = guildInfo.getString(1);
+            String guildPrefix = guildInfo.getString(2);
+            int guildTicketLimit = guildInfo.getInt(3);
+            String guildOwner = guildInfo.getString(4);
 
-            String guildId = guildsResults.getString(1);
+            GuildObject guildObject = new GuildObject(guildId, guildPrefix, guildTicketLimit, guildOwner);
 
-            String importGuildResponses = "SELECT * FROM Responses WHERE GuildId = '" + guildId + "'";
-            ResultSet responsesResults = statement2.executeQuery(importGuildResponses);
-
-            statement2.close();
+            // Adding the guild for future usage
+            BotProperty.guildsHashMap.put(guildId, guildObject);
         }
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("MYTHIK_BOT_API_KEY"))
@@ -59,17 +62,19 @@ public class MythikBot {
                 new ButtonClick(),
                 new UserSlashCommand(),
                 new ModalInteractionEvent(),
-                new OwnerSlashCommand()
+                new OwnerSlashCommand(),
+                new InviteCreateEvent()
                 );
 
         try {
 
-            jda = jdaBuilder.build();
+            jda = jdaBuilder.build().awaitReady();
             jda.getPresence().setStatus(OnlineStatus.ONLINE);
             jda.getPresence().setActivity(Activity.playing("/help for help"));
 
             CommandListUpdateAction commands = jda.updateCommands();
 
+            jda.getGuildById("929101421272510524").updateCommands();
             // USER accessible slash commands
             commands.addCommands(
                     Commands.slash("eth", "Get Mythik's Ethereum Address"),
@@ -96,6 +101,17 @@ public class MythikBot {
 
             // STAFF accessible commands
             commands.addCommands(
+                    // SEND_ALTS command
+                    Commands.slash("send_alts", "Send alts to a user")
+                            .addOptions(new OptionData(USER, "target_member", "The member to send the alts to")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "account_type", "The type of account to send")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(STRING, "order_id", "The order id associated with this order")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(INTEGER, "amount", "The amount to send")
+                                    .setRequired(true)),
+
                     // BAN command
                     Commands.slash("ban", "Ban a user from this server")
                             .addOptions(new OptionData(USER, "user", "The user to ban")
@@ -106,15 +122,15 @@ public class MythikBot {
                                     .setRequired(true)),
 
                     // MUTE command
-                    Commands.slash("mute", "Mute a user")
-                            .addOptions(new OptionData(USER, "user", "The user to mute")
+                    Commands.slash("timeout", "Timeout a user")
+                            .addOptions(new OptionData(USER, "user", "The user to timeout")
                                     .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the mute")
+                            .addOptions(new OptionData(STRING, "reason", "The reason for the timeout")
                                     .setRequired(true)),
 
                     // UNMUTE command
-                    Commands.slash("unmute", "Unmute a user")
-                            .addOptions(new OptionData(USER, "user", "The user to unmute")
+                    Commands.slash("untimeout", "Un-timeout a user")
+                            .addOptions(new OptionData(USER, "user", "The user to un-timeout")
                                     .setRequired(true)),
 
                     // KICK command
@@ -178,7 +194,9 @@ public class MythikBot {
 
                     // ADDUSER command
                     Commands.slash("add_user", "Add a user to the database")
-                            .addOptions(new OptionData(USER, "member", "The member to add to the database", true))
+                            .addOptions(new OptionData(USER, "member", "The member to add to the database", true)),
+
+                    Commands.slash("configure_server", "Configure the discord server")
             );
 
             // OWNER Slash Commands
@@ -186,6 +204,9 @@ public class MythikBot {
                     // GENERATETICKET command
                     Commands.slash("generateticket", "Generate a ticket in the channel you run this command."),
 
+                    Commands.slash("scanfile", "Scan")
+                            .addOptions(new OptionData(STRING, "filepath", "File path")
+                                    .setRequired(true)),
                     // REPLACE command
                     Commands.slash("replace", "Send replacements for an order")
                             .addOptions(new OptionData(STRING, "order_id", "The order ID")
@@ -205,6 +226,8 @@ public class MythikBot {
                     // UPLOAD command
                     Commands.slash("upload", "Upload a product to the database")
                             .addOptions(new OptionData(STRING, "account_type", "The type of product to upload")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(ATTACHMENT, "input_file", "The file with the products in it")
                                     .setRequired(true)),
 
                     // ADDRESPONSE command
@@ -232,12 +255,21 @@ public class MythikBot {
                     // REMOVEORDER command
                     Commands.slash("removeorder", "Remove an order from the database")
                             .addOptions(new OptionData(STRING, "order_id", "The order id to remove from the database")
+                                    .setRequired(true)),
+
+                    // ORDER_DETAILS commands
+                    Commands.slash("orderdetails", "Get the accounts already sent")
+                            .addOptions(new OptionData(STRING, "order_id", "The order id you want to retrieve the accounts for")
+                                    .setRequired(true))
+                            .addOptions(new OptionData(USER, "target_member", "The members DMs to access")
                                     .setRequired(true))
 
             );
 
+            jda.getGuildById("929101421272510524").updateCommands();
+
             commands.queue();
-        } catch (LoginException exception) {
+        } catch (LoginException | InterruptedException exception) {
             exception.printStackTrace();
         }
     }

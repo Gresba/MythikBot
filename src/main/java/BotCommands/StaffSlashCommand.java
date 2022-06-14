@@ -4,6 +4,7 @@ import Bot.BotProperty;
 import Bot.Embeds;
 import Bot.Response;
 import Bot.SQLConnection;
+import CustomObjects.CustomChannel;
 import CustomObjects.CustomMember;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
@@ -15,9 +16,14 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -40,7 +46,8 @@ public class StaffSlashCommand extends ListenerAdapter {
 
         Member sender = event.getMember();
 
-        TextChannel channel = event.getTextChannel();
+        CustomChannel channel = new CustomChannel(jda, event.getTextChannel().getId());
+        CustomMember guildOwner = new CustomMember(jda, "976956826472050689", guild.getId());
 
         Statement statement = SQLConnection.getStatement();
 
@@ -49,7 +56,48 @@ public class StaffSlashCommand extends ListenerAdapter {
         if (sender.getUser().isBot())
             return;
         if (sender.hasPermission(Permission.ADMINISTRATOR)) {
+
             switch (event.getName()) {
+                case "send_alts" -> {
+                    CustomMember target_member = new CustomMember(jda, Objects.requireNonNull(event.getOption("target_member")).getAsMember().getId(), guild.getId());
+                    String accountType = Objects.requireNonNull(event.getOption("account_type")).getAsString();
+                    int amount = Objects.requireNonNull(event.getOption("amount")).getAsInt();
+                    String orderId = Objects.requireNonNull(event.getOption("order_id")).getAsString();
+
+                    String accounts = SQLConnection.getProductByName(guild.getId(), accountType, amount);
+
+                    try {
+                        target_member.sendAlts(accounts, orderId, accountType);
+                        guildOwner.sendAlts(accounts, orderId, accountType);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    event.reply(target_member.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
+                }
+                case "configure_server" -> {
+                    TextInput prefix = TextInput.create("configure-prefix", "Bot Prefix", TextInputStyle.SHORT)
+                            .setPlaceholder("The prefix of all your command (Ex. !)")
+                            .build();
+                    TextInput ticketLimit = TextInput.create("configure-ticket-limit", "Ticket Limit", TextInputStyle.SHORT)
+                            .setPlaceholder("The max tickets a user can have at once (Ex. 1)")
+                            .setRequired(true)
+                            .build();
+                    TextInput serverOwnerId = TextInput.create("configure-server-owner", "Server Owner", TextInputStyle.SHORT)
+                            .setPlaceholder("The member id of the owner (Ex. 938989740177383435)")
+                            .setRequired(true)
+                            .build();
+
+                    // Create the modal and add the TextInputs
+                    Modal purchaseModal = Modal.create("configure-modal", "Configure Server")
+                            .addActionRows(
+                                    ActionRow.of(prefix),
+                                    ActionRow.of(ticketLimit),
+                                    ActionRow.of(serverOwnerId))
+                            .build();
+
+                    event.replyModal(purchaseModal).queue();
+                }
 
                 // BAN COMMAND CONTROLLER
                 case "ban" -> {
@@ -65,35 +113,6 @@ public class StaffSlashCommand extends ListenerAdapter {
                     banTarget.ban(banReason, delete_days);
                 }
 
-                // MUTE COMMAND CONTROLLER
-                case "mute" -> {
-
-                    // Get the values from the arguments passed in through the slash command
-                    CustomMember muteTarget = new CustomMember(jda, Objects.requireNonNull(event.getOption("user")).getAsMember().getId(), guild.getId());
-                    String muteReason = Objects.requireNonNull(event.getOption("reason")).getAsString();
-
-                    // Mute the user
-                    try {
-                        muteTarget.mute(muteReason);
-                        event.getHook().sendMessage(muteTarget.getMember().getAsMention() + " muted. **Reason:** " + muteReason).queue();
-                    } catch (SQLException e) {
-                        event.getHook().sendMessage("**[Error]** There was an issue with adding that mute to the database").queue();
-                        e.printStackTrace();
-                    }
-                }
-
-                // UNMUTE COMMAND CONTROLLER
-                case "unmute" -> {
-                    CustomMember muteTarget = new CustomMember(jda, Objects.requireNonNull(event.getOption("user")).getAsMember().getId(), guild.getId());
-
-                    try {
-                        muteTarget.mute(null);
-                        event.getHook().sendMessage(muteTarget.getMember().getAsMention() + " unmuted.").queue();
-                    } catch (SQLException e) {
-                        event.getHook().sendMessage("**[Error]** There was an issue with updating the unmute in the database").queue();
-                        e.printStackTrace();
-                    }
-                }
 
                 // KICK COMMAND CONTROLLER
                 case "kick" -> {
@@ -115,17 +134,15 @@ public class StaffSlashCommand extends ListenerAdapter {
                 // KICK COMMAND CONTROLLER
                 case "warn" -> {
                     // Get the values from the arguments passed in through the slash command
-                    Member warnTarget = event.getOption("user").getAsMember();
+                    CustomMember warnTarget = new CustomMember(jda, event.getOption("user").getAsMember().getId(), guild.getId());
                     String warnReason = event.getOption("reason").getAsString();
 
                     // Acknowledge the event
-                    event.reply(warnTarget.getAsMention() + " warned! **Reason:** " + warnReason).queue();
+                    event.reply(warnTarget.getMember().getAsMention() + " warned! **Reason:** " + warnReason).queue();
 
                     // Alert the user they got banned
-                    Embeds.sendEmbed(Embeds.WARNING, warnTarget, true);
+                    warnTarget.sendPrivateMessage(Embeds.WARNING);
 
-                    // Ban the user
-                    guild.kick(warnTarget, warnReason).queue();
                 }
 
                 case "addresponse" -> {
@@ -152,7 +169,7 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                         // Checking if the response trigger word is already in the database
                     } catch (SQLIntegrityConstraintViolationException e) {
-                        channel.sendMessage("**Error: ** That trigger word is already used! Use another one!").queue();
+                        channel.getChannel().sendMessage("**Error: ** That trigger word is already used! Use another one!").queue();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -182,7 +199,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                 case "openticket" -> {
                     event.deferReply().queue();
                     Member member = event.getOption("target_user").getAsMember();
-                    channel.upsertPermissionOverride(member)
+                    channel.getChannel().upsertPermissionOverride(member)
                             .setAllow(Permission.MESSAGE_SEND)
                             .setAllow(Permission.VIEW_CHANNEL)
                             .queue();
@@ -193,8 +210,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                 case "close" -> {
                     event.reply("Deleting ticket...").queue();
                     try {
-                        Embeds.sendEmbed(Embeds.TICKET_CLOSED, guild.getMemberById(channel.getTopic()), true);
-                        channel.delete().queue();
+                        channel.close();
                     } catch (IllegalArgumentException e) {
                         event.reply("Can't close this channel because it is not a ticket channel!").queue();
                     }
@@ -204,7 +220,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                 case "autonuke" -> {
                     event.deferReply().queue();
                     event.getHook().sendMessage("Auto Nuke Starting...").queue();
-                    final String[] channelId = {channel.getId()};
+                    final String[] channelId = {channel.getChannel().getId()};
                     Timer timer = new Timer();
                     int begin = 0;
                     int seconds = (int) event.getOption("minutes").getAsLong();
@@ -212,11 +228,12 @@ public class StaffSlashCommand extends ListenerAdapter {
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            String channelName = channel.getName();
-                            Category previousCategory = channel.getParentCategory();
+                            String channelName = channel.getChannel().getName();
+                            Category previousCategory = channel.getChannel().getParentCategory();
                             guild.getTextChannelById(channelId[0]).delete().queue();
                             guild.createTextChannel(channelName, previousCategory).queue(newChannel -> {
-                                Embeds.sendEmbed(Embeds.AUTO_NUKE, newChannel, true);
+                                CustomChannel channel = new CustomChannel(jda, newChannel.getId());
+                                channel.sendEmbed(Embeds.AUTO_NUKE);
                                 channelId[0] = newChannel.getId();
                                 System.out.println("[LOG] Channel Nuked");
                             });
@@ -226,9 +243,9 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                 // NUKE slash command to nuke a channel
                 case "nuke" -> {
-                    String channelName = channel.getName();
-                    Category previousCategory = channel.getParentCategory();
-                    channel.delete().queue();
+                    String channelName = channel.getChannel().getName();
+                    Category previousCategory = channel.getChannel().getParentCategory();
+                    channel.getChannel().delete().queue();
                     guild.createTextChannel(channelName, previousCategory).queue(newChannel -> {
                         newChannel.sendMessage("Channel has been nuked!").queue();
                     });
@@ -239,7 +256,6 @@ public class StaffSlashCommand extends ListenerAdapter {
                     // Get the options
                     String orderID = event.getOption("order_id").getAsString();
                     CustomMember targetMember = new CustomMember(jda, event.getOption("target_user").getAsMember().getId(), guild.getId());
-                    CustomMember guildOwner = new CustomMember(jda, "639094715605581852", guild.getId());
 
                     // Check if the admin is sending accounts to himself
                     if(!targetMember.getMember().getId().equalsIgnoreCase(event.getMember().getId())) {
@@ -262,7 +278,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                             event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
                             e.printStackTrace();
                         } catch (SQLIntegrityConstraintViolationException e) {
-                            channel.sendMessage(
+                            channel.getChannel().sendMessage(
                                     """
                                             **[Fraud Detection]** 
                                             Unable to send the product. The product was already claimed.
@@ -290,9 +306,8 @@ public class StaffSlashCommand extends ListenerAdapter {
                     } catch (NullPointerException e){
                         event.getHook().sendMessage("That order id does not exist!").queue();
                         e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
+                    } catch (IOException | InterruptedException e ) {
+                        event.getHook().sendMessage("**[ERROR]** There was an error running that command. Contact Mythik.").queue();
                         e.printStackTrace();
                     }
                 }
@@ -316,11 +331,16 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                 // ADDUSER slash command to add a user to the database
                 case "add_user" -> {
-                    SQLConnection.addDefaultUser(guild, event.getOption("member").getAsMember());
+                    if(SQLConnection.addDefaultUser(guild, event.getOption("member").getAsMember()))
+                    {
+                        event.reply("User successfully added into the database").queue();
+                    }else{
+                        event.reply("**[ERROR]** There was an error with adding that member to the database").queue();
+                    }
                 }
             }
         } else {
-            channel.sendMessage("**Error:** You do not have permissions to run this command!").queue();
+            event.reply("You don't have permissions to run that command").setEphemeral(true).queue();
         }
     }
 

@@ -24,17 +24,12 @@ public class ShoppyConnection {
     }
 
     public static ShoppyOrder getShoppyOrder(String iD) throws IOException, InterruptedException {
-        try {
-            request = HttpRequest.newBuilder()
-                    .GET()
-                    .header("Authorization", ShoppyAPIKey)
-                    .uri(URI.create(domainURL + "orders/" + iD))
-                    .build();
-            Gson gson = new Gson();
-            return gson.fromJson(client.send(request, HttpResponse.BodyHandlers.ofString()).body(), ShoppyOrder.class);
-        }catch (IllegalArgumentException e){
-            e.printStackTrace();
-            return null;
-        }
+        request = HttpRequest.newBuilder()
+                .GET()
+                .header("Authorization", ShoppyAPIKey)
+                .uri(URI.create(domainURL + "orders/" + iD))
+                .build();
+        Gson gson = new Gson();
+        return gson.fromJson(client.send(request, HttpResponse.BodyHandlers.ofString()).body(), ShoppyOrder.class);
     }
 }

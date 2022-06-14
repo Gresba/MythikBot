@@ -166,11 +166,13 @@ public class ButtonClick extends ListenerAdapter {
             }
 
             // GENERAL QUESTIONS button for tickets
-            case "general-ticket" -> event.editMessageEmbeds(Embeds.FAQ.build())
-                    .setActionRow(
-                            Button.primary("not-answered-ticket", "Question Not Answered"),
-                            Button.danger("close-ticket", "Close")
-                    ).queue();
+            case "general-ticket" -> {
+                event.editMessageEmbeds(Embeds.FAQ.build())
+                        .setActionRow(
+                                Button.primary("not-answered-ticket", "Question Not Answered"),
+                                Button.danger("close-ticket", "Close")
+                        ).queue();
+            }
 
             // CLOSE TICKET button for tickets
             case "close-ticket" -> {
@@ -233,6 +235,16 @@ public class ButtonClick extends ListenerAdapter {
 
 
             case "not-answered-ticket" -> {
+                TextInput orderRelated = TextInput.create("order-related", "Is This Related to an Order", TextInputStyle.SHORT)
+                        .setPlaceholder("(YES/NO)")
+                        .setRequired(true)
+                        .build();
+
+                TextInput question = TextInput.create("general-qyu", "Is This Related to an Order", TextInputStyle.SHORT)
+                        .setPlaceholder("(YES/NO)")
+                        .setRequired(true)
+                        .build();
+                
                 customChannel.getChannel().upsertPermissionOverride(member)
                         .setAllow(Permission.MESSAGE_SEND)
                         .setAllow(Permission.VIEW_CHANNEL)
@@ -274,7 +286,43 @@ public class ButtonClick extends ListenerAdapter {
             case "verify" -> {
                 guild.addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
 
-                event.getHook().sendMessage("You have been verified").setEphemeral(true).queue();
+                event.reply("You have been verified").setEphemeral(true).queue();
+            }
+
+            // Add the giveaway role to a user
+            case "add-giveaway-role" -> {
+                // Add the giveaway role to the user
+                guild.addRoleToMember(event.getMember(), event.getGuild().getRoleById("934630629088321646")).queue();
+
+                event.reply("You have received the giveaway role!").setEphemeral(true).queue();
+            }
+
+            // Remove the giveaway role to a user
+            case "remove-giveaway-role" -> {
+                // Remove the giveaway role from the user
+                guild.removeRoleFromMember(event.getMember(), event.getGuild().getRoleById("934630629088321646")).queue();
+
+                event.reply("You giveaway role was removed!").setEphemeral(true).queue();
+            }
+
+            //
+            case "staff-commands-help" -> {
+                if(member.hasPermission(Permission.ADMINISTRATOR))
+                    event.editMessageEmbeds(Embeds.STAFF_HELP.build()).queue();
+                else
+                    event.reply("You do not have permissions to view this!").setEphemeral(true).queue();
+            }
+
+            case "user-command-help" -> {
+                event.editMessageEmbeds(Embeds.USER_HELP.build()).queue();
+            }
+
+            case "customer-commands-help" -> {
+                event.editMessageEmbeds(Embeds.CUSTOMER_HELP.build()).queue();
+            }
+
+            case "faq-help" -> {
+
             }
         }
     }

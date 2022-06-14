@@ -47,6 +47,7 @@ public class ShoppyOrder {
             paidBoolean = true;
         EmbedBuilder orderEmbed = new EmbedBuilder();
         try{
+            System.out.println(id);
             orderEmbed.setTitle("**__Better Alts Order__**")
                     .setColor(7419530)
                     .addField("**Order ID:**", id, false)
@@ -76,10 +77,6 @@ public class ShoppyOrder {
 
         String deleteQuery = "DELETE FROM accounts WHERE AccountType = '" + accountType + "' LIMIT " + amount;
 
-
-//        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE (AccountType = '" + accountType + "' AND GuildId = '" + guild.getId() + "') LIMIT " + amount;
-
-//        String deleteQuery = "DELETE FROM accounts WHERE (AccountType = '" + accountType + "' AND GuildId = '" + guild.getId() + "') LIMIT " + amount;
         ResultSet resultSet = null;
         try {
             resultSet = statement.executeQuery(retrieveAccountsQuery);

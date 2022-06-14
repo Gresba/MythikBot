@@ -1,15 +1,11 @@
 package BotCommands;
 
 import Bot.BotProperty;
-import Bot.Embeds;
 import Bot.MessageObj;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import static Bot.SQLConnection.getStatement;
@@ -24,7 +20,6 @@ public class UserCommand extends ListenerAdapter {
         Guild guild = event.getGuild();
 
         BotProperty botProperty = new BotProperty(guild.getId());
-        String botPrefix = botProperty.getPrefix();
 
         Member member = event.getMember();
 
@@ -39,7 +34,6 @@ public class UserCommand extends ListenerAdapter {
 
         Statement statement = getStatement();
 
-        try {
             memberUser = member.getUser();
 
             if(!memberUser.isBot())
@@ -59,33 +53,6 @@ public class UserCommand extends ListenerAdapter {
                 botProperty.getMessageHistory().put(messageId, messageObj);
                 botProperty.getMessageHistoryQueue().add(messageId);
 
-                if(messageArr[0].equalsIgnoreCase(botPrefix + "gen"))
-                {
-                    if(channel.getId().equalsIgnoreCase("967134302594809866") && member.getRoles().contains(guild.getRoleById("973033947699249212"))){
-                        String accountsSent = "";
-
-                        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE AccountType = 'NFA/SFA [Unbanned]' LIMIT 1";
-
-                        String deleteQuery = "DELETE FROM accounts WHERE AccountType = 'NFA/SFA [Unbanned]' LIMIT 1";
-
-                        ResultSet resultSet = statement.executeQuery(retrieveAccountsQuery);
-
-                        while (resultSet.next())
-                        {
-                            accountsSent += resultSet.getString(1);
-                        }
-
-                        // Sending the Embed with the products to the member through DMs
-                        Embeds.sendEmbed(Embeds.GENERATOR
-                                .addField("**Alt**", accountsSent, false), member, true);
-
-                        statement.executeUpdate(deleteQuery);
-
-                        Embeds.sendEmbed(Embeds.GEN_SUCCESS, channel, false);
-                    }else{
-                        Embeds.sendEmbed(Embeds.GEN_FAILURE, channel, false);
-                    }
-                }
 
 //                if(messageArr[0].equalsIgnoreCase(botPrefix + "orders"))
 //                {
@@ -119,8 +86,5 @@ public class UserCommand extends ListenerAdapter {
 //                    }
 //                }
             }
-        }catch (NullPointerException | SQLException e){
-            e.printStackTrace();
-        }
     }
 }

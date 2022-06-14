@@ -1,8 +1,8 @@
 package Bot;
 
+import BotObjects.GuildObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -22,6 +22,7 @@ public class BotProperty {
         BotProperty.messageHistoryQueue = messageHistoryQueue;
     }
 
+    public static HashMap<String, GuildObject> guildsHashMap = new HashMap<>();
     private static HashMap<String, Response> responseHashMap = new HashMap<>();
     private static HashMap<String, Boolean> autoNukeChannels = new HashMap<>();
     private static HashMap<String, String> verifyCodes = new HashMap<>();

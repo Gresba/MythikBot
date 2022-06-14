@@ -18,7 +18,6 @@ public class SQLConnection {
      */
     public static Statement getStatement() {
         try {
-
             String SQLUsername = System.getenv("MYTHIK_BOT_SQL_USER");
             String SQLPassword = System.getenv("MYTHIK_BOT_SQL_PASSWORD");
 
@@ -40,22 +39,10 @@ public class SQLConnection {
     }
 
     /**
-     * Get the product from the order ID
      *
-     * @param orderID The order id related to the product
-     * @param guildId The guild that the member belongs to
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
-    public static String getProductDetails(String orderID, String guildId, int amount) throws IOException, InterruptedException {
-        ShoppyOrder orderObject = ShoppyConnection.getShoppyOrder(orderID);
-
-        String productType = orderObject.getProduct().getTitle();
-
-        if(amount == 0)
-            amount = orderObject.getQuantity();
-
+    public static String getProductByName(String guildId, String accountType, int amount)
+    {
         String accounts = "";
 
         try {
@@ -65,8 +52,8 @@ public class SQLConnection {
             PreparedStatement deleteProductQuery = connection.prepareStatement("DELETE FROM Accounts WHERE (AccountType = ? AND GuildId = ?) LIMIT ?");
 
             // Setting the account type
-            retrieveProductQuery.setString(1, productType);
-            deleteProductQuery.setString(1, productType);
+            retrieveProductQuery.setString(1, accountType);
+            deleteProductQuery.setString(1, accountType);
 
             // Setting the guild id
             retrieveProductQuery.setString(2, guildId);
@@ -102,6 +89,27 @@ public class SQLConnection {
         return accounts;
     }
 
+
+    /**
+     * Get the product from the order ID
+     *
+     * @param orderID The order id related to the product
+     * @param guildId The guild that the member belongs to
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static String getProductDetails(String orderID, String guildId, int amount) throws IOException, InterruptedException {
+        ShoppyOrder orderObject = ShoppyConnection.getShoppyOrder(orderID);
+
+        String productType = orderObject.getProduct().getTitle();
+
+        if(amount == 0)
+            amount = orderObject.getQuantity();
+
+        return getProductByName(guildId, productType, amount);
+    }
+
     /**
      * Updates muted status of a user in the database
      *
@@ -135,7 +143,7 @@ public class SQLConnection {
      * @param reason The reason for the punishment
      */
     public static void updatePunishment(String punishmentType, Member member, String reason) throws SQLException {
-        PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments VALUES (?, ?, ?)");
+        PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments (Type, Reason, MemberID) VALUES (?, ?, ?)");
 
         // Setting type, reason and member, respectively, for punishment
         updatePunishmentQuery.setString(1, punishmentType);
@@ -183,9 +191,10 @@ public class SQLConnection {
             // Inviter
             insertUserIntoDb.setString(7, "");
 
+            // Execute the query
             insertUserIntoDb.executeUpdate();
 
-            return false;
+            return true;
 
         // Checking if the user is in the database
         } catch (SQLIntegrityConstraintViolationException e) {
@@ -213,6 +222,68 @@ public class SQLConnection {
         } catch (SQLException e){
             e.printStackTrace();
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * Get the information about a guild or every guild depending on whether the argument is empty
+     *
+     * @param guildId Optional param for the id to get the guild information for
+     *
+     * @return ResultSet The result of a query to get a guild's information
+     */
+    public static ResultSet getGuildInfo(String ...guildId) throws SQLException {
+        String query;
+
+        // Check if the guildId is empty
+        if(guildId.length == 0)
+            query = "SELECT * FROM Guilds";
+        else
+            query = "SELECT * FROM Guilds WHERE GuildID = ?";
+
+        // Get the query ready
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        // Fill in the query if needed
+        if(guildId.length != 0)
+            preparedStatement.setString(1, guildId[0]);
+
+        // Return the result of the query
+        return preparedStatement.executeQuery();
+    }
+
+    /**
+     * Update the server configuration info for the guild the method is called in
+     *
+     * @param guild The id of the guild
+     * @param guildPrefix The prefix to use the commands for
+     * @param ticketLimit The amount of tickets a user can make in a guild
+     * @param serverOwnerID The server owner's Id
+     * @throws SQLException Exception that must be caught when calling this method
+     */
+    public static void updateGuildInfo(Guild guild, String guildPrefix, int ticketLimit, String serverOwnerID) throws SQLException {
+        PreparedStatement updateGuildQuery = connection.prepareStatement("UPDATE Guilds SET Prefix = ?, TicketLimit = ?, OwnerID = ? WHERE GuildID = ?");
+        updateGuildQuery.setString(1, guildPrefix);
+        updateGuildQuery.setInt(2, ticketLimit);
+        updateGuildQuery.setString(3, serverOwnerID);
+        updateGuildQuery.setString(4, guild.getId());
+
+        updateGuildQuery.executeUpdate();
+    }
+
+    /**
+     * Adds a default record of a guild in the Guilds table
+     *
+     * @param guild The id of the guild
+     * @throws SQLException
+     */
+    public static void addDefaultGuild(Guild guild) throws SQLException {
+        PreparedStatement updateGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?)");
+        updateGuildQuery.setString(1, guild.getId());
+        updateGuildQuery.setString(2, "b!");
+        updateGuildQuery.setInt(3, 1);
+        updateGuildQuery.setString(4, "");
+
+        updateGuildQuery.executeUpdate();
     }
 }

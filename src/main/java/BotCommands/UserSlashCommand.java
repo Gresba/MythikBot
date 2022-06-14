@@ -54,6 +54,10 @@ public class UserSlashCommand extends ListenerAdapter {
                                 Button.secondary("faq-help", "FAQ")
                         ).queue();
                 break;
+            case "generate":
+                // Check requirements for user to generate an alt
+
+
         }
     }
 }

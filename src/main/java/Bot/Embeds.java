@@ -21,7 +21,7 @@ public class Embeds {
      * Embed that is sent to a channel whenever a member needs help with the bot
      */
     public static final EmbedBuilder HELP = new EmbedBuilder()
-            .setTitle("**__Better Alts Help__**")
+            .setTitle("**Better Alts Help**")
             .setColor(Color.CYAN)
             .setDescription("Assistance for Better Alts bot")
             .setThumbnail(logoUrl)
@@ -35,7 +35,7 @@ public class Embeds {
      * Embed to show the server rules
      */
     public static final EmbedBuilder RULES = new EmbedBuilder()
-            .setTitle("**__Official Better Alts Server Rules__**")
+            .setTitle("**Official Better Alts Server Rules**")
             .setDescription("Read and follow all rules")
             .setColor(Color.BLACK)
 
@@ -60,7 +60,7 @@ public class Embeds {
                             """, false)
             .addField("**Purchases**",
                     "**3.1)** Don't leave bad feedback in chat or store before talking to us\n" +
-                            "*This may result in no replacements/refunds*", false)
+                            "*This may result in no replacements/refunds/your products being given as a giveaway*", false)
             .addField("**Punishments**",
                     """
                             - Ban
@@ -89,7 +89,7 @@ public class Embeds {
                             Migrated Unbanned NFA - :white_check_mark:
                             Migrated Banned NFA - :peach:
                             Yahoo FA - :yin_yang:""", false)
-            .setThumbnail("https://cdn.discordapp.com/attachments/934569594830614618/945219120276852776/logo.PNG")
+            .setThumbnail(logoUrl)
             .setColor(Color.CYAN);
 
     /**
@@ -99,10 +99,10 @@ public class Embeds {
                 .setTitle("Skyblock Coins")
                 .addField("**Prices**",
                         """
-                                100+ million: $0.20/mil
-                                300+ million: $0.18/mil
-                                500+ million: $0.17/mil
-                                1 billion+: $0.15/mil""", false)
+                                250+ million: $0.11/mil
+                                500+ million: $0.10/mil
+                                1+ billion: $0.09/mil
+                                2+ billion: $0.085/mil""", false)
                 .addField("**Payment Methods**",
                         """
                                 Crypto (Any Type)
@@ -119,13 +119,10 @@ public class Embeds {
      * Embed to tell people how to get the giveaway role
      */
     public static final EmbedBuilder GIVEAWAY = new EmbedBuilder()
-                .setTitle("**__Better Alts Giveaway__**")
-
-                .addField("React to be alerted for future giveaways\n",
-                        "Giveaway Role - :gift:\n", true)
+                .setTitle("**Better Alts Giveaway**")
+                .setDescription("Choose an option")
                 .addField("Note",
-                        "*No replacements for giveaways. If you complain about about something you received in a giveaway not working. You will be banned.*", false)
-                .addField("**Remove role**", "*Remove your reaction to remove the role from your role list*", false)
+                        "*No replacements for giveaways. If you complain about  something you received in a giveaway not working. You will be banned.*", false)
                 .setColor(Color.ORANGE)
                 .setThumbnail(logoUrl);
 
@@ -133,7 +130,7 @@ public class Embeds {
      * Embed to tell show people answers to frequently asked questions
      */
     public static final EmbedBuilder FAQ = new EmbedBuilder()
-                .setTitle("**__Frequently Asked Questions__**")
+                .setTitle("**Frequently Asked Questions**")
                 .setColor(Color.CYAN)
                 .setDescription("If this answers your question then please close the ticket")
                 .addField("**Nitro**", "We do not accept nitro as any sort of payment and it can not be used to gain any types of rewards.", false)
@@ -151,20 +148,21 @@ public class Embeds {
      * Embed to tell people that the channel is in auto-nuke mode and the reason
      */
     public static final EmbedBuilder AUTO_NUKE = new EmbedBuilder()
-                .setTitle("**__Better Alts Moderation__**")
+                .setTitle("**Better Alts Moderation**")
                 .setDescription("Channel is nuked every 30 minutes. Create a ticket if you have any questions.")
                 .addField("**Reason**", """
                         Channel is nuked because staff members can't always moderate the chat and this is the best way to keep the chat completely clean so we do not get punished by discord.
-                        If you want to leave permanent feedback then please go to #vouch.
-                        *Feedback is only removed if you break one of our terms of services.*
+                        
+                        If you have an issue with an order give us a chance to resolve it.
+                        Leaving any negative feedback before that in any form will result in your order getting revoked.
+            
                         """, false)
                 .setColor(Color.BLACK);
-
     /**
      * Embed to show users all the payment methods
      */
     public static final EmbedBuilder PAYMENT_METHODS = new EmbedBuilder()
-                .setTitle("__Better Alts Tickets__")
+                .setTitle("Better Alts Tickets")
                 .setColor(Color.BLUE)
                 .setDescription("Please choose a payment method")
                 .addField("**Payment Methods**",
@@ -182,15 +180,17 @@ public class Embeds {
      * Embed to tell a user their ticket was closed
      */
     public static final EmbedBuilder TICKET_CLOSED = new EmbedBuilder()
-                .setTitle("__Better Alts Tickets__")
+                .setTitle("Better Alts Tickets")
                 .setColor(Color.RED)
-                .setDescription("Your ticket has been closed. If you have anymore issues then please make another ticket!");
+                .setDescription("Your ticket has been closed. If you have anymore issues then please make another ticket!")
+                .addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
+                .addField("**Store**", "https://betteralts.com", false);;
 
     /**
      * Embed to show a user the options for a ticket
      */
     public static final EmbedBuilder TICKET_REASON = new EmbedBuilder()
-                .setTitle("**__Better Alts Tickets__**")
+                .setTitle("**Better Alts Tickets**")
                 .setDescription("""
                         Please choose a reason for creating this ticket
                         
@@ -205,27 +205,20 @@ public class Embeds {
      * Embed to show user the choices for an order ticket
      */
     public static final EmbedBuilder CHOOSE_ORDER_REASON = new EmbedBuilder()
-                .setTitle("__Better Alts Ticket__")
+                .setTitle("Better Alts Ticket")
                 .setDescription("""
                     Please choose one of the reasons
                     **Claim Order** - Claim an order that you made
-                    **Replacements** - Gain replacements for an order
+                    **Replacements** - Request for replacements for an order
                     
                     If it has passed 24 hours since your order was sent, you will **NOT** receive replacements/refunds
                     """);
 
     /**
-     * Embed to tell the user their order is being fetched
-     */
-    public static final EmbedBuilder FETCHING_ORDER = new EmbedBuilder()
-                .setTitle("**__Better Alts Tickets__**")
-                .setDescription("Fetching your order...");
-
-    /**
      * Embed to show user commands with the bot
      */
     public static final EmbedBuilder USER_HELP = new EmbedBuilder()
-                .setTitle("**__User Command Help__**")
+                .setTitle("**User Command Help**")
                 .setDescription("User commands and descriptions")
                 .addField("**Commands**",
                         """
@@ -243,7 +236,7 @@ public class Embeds {
      * Embed to show customers commands with the bot
      */
     public static final EmbedBuilder CUSTOMER_HELP = new EmbedBuilder()
-                .setTitle("**__Customer Command Help__**")
+                .setTitle("**Customer Command Help**")
                 .setDescription("Customer commands and descriptions")
                 .addField("**Commands",
                         """
@@ -255,7 +248,7 @@ public class Embeds {
      * Embed to show staff commands and how to use the bot
      */
     public static final EmbedBuilder STAFF_HELP = new EmbedBuilder()
-                .setTitle("**__Admin Command Help__**")
+                .setTitle("**Admin Command Help**")
                 .setDescription("Admin commands and descriptions")
                 .addField("**Moderation**",
                         """
@@ -285,7 +278,7 @@ public class Embeds {
      * Embed to show staff a list of different directions
      */
     public static final EmbedBuilder DIRECTIONS = new EmbedBuilder()
-                .setTitle("**__Directions__**")
+                .setTitle("**Directions**")
                 .setDescription("Directions Category. Use this with the /directions (category): Command")
                 .addField("**Tickets Direction List:**",
                         """
@@ -315,7 +308,7 @@ public class Embeds {
      * Embed to show staff how to claim a ticket
      */
     public static final EmbedBuilder CLAIM_TICKET = new EmbedBuilder()
-                    .setTitle("**__How to Claim Ticket__**")
+                    .setTitle("**How to Claim Ticket**")
                     .setDescription("When a user creates a ticket you will be able to claim the ticket to get paid for it")
                     .addField("**How?**", "Run the command /claim which will assign the ticket to you", false);
 
@@ -323,7 +316,7 @@ public class Embeds {
      * Embed to show staff how to send an order
      */
     public static final EmbedBuilder SEND_ORDER = new EmbedBuilder()
-                    .setTitle("**__How to Send Order__**")
+                    .setTitle("**How to Send Order**")
                     .setDescription("Directions on steps to take before and while sending an order")
                     .addField("**How?**", """
                             **1** - Log into stripe and copy and paste the order ID into the Stripe dashboard
@@ -338,7 +331,7 @@ public class Embeds {
      * Embed to show staff how to check if an order is potentially fraudulent
      */
     public static final EmbedBuilder FRAUDULENT_CHECK = new EmbedBuilder()
-                    .setTitle("**__How to check if an order is fraudulent__**")
+                    .setTitle("**How to check if an order is fraudulent**")
                     .setDescription("How to check if an order is potentially fraudulent. **ONLY** check for the four things listed. Do **NOT** check fraud score")
                     .addField("**What to check for**",
                             """
@@ -359,21 +352,21 @@ public class Embeds {
      * Embed to show staff how to send replacements
      */
     public static final EmbedBuilder REPLACEMENTS = new EmbedBuilder()
-        .setTitle("**__How to send replacements__**")
+        .setTitle("**How to send replacements**")
         .setDescription("As of now this is only available for Mythik");
 
     /**
      * Embed to show staff what to do in an unknown situation
      */
     public static final EmbedBuilder UNKNOWN = new EmbedBuilder()
-            .setTitle("**__Directions Not Listed?__**")
+            .setTitle("**Directions Not Listed?**")
             .setDescription("Stop whatever you're doing. Let Mythik know what the situation is. Don't do anything else");
 
     /**
      * Embed to show staff how to deal with an issue with unbanned products
      */
     public static final EmbedBuilder UNBANNED_PRODUCT_ISSUE = new EmbedBuilder()
-                .setTitle("**__Issue with Unbanned Product__**")
+                .setTitle("**Issue with Unbanned Product**")
                 .setDescription("Dealing with inquiries related to Unbanned Products")
                     .addField("**Steps:**",
                             """
@@ -394,7 +387,7 @@ public class Embeds {
      * Embed to show staff how to deal with issues about a MFA
      */
     public static final EmbedBuilder MINECRAFT_MFA_ISSUE = new EmbedBuilder()
-                .setTitle("**__Issue with MFA__**")
+                .setTitle("**Issue with MFA**")
                 .setDescription("How to deal with inquiries related to Minecraft MFAs")
                 .addField("**Steps**",
                         """
@@ -520,45 +513,4 @@ public class Embeds {
                 .setTitle("**Better Alts Account Gen**")
                 .setDescription("Unbanned NFA/SFA")
                 .setFooter("Better Alts Account Gen");
-
-    /**
-     * Send a private message with a specified embed to a member
-     *
-     * @param embedBuilder Type of embed to send
-     * @param member Member to send the message to
-     * @param storeHeader Add the store headers
-     */
-    public static void sendEmbed(EmbedBuilder embedBuilder, Member member, boolean storeHeader)
-    {
-        embedBuilder
-            .setColor(Color.GREEN);
-        if(storeHeader) {
-            embedBuilder.addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
-                    .addField("**Store**", "https://betteralts.com", false);
-        }
-
-        member.getUser().openPrivateChannel().complete().getId();
-
-        member.getUser().openPrivateChannel().flatMap(privateChannel ->
-            privateChannel.sendMessageEmbeds(embedBuilder.build())
-        ).queue();
-    }
-
-    /**
-     * Send a message with a specific embed to a channel
-     *
-     * @param embedBuilder The embed to send
-     * @param textChannel Channel to send the message to
-     */
-    public static void sendEmbed(EmbedBuilder embedBuilder, TextChannel textChannel, boolean storeHeader)
-    {
-        embedBuilder
-            .setColor(Color.GREEN);
-        if(storeHeader) {
-            embedBuilder.addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
-                    .addField("**Store**", "https://betteralts.com", false);
-        }
-
-        textChannel.sendMessageEmbeds(embedBuilder.build()).queue();
-    }
 }

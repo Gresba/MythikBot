@@ -10,11 +10,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-import java.awt.*;
+import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 public class CustomMember {
     private JDA jda;
@@ -42,12 +44,6 @@ public class CustomMember {
      */
     public void sendPrivateMessage(EmbedBuilder embedBuilder)
     {
-        // The header which shows the store information
-        embedBuilder
-                .setColor(Color.GREEN)
-                .addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
-                .addField("**Store**", "https://betteralts.com", false);
-
         // Open a private channel with the member and send the DM
         member.getUser().openPrivateChannel().flatMap(privateChannel ->
                 privateChannel.sendMessageEmbeds(embedBuilder.build())
@@ -72,30 +68,6 @@ public class CustomMember {
     }
 
     /**
-     * Handle unmute and mute by checking if the reason is null or not.
-     * If the reason is null then it's an unmute. If not, it's a mute.
-     * Stores the punishment record in the database
-     *
-     * @param reason The reason for the mute
-     * @throws SQLException If there are any errors with updating the database
-     */
-    public void mute(String reason) throws SQLException {
-        // Add the mute role to the user and alert the user they got muted
-        Role muteRole = guild.getRoleById("936718165130481705");
-        guild.addRoleToMember(member, muteRole).queue();
-
-        // Check if it's an unmute or mute by check if the reason is null
-        if(reason != null)
-            sendPrivateMessage(Embeds.MUTED.addField("**Reason**", reason, false));
-        else
-            sendPrivateMessage(Embeds.UNMUTED);
-
-        SQLConnection.updateMute(member, reason);
-
-        SQLConnection.updatePunishment("mute", member, reason);
-    }
-
-    /**
      * Kicks a user and stores the punishment record in the database.
      *
      * @param reason The reason for kicking the member
@@ -104,7 +76,81 @@ public class CustomMember {
     public void kick(String reason) throws SQLException {
         guild.kick(member, reason).queue();
 
-        SQLConnection.updatePunishment("mute", member, reason);
+        SQLConnection.updatePunishment("kick", member, reason);
+    }
+
+    /**
+     * Times out a server in the guild with the given argument from the slash command that will call this method
+     *
+     * @param reason The reason for the time
+     * @param amount The duration of the timeout depending on the timeUnit
+     * @param timeUnitString The timeUnitString which will be converted into a TimeUnit
+     * @throws SQLException
+     */
+    public void timeout(String reason, int amount, @Nonnull String timeUnitString) throws SQLException {
+        // Check if member is already timed out
+        if(member.isTimedOut())
+        {
+            // If they are then untime them out
+            guild.removeTimeout(member).queue();
+        }else{
+            TimeUnit timeUnit;
+            switch (timeUnitString)
+            {
+                case "minutes" ->
+                        timeUnit = TimeUnit.MINUTES;
+                case "hours" ->
+                        timeUnit = TimeUnit.HOURS;
+                case "days" ->
+                        timeUnit = TimeUnit.DAYS;
+                default ->
+                        timeUnit = TimeUnit.SECONDS;
+            }
+
+            guild.timeoutFor(member, amount, timeUnit).queue();
+
+            SQLConnection.updatePunishment("timeout", member, reason);
+        }
+    }
+
+
+    /**
+     *
+     */
+    public void sendAlts(String accounts, String orderId, String accountType) throws FileNotFoundException {
+        EmbedBuilder orderEmbed = new EmbedBuilder()
+                .setTitle("**Better Alts Order**")
+                .addField("**Order ID:**", orderId, false)
+                .setDescription(setOrderDescription(accountType));
+
+        // If the product is out of stock then alert the customer
+        if(accounts == null){
+            orderEmbed.addField("Alts", "No accounts in the database. Contact a staff", false);
+
+            // If the product length is less than 1000 then put it in the embed
+        }else if (accounts.length() < 1000) {
+
+            // Add products to the description
+            if(accounts.length() == 0)
+                orderEmbed.addField("Alts", "No Stock! Don't worry contact the owner!", false);
+            else
+                orderEmbed.addField("Alts", "```" + accounts + "```", false);
+            sendPrivateMessage(orderEmbed);
+
+            // If the product length is greater than 1000 then put it in a file
+        }else{
+            sendPrivateMessage(orderEmbed);
+
+            // Create a text file and add the product to it
+            PrintStream outputFile = new PrintStream("output");
+            outputFile.print(accounts);
+
+            // Send the customer the product
+            member.getUser().openPrivateChannel().flatMap(privateChannel ->
+                    privateChannel.sendFile(new File("output"), "product.txt")
+            ).queue();
+        }
+        guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
     }
 
     /**
@@ -118,6 +164,7 @@ public class CustomMember {
     public boolean sendProduct(String orderID, String accounts) throws IOException, InterruptedException {
         ShoppyOrder orderObject = ShoppyConnection.getShoppyOrder(orderID);
 
+        // Check if the account was paid for
         if (orderObject.getPaid_at() != null) {
 
             EmbedBuilder orderEmbed = new EmbedBuilder()
@@ -127,7 +174,7 @@ public class CustomMember {
 
             // If the product is out of stock then alert the customer
             if(accounts == null){
-                orderEmbed.addField("Alts", "Out of Stock. Contact staff through a ticket", false);
+                orderEmbed.addField("Alts", "No accounts in the database. Contact a staff", false);
 
             // If the product length is less than 1000 then put it in the embed
             }else if (accounts.length() < 1000) {
@@ -148,11 +195,10 @@ public class CustomMember {
                         privateChannel.sendFile(new File("output"), "product.txt")
                 ).queue();
             }
+            guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
 
+            return true;
         }
-
-        // Add customer role to the user
-        guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
 
         return false;
     }
@@ -182,18 +228,18 @@ public class CustomMember {
         if(accountType.toLowerCase().contains("mfa")) {
             return "Thank you for ordering " + accountType + "\n" +
                     """
-                    **Format:** email:emailPassword
-                    **Minecraft Password:** Wanker!!22 or Vbkfybz22!
-                    **Mail Site:** yahoo.com, mail.com or rambler.ru (Check the domain of your account)
-                    **Security Questions:** a a a
+                    **Format:** email:emailPassword:MinecraftPassword
+                    **Mail Site:** rambler.ru (Check the domain of your account)
                     **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
                     **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM
                     *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
                     *If the account requires migration, then migrate it.*
                     """;
         }else if(accountType.toLowerCase().contains("Unbanned") ){
-            return "Thank you for ordering " + accountType + "\n" +
+            return "Thank you for ordering " + accountType +
+                    "" +
                     "**Format:** email:password:username\n" +
+                    "" +
                     "Use VyprVPN to avoid getting them security banned on Hypixel";
         }else if(accountType.toLowerCase().contains("hypixel") || accountType.toLowerCase().contains("nfa")){
             return "Thank you for ordering " + accountType + "\n" +

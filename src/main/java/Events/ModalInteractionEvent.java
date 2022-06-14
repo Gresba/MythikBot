@@ -1,5 +1,6 @@
 package Events;
 
+import Bot.BotProperty;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
 import CustomObjects.CustomMember;
@@ -18,10 +19,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Calendar;
 
 import static Bot.SQLConnection.getStatement;
 
@@ -43,7 +42,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
         JDA jda = event.getJDA();
 
         CustomMember member = new CustomMember(jda, event.getMember().getId(), guild.getId());
-        CustomMember guildOwner = new CustomMember(jda, "639094715605581852", guild.getId());
+        CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getServerOwnerId(), guild.getId());
 
         // Checking if the modal is either for a replacement or claiming order
         if (event.getModalId().equals("claim-order-modal") || event.getModalId().equals("replacement-modal"))
@@ -51,65 +50,64 @@ public class ModalInteractionEvent extends ListenerAdapter {
             // Getting the order ID
             String orderId = event.getValue("order-id").getAsString().strip();
 
-            // Connecting to shoppy
-            ShoppyConnection shoppyConnection = new ShoppyConnection();
             try {
                 // Getting the order that connects to the order ID
-                ShoppyOrder order = shoppyConnection.getShoppyOrder(orderId);
+                ShoppyOrder order = ShoppyConnection.getShoppyOrder(orderId);
 
                 EmbedBuilder productDescriptionEmbed = order.sendOrderEmbed();
 
                 // If the order is for claiming an order
                 if (event.getModalId().equals("claim-order-modal")){
 
-                        // If the payment method is crypto then just send the product
-//                        if (!order.requiresVerification(member, order.getGateway())) {
-                            try {
-                                java.util.Date date = new java.util.Date();
-                                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                    try {
+                        Calendar calendar = Calendar.getInstance();
+                        java.util.Date date = calendar.getTime();
+                        long time = date.getTime();
 
-                                // Insert the order into the database so the same order cannot be claimed twice
-                                PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
-                                insertOrder.setString(1, orderId);
-                                insertOrder.setString(2, member.getMember().getId());
-                                insertOrder.setDate(3, sqlDate);
-                                insertOrder.executeUpdate();
+                        // Insert the order into the database so the same order cannot be claimed twice
+                        PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
+                        insertOrder.setString(1, orderId);
+                        insertOrder.setString(2, member.getMember().getId());
+                        insertOrder.setTimestamp(3, new Timestamp(time));
+                        insertOrder.executeUpdate();
 
-                                String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
+                        String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
 
-                                member.sendProduct(orderId, accounts);
-                                guildOwner.sendProduct(orderId, accounts);
+                        member.sendProduct(orderId, accounts);
+                        guildOwner.sendProduct(orderId, accounts);
 
-                                event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
-                            } catch (IOException | InterruptedException e) {
-                                channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
-                                e.printStackTrace();
-                            } catch (SQLIntegrityConstraintViolationException e) {
-                                channel.sendMessage(
-                                        """
-                                                **[Fraud Detection]** 
-                                                Unable to send the product. The product was already claimed
-                                                """).queue();
-                                e.printStackTrace();
-                            } catch (SQLException e){
-                                event.reply("**[ERROR]** There was an issue with registering the order to the database").queue();
-                                e.printStackTrace();
-                            }
-//                        }
+                        event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
+                    } catch (IOException | InterruptedException e) {
+                        channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
+                        e.printStackTrace();
+                    } catch (SQLIntegrityConstraintViolationException e) {
+                        channel.sendMessage(
+                                """
+                                        **[Fraud Detection]** 
+                                        Unable to send the product. The product was already claimed
+                                        """).queue();
+                        e.printStackTrace();
+                    } catch (SQLException e){
+                        event.reply("**[ERROR]** There was an issue with registering the order to the database").queue();
+                        e.printStackTrace();
+                    }
 
-                        productDescriptionEmbed
-                                .addField("**User**", member.getMember().getAsMention(), false)
-                                .addField("**What to do now**", """
-                                        First, thank you for choosing Better Alts!
-                                        
-                                        Thank you for submitting your information. A staff will be with you shortly!
-                                        
-                                        We have disabled your ability to talk. Don't worry! This is to ensure there is no confusion between the customer and staff!
-                                        """, false);
+                    productDescriptionEmbed
+                            .addField("**User**", member.getMember().getAsMention(), false)
+                            .addField("**What to do now**", """
+                                    First, thank you for choosing Better Alts!
+                                    
+                                    Thank you for submitting your information. A staff will be with you shortly!
+                                    
+                                    We have disabled your ability to talk. Don't worry! This is to ensure there is no confusion between the customer and staff!
+                                    """, false);
 
-                        event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
+                    event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
 
                 }else if(event.getModalId().equals("replacement-modal")){
+                    Calendar currentTime = Calendar.getInstance();
+                    currentTime.getTime();
+
                     String replacementAmount = event.getValue("replacement-amount").getAsString();
                     String replacementReason = event.getValue("replacement-reason").getAsString();
 
@@ -126,10 +124,13 @@ public class ModalInteractionEvent extends ListenerAdapter {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (IllegalArgumentException e){
+                event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
+                e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
-                event.getHook().sendMessage("That is not a valid order ID. Please put in just your order id.").queue();
+                event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
             }
         }else if(event.getModalId().equals("purchase-modal")){
             String purchaseItemName = event.getValue("purchase-item-name").getAsString();
@@ -147,9 +148,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
             event.getHook().editOriginalEmbeds(purchaseEmbed.build())
                     .setActionRow(Button.danger("close-ticket", "Close"))
                     .queue();
-
-            if(purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))
-            {
+            if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
                 Role paypalExchangerRole = guild.getRoleById(938905340001542235l);
 
                 channel.upsertPermissionOverride(paypalExchangerRole)
@@ -188,6 +187,17 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     .addField("**Service**", sponsorshipService, false)
                     .addField("**Payment**", sponsorshipPayment, false);
             event.getHook().editOriginalEmbeds(partnershipEmbed.build()).queue();
+        }else if(event.getModalId().equals("configure-modal")){
+            String prefix = event.getValue("configure-prefix").getAsString();
+            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
+            String serverOwnerId = event.getValue("configure-server-owner").getAsString();
+
+            try {
+                SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId);
+                event.getHook().sendMessage("Successfully configured server").queue();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
