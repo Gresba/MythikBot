@@ -49,6 +49,7 @@ public class UserCommand extends ListenerAdapter {
                     String poppedId = botProperty.getMessageHistoryQueue().poll();
                     botProperty.getMessageHistory().remove(poppedId);
                 }
+
                 // Add the messages to the queue and hashMap
                 botProperty.getMessageHistory().put(messageId, messageObj);
                 botProperty.getMessageHistoryQueue().add(messageId);

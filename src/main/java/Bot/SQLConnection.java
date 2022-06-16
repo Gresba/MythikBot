@@ -11,6 +11,7 @@ import java.sql.*;
 public class SQLConnection {
     private static Statement statement;
     private static Connection connection;
+
     /**
      * Gets the statement to connect with the database
      *

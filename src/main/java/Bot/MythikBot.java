@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -23,7 +22,6 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class MythikBot {
 
     private static JDA jda;
-
     public static void main(String[] args) throws SQLException{
         Statement statement = getStatement();
 
@@ -92,6 +90,8 @@ public class MythikBot {
                     Commands.slash("venmo", "Get Mythik's Venmo Tag"),
 
                     Commands.slash("cashapp", "Get Mythik's CashApp Tag"),
+
+                    Commands.slash("paypal", "Get Mythik's PayPal email"),
 
                     // HELP command
                     Commands.slash("help", "How to use the discord bot")

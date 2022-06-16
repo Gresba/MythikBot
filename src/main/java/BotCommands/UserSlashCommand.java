@@ -43,6 +43,12 @@ public class UserSlashCommand extends ListenerAdapter {
             case "venmo":
                 event.reply("**Venmo:** pkvenmo11").queue();
                 break;
+            case "paypal":
+                event.reply("""
+                    **PayPal Email:** betteralts01@gmail.com
+                    Make sure the payment is **PayPal Friends and Family** or you will not receive the product and pay a refund fee.
+                    **NOTE:** If you did not specifically click *friends and family* option that means you did not send using friends and family""");
+                break;
 
             // HELP COMMAND
             case "help":

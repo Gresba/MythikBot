@@ -7,11 +7,6 @@ import java.awt.*;
 
 public class Embeds {
 
-    public Embeds()
-    {
-
-    }
-
     /**
      * The logo for the url of the Better Alts bot
      */
@@ -70,27 +65,6 @@ public class Embeds {
                             - Ban from future giveaways
                             *You may receive any of these punishments for breaking a rule*""", false)
             .setThumbnail(logoUrl);
-
-    /**
-     * Embed to show restock roles
-     */
-    public static final EmbedBuilder RESTOCK_ALERTS = new EmbedBuilder()
-            .setTitle("Restock Roles")
-            .addField("React to get alerts for the specific product",
-                    """
-                            MFA - :e_mail:
-                            Skyblock - :cloud:
-                            Hypixel LvL21+/Ranked - :evergreen_tree:
-                            Hypixel Unbanned NFA/SFA Mix - :heart:
-                            NFA Banned - :red_square:
-                            SFA Banned - :
-                            VyprVPN - :alien:
-                            Special MFA - :heart_eyes_cat:
-                            Migrated Unbanned NFA - :white_check_mark:
-                            Migrated Banned NFA - :peach:
-                            Yahoo FA - :yin_yang:""", false)
-            .setThumbnail(logoUrl)
-            .setColor(Color.CYAN);
 
     /**
      * Embed to show skyblock prices and how to purchase it
@@ -194,13 +168,26 @@ public class Embeds {
                 .setDescription("""
                         Please choose a reason for creating this ticket
                         
-                        **Order** - Claim Order/Replacements
+                        **Order** - Claim Order/Replacements/Problems with Product
                         **Partnership** - Requirements or steps for sponsorship or partnership
                         **Purchase** - Purchase an item
                         **General** - Ask a general questions and see FAQ
                         **Close** - Close the ticket
-                        """);
+                        """)
+                .addField("**Note**", "Read all everything before choosing an option or your warranty may expire", false);
 
+    /**
+     * Embed to ask if someone's ticket is related to an order
+     */
+    public static final EmbedBuilder ORDER_RELATED = new EmbedBuilder()
+            .setTitle("**Better Alts Tickets**")
+            .setDescription("Is your ticket for anything related to a product you purchased?")
+            .addField("**Note**", """
+                *Your warranty only works if you make a ticket for an order.
+                
+                If you click "NO" and this ticket is for any issues with a product,
+                this ticket will be treated as a general question ticket and will not be used to validate your warranty*")
+                """, false);
     /**
      * Embed to show user the choices for an order ticket
      */

@@ -9,7 +9,7 @@ public class CustomChannel {
     private JDA jda;
     private TextChannel customChannel;
     /**
-     * Constuctor for initializing a ticket channel
+     * Constructor for initializing a ticket channel
      *
      * @param jda The jda the channel belongs to
      * @param channelId The channel id
