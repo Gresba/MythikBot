@@ -121,14 +121,14 @@ public class MythikBot {
                             .addOptions(new OptionData(INTEGER, "delete_days", "Messages to delete for the past days")
                                     .setRequired(true)),
 
-                    // MUTE command
+                    // TIMEOUT command
                     Commands.slash("timeout", "Timeout a user")
                             .addOptions(new OptionData(USER, "user", "The user to timeout")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "reason", "The reason for the timeout")
                                     .setRequired(true)),
 
-                    // UNMUTE command
+                    // UNTIMEOUT command
                     Commands.slash("untimeout", "Un-timeout a user")
                             .addOptions(new OptionData(USER, "user", "The user to un-timeout")
                                     .setRequired(true)),

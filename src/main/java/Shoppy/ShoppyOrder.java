@@ -47,7 +47,6 @@ public class ShoppyOrder {
             paidBoolean = true;
         EmbedBuilder orderEmbed = new EmbedBuilder();
         try{
-            System.out.println(id);
             orderEmbed.setTitle("**__Better Alts Order__**")
                     .setColor(7419530)
                     .addField("**Order ID:**", id, false)
@@ -69,7 +68,6 @@ public class ShoppyOrder {
     {
         String accounts = "";
         String accountType = orderObject.getProduct().getTitle();
-        System.out.println("ACCOUNT TYPE: " + accountType);
         if(amount == 0)
             amount = orderObject.getQuantity();
 
@@ -86,8 +84,6 @@ public class ShoppyOrder {
                 String account = resultSet.getString(1);
 
                 accounts += account + "\n";
-
-                System.out.println(account);
             }
 
             statement.executeUpdate(deleteQuery);

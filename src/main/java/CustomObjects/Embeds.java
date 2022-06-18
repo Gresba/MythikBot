@@ -111,7 +111,6 @@ public class Embeds {
                 .addField("**Steam**", "We do not accept steam gift cards/balance as a payment method", false)
                 .addField("**PayPal**", "Create a ticket to purchase and type PayPal as the payment method", false)
                 .addField("**Restocked**", "There is no estimated time of restock for any product. To be alert for restocks go to #store and react to the proper message", false)
-                .addField("**Orders/Replacements**", "Close this ticket and make a new ticket for an order", false)
                 .addField("**Warranty**", """
                         All products have a 24 hour warranty. Except MFAs which have a 1 hour warranty. 
                         During that warranty you have to confirm whether your products are working or we can not give you any reimbursements.
@@ -182,11 +181,9 @@ public class Embeds {
     public static final EmbedBuilder ORDER_RELATED = new EmbedBuilder()
             .setTitle("**Better Alts Tickets**")
             .setDescription("Is your ticket for anything related to a product you purchased?")
-            .addField("**Note**", """
-                *Your warranty only works if you make a ticket for an order.
-                
-                If you click "NO" and this ticket is for any issues with a product,
-                this ticket will be treated as a general question ticket and will not be used to validate your warranty*")
+            .addField("**IMPORTANT**", """
+                If you click "NO", this ticket will not be counted as you reporting a problem with your order.
+                This may cause your warranty to expire even though you reported it here.
                 """, false);
     /**
      * Embed to show user the choices for an order ticket

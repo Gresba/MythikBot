@@ -31,6 +31,14 @@ public class SQLConnection {
         return statement;
     }
 
+    /**
+     * Insert an order into the
+     *
+     * @param orderID
+     * @param member
+     * @param insertedDate
+     * @throws SQLException
+     */
     public static void insertOrder(String orderID, Member member, Date insertedDate) throws SQLException {
         PreparedStatement insertOrder = connection.prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
         insertOrder.setString(1, orderID);
@@ -143,6 +151,21 @@ public class SQLConnection {
         insertOrder.setString(2, MemberId);
         insertOrder.setTimestamp(3, claimedDate);
         insertOrder.executeUpdate();
+    }
+
+    /**
+     * Gets the information of the order in a database with an order id
+     *
+     * @param orderId The order id of an order
+     * @return {ResultSet} The result of the query
+     * @throws SQLException
+     */
+    public static ResultSet getOrder(String orderId) throws SQLException {
+        PreparedStatement getOrder = statement.getConnection().prepareStatement("SELECT * FROM Orders WHERE OrderID = ?");
+        getOrder.setString(1, orderId);
+
+        ResultSet retrievedOrder = getOrder.executeQuery();
+        return retrievedOrder;
     }
 
     /**

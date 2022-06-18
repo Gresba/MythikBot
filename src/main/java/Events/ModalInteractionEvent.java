@@ -19,7 +19,11 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Calendar;
+import java.util.Date;
 
 import static Bot.SQLConnection.getStatement;
 
@@ -66,12 +70,17 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         // Insert the order into the database so the same order cannot be claimed twice
                         SQLConnection.addOrder(orderId, member.getMember().getId(), new Timestamp(time));
 
-                        String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
+                        if(order.getPaid_at() != null)
+                        {
+                            String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
 
-                        member.sendProduct(orderId, accounts);
-                        guildOwner.sendProduct(orderId, accounts);
+                            member.sendProduct(orderId, accounts);
+                            guildOwner.sendProduct(orderId, accounts);
 
-                        event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
+                            event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
+                        }else{
+                            event.getHook().sendMessage("Sorry, but this order has not been paid for. If this is a mistake, contact Mythik and he will resolved this").queue();
+                        }
                     } catch (IOException | InterruptedException e) {
                         channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
                         e.printStackTrace();
@@ -100,22 +109,43 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
 
                 }else if(event.getModalId().equals("replacement-modal")){
-                    Calendar currentTime = Calendar.getInstance();
-                    currentTime.getTime();
+                    LocalDateTime now = LocalDateTime.now();
+                    LocalDateTime claimedDate = null;
 
-                    String replacementAmount = event.getValue("replacement-amount").getAsString();
-                    String replacementReason = event.getValue("replacement-reason").getAsString();
+                    try {
+                        ResultSet resultSet = SQLConnection.getOrder(orderId);
+                        while(resultSet.next())
+                        {
+                            claimedDate = resultSet.getTimestamp("ClaimedDate").toLocalDateTime();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    
+                    if((now.toEpochSecond(ZoneOffset.UTC) - claimedDate.toEpochSecond(ZoneOffset.UTC) > 86400) && claimedDate != null)
+                    {
+                        event.getHook().sendMessage("""
+                        Thank you for submitting your information and choosing Better Alts.
+                        
+                        Unfortunately, the maximum warranty of 24 hours has expired and replacements or a refund can not be given for this order.
+                        
+                        The ticket will be closed soon.
+                        """).queue();
+                    }else{
+                        String replacementAmount = event.getValue("replacement-amount").getAsString();
+                        String replacementReason = event.getValue("replacement-reason").getAsString();
 
-                    productDescriptionEmbed
-                        .addField("**User**", member.getMember().getAsMention(), false)
-                        .addField("**Replacement Amount**", replacementAmount, false)
-                        .addField("**Replacement Reason**", replacementReason, false)
-                        .addField("**What to do now**", """
+                        productDescriptionEmbed
+                                .addField("**User**", member.getMember().getAsMention(), false)
+                                .addField("**Replacement Amount**", replacementAmount, false)
+                                .addField("**Replacement Reason**", replacementReason, false)
+                                .addField("**What to do now**", """
                                 We're sorry to hear that you are having an issue with your purchase.
                                 
                                 Thank you so much for submitting your information. A staff member will be with you shortly!
                                 """, false);
-                    event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
+                        event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -182,6 +212,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     .addField("**Service**", sponsorshipService, false)
                     .addField("**Payment**", sponsorshipPayment, false);
             event.getHook().editOriginalEmbeds(partnershipEmbed.build()).queue();
+
         }else if(event.getModalId().equals("configure-modal")){
             String prefix = event.getValue("configure-prefix").getAsString();
             int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());

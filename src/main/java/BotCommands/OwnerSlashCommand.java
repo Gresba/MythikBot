@@ -181,32 +181,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     event.getHook().sendMessage("Successfully deleted DMs with the user " + targetMember.getAsMention()).setEphemeral(true).queue();
                 }
 
-                // FRAUD add a user to the fraud list
-                case "fraud" -> {
-
-                    // Get the arguments passed in
-                    Member targetMember = event.getOption("target_member").getAsMember();
-
-                    try {
-                        // Build and execute the query
-                        String addFraudQuery = "INSERT INTO FraudList VALUES ('" + targetMember.getId() + "')";
-                        statement.executeUpdate(addFraudQuery);
-
-                        // Send a DM to the user telling them they got banned
-                        targetMember.getUser().openPrivateChannel().flatMap(privateChannel ->
-                                privateChannel.sendMessageEmbeds(Embeds.BANNED.build())
-                        ).queue();
-
-                        // Ban the user
-                        guild.ban(targetMember.getId(), 0, "Fraudulent").queue();
-
-                        event.getHook().sendMessage(targetMember.getUser().getAsTag() + " has been banned and added to the fraud list").setEphemeral(true).queue();
-                    } catch (SQLException e) {
-                        event.getHook().sendMessage("There was an issue with adding that user to the fraud list!").setEphemeral(true).queue();
-                        e.printStackTrace();
-                    }
-                }
-
                 // SCANFILE scan a file
                 case "scanfile" -> {
                     // The path of the file

@@ -240,8 +240,8 @@ public class ButtonClick extends ListenerAdapter {
                 event.replyEmbeds(Embeds.ORDER_RELATED.build())
                         .addActionRow(
                                 Button.primary("yes", "YES"),
-                                Button.primary("no", "NO")
-                        );
+                                Button.secondary("no", "NO")
+                        ).queue();
             }
 
             case "yes" -> {
