@@ -1,4 +1,3 @@
-Bot\Embeds.class
 BotCommands\OwnerSlashCommand.class
 BotCommands\StaffSlashCommand$1.class
 Events\ModalInteractionEvent.class
@@ -8,8 +7,6 @@ Shoppy\ShoppyConnection.class
 CustomObjects\CustomMember.class
 Bot\SQLConnection.class
 Bot\BotProperty.class
-BotCommands\ButtonClick.class
-Events\ReactionEvent.class
 Events\DeleteChannelEvent.class
 Shoppy\ShoppyOrder.class
 Bot\MessageObj.class

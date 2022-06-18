@@ -249,15 +249,16 @@ public class ButtonClick extends ListenerAdapter {
             }
 
             case "no" -> {
-                event.reply("""
-            Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
-            
-            Staff members usually only look at tickets once a day so if you aren't descriptive you will have to wait until the next day to receive a response.
-            """).queue();
                 customChannel.getChannel().upsertPermissionOverride(member)
                         .setAllow(Permission.MESSAGE_SEND)
                         .setAllow(Permission.VIEW_CHANNEL)
                         .queue();
+
+                event.reply("""
+                Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
+                
+                Staff members usually only look at tickets once a day so if you aren't descriptive you will have to wait until the next day to receive a response.
+                """).queue();
             }
 
             case "paypal-claim-order" -> {
