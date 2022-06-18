@@ -22,7 +22,7 @@ public class InviteCreateEvent extends ListenerAdapter {
         User inviter = event.getInvite().getInviter();
 
         Invite invite = event.getInvite();
-        System.out.println("invite created: " + invite.getCode());
+        System.out.println("Invite created: " + invite.getCode());
 
         try {
             PreparedStatement addInviteQuery = statement.getConnection().prepareStatement("INSERT INTO Invites VALUES (?, ?, ?)");

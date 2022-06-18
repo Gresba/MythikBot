@@ -1,6 +1,5 @@
 package CustomObjects;
 
-import Bot.Embeds;
 import Bot.SQLConnection;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
@@ -8,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -65,18 +63,6 @@ public class CustomMember {
         sendPrivateMessage(Embeds.BANNED
                 .addField("**Reason**", reason, false)
         );
-    }
-
-    /**
-     * Kicks a user and stores the punishment record in the database.
-     *
-     * @param reason The reason for kicking the member
-     * @throws SQLException If there are any errors with updating the database
-     */
-    public void kick(String reason) throws SQLException {
-        guild.kick(member, reason).queue();
-
-        SQLConnection.updatePunishment("kick", member, reason);
     }
 
     /**
@@ -235,7 +221,7 @@ public class CustomMember {
                     *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
                     *If the account requires migration, then migrate it.*
                     """;
-        }else if(accountType.toLowerCase().contains("Unbanned") ){
+        }else if(accountType.toLowerCase().contains("unbanned") ){
             return "Thank you for ordering " + accountType +
                     "" +
                     "**Format:** email:password:username\n" +

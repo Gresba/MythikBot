@@ -1,17 +1,17 @@
 package BotCommands;
 
 import Bot.BotProperty;
-import Bot.Embeds;
+import CustomObjects.DropDowns;
+import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomMember;
-import Shoppy.ShoppyOrder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
@@ -47,31 +46,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
             event.deferReply().queue();
 
             switch (event.getName()) {
-                case "rolesembed" -> {
-                    EmbedBuilder roles = new EmbedBuilder();
-                    roles.setColor(Color.BLACK)
-                            .setTitle("**Restock Roles**")
-                            .setDescription("""
-                                Click the button below to be alerted for the following roles
-                                
-                                To remove restock roles repeat the step for the role you want to remove""");
-
-                    event.replyEmbeds(roles.build()).addActionRow(
-                            SelectMenu.create("select-roles")
-                                    .addOption("Unbanned MFA", "unbanned-mfa", "MFAs unbanned on Hypixel")
-                                    .addOption("Banned MFA", "banned-mfa", "MFAs banned on Hypixel")
-                                    .addOption("Unbanned NFA", "unbanned-nfa", "NFAs unbanned on Hypixel")
-                                    .addOption("Banned NFA", "banned-nfa", "NFAs banned on Hypixel")
-                                    .addOption("Microsoft Unbanned NFA", "microsoft-unbanned-nfa", "Microsoft NFAs unbanned on Hypixel")
-                                    .addOption("Microsoft Banned NFA", "microsoft-banned-nfa", "Microsoft NFAs banned on Hypixel")
-                                    .addOption("Minecraft NFA", "minecon-nfa", "NFAs with Minecon capes on them")
-                                    .addOption("Hypixel Ranked/LvL", "hypixel-ranked-lvl", "NFAs with ranks, levels or both on them")
-                                    .addOption("Ranked MFAs", "ranked-mfa", "MFAs with a rank on Hypixel")
-                                    .addOption("LvL 21+ MFAs", "lvl21-mfa", "MFAs level 21+ on Hypixel")
-                                    .addOption("Skyblock", "skyblock", "Coins or account with skyblock items")
-                                .build()
-                    );
-                }
 
                 // UPLOAD a product into the database
                 case "upload" -> {

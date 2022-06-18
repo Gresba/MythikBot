@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -65,11 +64,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         long time = date.getTime();
 
                         // Insert the order into the database so the same order cannot be claimed twice
-                        PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
-                        insertOrder.setString(1, orderId);
-                        insertOrder.setString(2, member.getMember().getId());
-                        insertOrder.setTimestamp(3, new Timestamp(time));
-                        insertOrder.executeUpdate();
+                        SQLConnection.addOrder(orderId, member.getMember().getId(), new Timestamp(time));
 
                         String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
 

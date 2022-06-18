@@ -49,7 +49,6 @@ public class MythikBot {
 
         jdaBuilder.addEventListeners(
                 new DeleteChannelEvent(),
-                new ReactionEvent(),
                 new MemberJoinGuildEvent(),
                 new UserCommand(),
                 new MessageAutoResponse(),
@@ -61,7 +60,8 @@ public class MythikBot {
                 new UserSlashCommand(),
                 new ModalInteractionEvent(),
                 new OwnerSlashCommand(),
-                new InviteCreateEvent()
+                new InviteCreateEvent(),
+                new OptionSelectionEvent()
                 );
 
         try {
@@ -262,7 +262,8 @@ public class MythikBot {
                             .addOptions(new OptionData(STRING, "order_id", "The order id you want to retrieve the accounts for")
                                     .setRequired(true))
                             .addOptions(new OptionData(USER, "target_member", "The members DMs to access")
-                                    .setRequired(true))
+                                    .setRequired(true)),
+                    Commands.slash("rolesembed", "Add embed")
 
             );
 

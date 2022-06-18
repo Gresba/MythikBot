@@ -15,7 +15,7 @@ public class SQLConnection {
     /**
      * Gets the statement to connect with the database
      *
-     * @return The SQL statement
+     * @return Statement The SQL statement
      */
     public static Statement getStatement() {
         try {
@@ -112,31 +112,6 @@ public class SQLConnection {
     }
 
     /**
-     * Updates muted status of a user in the database
-     *
-     * @param member The member to update muted status for
-     * @param reason The reason behind the mute if there is any
-     */
-    public static void updateMute(Member member, String reason) throws SQLException {
-        // Variable to decide whether the user gets muted or unmuted
-        boolean muted = true;
-
-        // If there is no reason that means the command is unmute
-        if(reason == null)
-            muted = false;
-
-        // Create the query
-        PreparedStatement updateMuteQuery = connection.prepareStatement("UPDATE Users SET Muted = ? WHERE MemberID = ?");
-
-        // Populate the query
-        updateMuteQuery.setBoolean(1, muted);
-        updateMuteQuery.setString(2, member.getId());
-
-        // Execute the query
-        updateMuteQuery.executeUpdate();
-    }
-
-    /**
      * Update the punishment table for a punishment
      *
      * @param punishmentType The type of punishment
@@ -155,6 +130,20 @@ public class SQLConnection {
         updatePunishmentQuery.executeUpdate();
     }
 
+    /**
+     * Inserts an order into the database
+     *
+     * @param orderId The order id for the order
+     * @param MemberId The member that claimed the order
+     * @param claimedDate The date the order was claimed
+     */
+    public static void addOrder(String orderId, String MemberId, Timestamp claimedDate) throws SQLException {
+        PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
+        insertOrder.setString(1, orderId);
+        insertOrder.setString(2, MemberId);
+        insertOrder.setTimestamp(3, claimedDate);
+        insertOrder.executeUpdate();
+    }
 
     /**
      * Add a member to the database and returns whether the member was successfully added into the database
@@ -198,28 +187,6 @@ public class SQLConnection {
             return true;
 
         // Checking if the user is in the database
-        } catch (SQLIntegrityConstraintViolationException e) {
-            try
-            {
-                // Checking if the user was muted
-                PreparedStatement checkMuted = connection.prepareStatement("SELECT Muted FROM Users WHERE MemberID = ?");
-                checkMuted.setString(1, member.getId());
-
-                ResultSet mutedOutput = checkMuted.executeQuery();
-
-                mutedOutput.next();
-                boolean muted = mutedOutput.getBoolean(1);
-
-                // If the user was muted before then mute them again
-                if (muted)
-                {
-                    guild.addRoleToMember(member.getId(), guild.getRoleById("936718165130481705")).queue();
-                }
-            } catch (SQLException ex) {
-                System.out.println("[ERROR] Error with reading the user's information");
-                ex.printStackTrace();
-            }
-
         } catch (SQLException e){
             e.printStackTrace();
         }

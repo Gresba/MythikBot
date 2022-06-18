@@ -1,21 +1,17 @@
 package BotCommands;
 
 import Bot.BotProperty;
-import Bot.Embeds;
+import CustomObjects.Embeds;
 import Bot.Response;;
 import Bot.SQLConnection;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class MessageAutoResponse extends ListenerAdapter {

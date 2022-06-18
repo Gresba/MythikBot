@@ -1,4 +1,4 @@
-package Bot;
+package CustomObjects;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -469,35 +469,4 @@ public class Embeds {
                         You will be able to join in 24 hours
                         """)
                 .setFooter("Better Alts Security");
-
-
-    /**
-     * Embed to tell a user they successfully generated an alt
-     */
-    public static final EmbedBuilder GEN_SUCCESS = new EmbedBuilder()
-                .setTitle("**Better Alts Account Gen**")
-                .setDescription("Unbanned NFA sent to your DMs! Enjoy :)");
-
-    /**
-     * Embed to tell a user they could not generate an alt and how to
-     */
-    public static final EmbedBuilder GEN_FAILURE = new EmbedBuilder()
-                .setTitle("**Better Alts Account Gen**")
-                .setDescription("""
-                        You do not have permissions to run this command!
-
-                        **Gen Requirements:**
-                        Youtuber/Partner **or**\s
-                        $50 for the gen needed! Make a ticket for this!
-                        *If you paid then make a ticket and send order ID*""")
-                .setColor(Color.RED);
-
-
-    /**
-     * Embed that is sent to the user when they generate an alt
-     */
-    public static final EmbedBuilder GENERATOR = new EmbedBuilder()
-                .setTitle("**Better Alts Account Gen**")
-                .setDescription("Unbanned NFA/SFA")
-                .setFooter("Better Alts Account Gen");
 }

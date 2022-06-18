@@ -1,6 +1,5 @@
 package CustomObjects;
 
-import Bot.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -8,6 +7,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class CustomChannel {
     private JDA jda;
     private TextChannel customChannel;
+
     /**
      * Constructor for initializing a ticket channel
      *
@@ -37,7 +37,6 @@ public class CustomChannel {
     {
         customChannel.sendMessageEmbeds(embeds.build()).queue();
     }
-
 
     public TextChannel getChannel()
     {

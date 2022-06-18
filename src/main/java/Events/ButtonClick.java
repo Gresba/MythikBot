@@ -1,6 +1,6 @@
 package Events;
 
-import Bot.Embeds;
+import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
 import net.dv8tion.jda.api.Permission;
@@ -235,10 +235,8 @@ public class ButtonClick extends ListenerAdapter {
 
 
             case "not-answered-ticket" -> {
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setAllow(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+
+                // Ask the user if their ticket is related to an order
                 event.replyEmbeds(Embeds.ORDER_RELATED.build())
                         .addActionRow(
                                 Button.primary("yes", "YES"),
@@ -252,7 +250,7 @@ public class ButtonClick extends ListenerAdapter {
 
             case "no" -> {
                 event.reply("""
-            Please ask your ticket. Be as descriptive as possible and explain the question/issue as best as you can.
+            Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
             
             Staff members usually only look at tickets once a day so if you aren't descriptive you will have to wait until the next day to receive a response.
             """).queue();

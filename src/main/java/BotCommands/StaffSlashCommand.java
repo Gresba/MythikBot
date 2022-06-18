@@ -1,7 +1,7 @@
 package BotCommands;
 
 import Bot.BotProperty;
-import Bot.Embeds;
+import CustomObjects.Embeds;
 import Bot.Response;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
@@ -113,24 +113,6 @@ public class StaffSlashCommand extends ListenerAdapter {
                     banTarget.ban(banReason, delete_days);
                 }
 
-
-                // KICK COMMAND CONTROLLER
-                case "kick" -> {
-                    // Get the values from the arguments passed in through the slash command
-                    CustomMember kickTarget = new CustomMember(jda, event.getOption("user").getAsMember().getId(), guild.getId());
-                    String kickReason = event.getOption("reason").getAsString();
-
-                    try {
-                        kickTarget.kick(kickReason);
-
-                        // Acknowledge the event
-                        event.getHook().sendMessage(kickTarget.getMember().getAsMention() + " kicked! **Reason:** " + kickReason).queue();
-                    } catch (SQLException e) {
-                        event.getHook().sendMessage("**[Error]** There was an issue with updating the punishment in the database").queue();
-                        e.printStackTrace();
-                    }
-                }
-
                 // KICK COMMAND CONTROLLER
                 case "warn" -> {
                     // Get the values from the arguments passed in through the slash command
@@ -192,7 +174,7 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                 case "cardcheck" -> event.reply("Your order was marked as fraud. To verify you're the owner of the card we need to see the card with the last 4 digits of: " + event.getOption("last_four_digits").getAsString() + "\n" +
                                 "You can blur everything else out we just need to see the last 4 digits. If this cannot be done, we can provide a full refund. Just let us know.\n" +
-                                "Example: https://cdn.discordapp.com/attachments/882612837380399174/955249207466422332/IMG_5751.jpg")
+                                "Example: https://cdn.discordapp.com/attachments/859129620493369367/987782981684985896/IMG_6438.jpg")
                         .queue();
 
                 // Opens the ticket so the target user can speak in it and view the ticket

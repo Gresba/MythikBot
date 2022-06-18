@@ -2,7 +2,7 @@ package Events;
 
 import Bot.BotProperty;
 import Bot.CustomTime;
-import Bot.Embeds;
+import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomMember;
 import net.dv8tion.jda.api.EmbedBuilder;
