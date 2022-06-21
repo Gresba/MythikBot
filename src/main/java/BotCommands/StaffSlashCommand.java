@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -87,13 +88,18 @@ public class StaffSlashCommand extends ListenerAdapter {
                             .setPlaceholder("The member id of the owner (Ex. 938989740177383435)")
                             .setRequired(true)
                             .build();
+                    TextInput ticketCategoryId = TextInput.create("configure-ticket-category", "Ticket Category Id", TextInputStyle.SHORT)
+                            .setPlaceholder("The category the tickets will be put into (Ex. 838934740177383435")
+                            .setRequired(true)
+                            .build();
 
                     // Create the modal and add the TextInputs
                     Modal purchaseModal = Modal.create("configure-modal", "Configure Server")
                             .addActionRows(
                                     ActionRow.of(prefix),
                                     ActionRow.of(ticketLimit),
-                                    ActionRow.of(serverOwnerId))
+                                    ActionRow.of(serverOwnerId),
+                                    ActionRow.of(ticketCategoryId))
                             .build();
 
                     event.replyModal(purchaseModal).queue();

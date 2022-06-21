@@ -15,7 +15,6 @@ import java.sql.Statement;
 public class DeleteChannelEvent extends ListenerAdapter {
     @Override
     public void onChannelDelete(@NotNull net.dv8tion.jda.api.events.channel.ChannelDeleteEvent event) {
-        Statement statement = SQLConnection.getStatement();
 
         BotProperty botProperty = new BotProperty();
 
@@ -29,8 +28,7 @@ public class DeleteChannelEvent extends ListenerAdapter {
         );
 
         try {
-            String decrementTicketCount = "DELETE FROM Tickets WHERE TicketID = '" + event.getChannel().getId() + "'";
-            statement.executeUpdate(decrementTicketCount);
+            SQLConnection.deleteTicket(event.getChannel().getId());
         } catch (SQLException e) {
             e.printStackTrace();
         }

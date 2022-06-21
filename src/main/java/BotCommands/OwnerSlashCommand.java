@@ -41,7 +41,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
         if (sender.getUser().isBot())
             return;
 
-        // If the send contains the role "Owner" then allow them to use this command
+        // If send contains the role "Owner" then allow them to use this command
         if (sender.getId().equalsIgnoreCase(guildOwner.getMember().getId())) {
             event.deferReply().queue();
 
@@ -148,10 +148,11 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     String query = "DELETE FROM Orders WHERE OrderId='" + event.getOption("order_id").getAsString() + "'";
                     try {
                         statement.executeUpdate(query);
+                        event.getHook().sendMessage("Order successfully removed from the database!").setEphemeral(true).queue();
                     } catch (SQLException e) {
+                        event.getHook().sendMessage("**[ERROR]** There was an error with removing the order from the databdase").queue();
                         e.printStackTrace();
                     }
-                    event.getHook().sendMessage("Order successfully removed from the database!").setEphemeral(true).queue();
                 }
 
                 // DELETEDM delete a DM with a user and the bot

@@ -252,12 +252,13 @@ public class SQLConnection {
      * @param serverOwnerID The server owner's Id
      * @throws SQLException Exception that must be caught when calling this method
      */
-    public static void updateGuildInfo(Guild guild, String guildPrefix, int ticketLimit, String serverOwnerID) throws SQLException {
-        PreparedStatement updateGuildQuery = connection.prepareStatement("UPDATE Guilds SET Prefix = ?, TicketLimit = ?, OwnerID = ? WHERE GuildID = ?");
+    public static void updateGuildInfo(Guild guild, String guildPrefix, int ticketLimit, String serverOwnerID, String ticketCategoryId) throws SQLException {
+        PreparedStatement updateGuildQuery = connection.prepareStatement("UPDATE Guilds SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ? WHERE GuildID = ?");
         updateGuildQuery.setString(1, guildPrefix);
         updateGuildQuery.setInt(2, ticketLimit);
         updateGuildQuery.setString(3, serverOwnerID);
         updateGuildQuery.setString(4, guild.getId());
+        updateGuildQuery.setString(5, ticketCategoryId);
 
         updateGuildQuery.executeUpdate();
     }
@@ -268,13 +269,41 @@ public class SQLConnection {
      * @param guild The id of the guild
      * @throws SQLException
      */
-    public static void addDefaultGuild(Guild guild) throws SQLException {
-        PreparedStatement updateGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?)");
-        updateGuildQuery.setString(1, guild.getId());
-        updateGuildQuery.setString(2, "b!");
-        updateGuildQuery.setInt(3, 1);
-        updateGuildQuery.setString(4, "");
+    public static void insertGuild(Guild guild) throws SQLException {
+        PreparedStatement insertGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?, ?)");
+        insertGuildQuery.setString(1, guild.getId());
+        insertGuildQuery.setString(2, "b!");
+        insertGuildQuery.setInt(3, 1);
+        insertGuildQuery.setString(4, "");
 
-        updateGuildQuery.executeUpdate();
+        // TO DO: Implement this to database
+        // Ticket Category Id
+        insertGuildQuery.setString(5, "");
+
+        insertGuildQuery.executeUpdate();
+    }
+
+    /**
+     * Inserts a new ticket record into the database
+     *
+     * @param ticketChannelId The channel id of the new ticket channel
+     * @param memberId The member of the creator of the ticket
+     * @throws SQLException Common exception to be dealt with
+     */
+    public static void insertTicket(String ticketChannelId, String memberId) throws SQLException {
+        PreparedStatement insertTicketQuery = connection.prepareStatement("INSERT INTO Tickets VALUES (?, ?)");
+
+        insertTicketQuery.setString(1, ticketChannelId);
+        insertTicketQuery.setString(2, memberId);
+
+        insertTicketQuery.executeQuery();
+    }
+
+    public static void deleteTicket(String ticketChannelId) throws SQLException {
+        PreparedStatement deleteTicketQuery = connection.prepareStatement("DELETE FROM Tickets WHERE TicketId = ?");
+
+        deleteTicketQuery.setString(1, ticketChannelId);
+
+        deleteTicketQuery.executeUpdate();
     }
 }

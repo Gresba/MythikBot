@@ -11,7 +11,7 @@ public class JoinGuildEvent extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
-            SQLConnection.addDefaultGuild(event.getGuild());
+            SQLConnection.insertGuild(event.getGuild());
         } catch (SQLException e) {
             e.printStackTrace();
         }

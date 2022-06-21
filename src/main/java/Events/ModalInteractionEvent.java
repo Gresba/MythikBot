@@ -217,9 +217,10 @@ public class ModalInteractionEvent extends ListenerAdapter {
             String prefix = event.getValue("configure-prefix").getAsString();
             int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
             String serverOwnerId = event.getValue("configure-server-owner").getAsString();
+            String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
 
             try {
-                SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId);
+                SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId, ticketCategoryId);
                 event.getHook().sendMessage("Successfully configured server").queue();
             } catch (SQLException e) {
                 e.printStackTrace();

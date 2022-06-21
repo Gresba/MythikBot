@@ -35,8 +35,9 @@ public class MythikBot {
             String guildPrefix = guildInfo.getString(2);
             int guildTicketLimit = guildInfo.getInt(3);
             String guildOwner = guildInfo.getString(4);
+            String ticketCategoryId = guildInfo.getString(5);
 
-            GuildObject guildObject = new GuildObject(guildId, guildPrefix, guildTicketLimit, guildOwner);
+            GuildObject guildObject = new GuildObject(guildId, guildPrefix, guildTicketLimit, guildOwner, ticketCategoryId);
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);

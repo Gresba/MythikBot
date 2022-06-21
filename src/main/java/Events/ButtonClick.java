@@ -1,5 +1,7 @@
 package Events;
 
+import Bot.BotProperty;
+import BotObjects.GuildObject;
 import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
@@ -28,7 +30,8 @@ public class ButtonClick extends ListenerAdapter {
             return;
         Member member = event.getMember();
         Guild guild = event.getGuild();
-        Statement statement = SQLConnection.getStatement();
+
+        GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
 
         CustomChannel customChannel = new CustomChannel(event.getJDA(), event.getTextChannel().getId());
 
@@ -36,8 +39,9 @@ public class ButtonClick extends ListenerAdapter {
 
             // CREATE TICKET button for tickets
             case "create-ticket" ->
-                // Creates a new ticket channel
-                guild.createTextChannel(member.getUser().getName(), guild.getCategoryById("930157671896731649")).queue(
+
+                // Creates a new ticket channel in the category configured
+                guild.createTextChannel(member.getUser().getName(), guild.getCategoryById(guildObject.getTicketCategoyId())).queue(
                     ticketChannel -> {
                         try {
                             customChannel.setChannel(ticketChannel.getId());
@@ -45,9 +49,8 @@ public class ButtonClick extends ListenerAdapter {
                             // Set the channel topic to the user's id for future uses
                             customChannel.getChannel().getManager().setTopic(member.getId()).queue();
 
-                            // Create query with
-                            String insertQuery = "INSERT INTO Tickets VALUES ('" + ticketChannel.getId() + "', '" + member.getId() + "')";
-                            statement.executeUpdate(insertQuery);
+                            // Uses method in SQLConnection class to insert a new ticket record into the database
+                            SQLConnection.insertTicket(ticketChannel.getId(), member.getId());
 
                             // Setting permissions to allow ticket creator to view channel but can't send messages yet
                             ticketChannel.putPermissionOverride(member)
@@ -89,10 +92,7 @@ public class ButtonClick extends ListenerAdapter {
                                 Button.success("order-replacement", "Replacement"),
                                 Button.danger("close-ticket", "Close")
                         ).queue();
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setDeny(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                customChannel.muteTicket(member);
             }
 
             // PARTNERSHIP button for tickets
@@ -159,10 +159,7 @@ public class ButtonClick extends ListenerAdapter {
 
                 // Show the modal to the client
                 event.replyModal(purchaseModal).queue();
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setAllow(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                customChannel.openTicket(member);
             }
 
             // GENERAL QUESTIONS button for tickets
@@ -192,12 +189,6 @@ public class ButtonClick extends ListenerAdapter {
                         .addActionRows(ActionRow.of(claimOrderID))
                         .build();
                 event.replyModal(orderClaimModal).queue();
-
-                // Allow user to type to send their order ID
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setDeny(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
             }
             case "order-replacement" -> {
                 TextInput replacementOrderID = TextInput.create("order-id", "Order ID", TextInputStyle.SHORT)
@@ -227,10 +218,7 @@ public class ButtonClick extends ListenerAdapter {
                 event.replyModal(replacementModal).queue();
 
                 // Allow user to type to send their order ID
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setDeny(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                customChannel.muteTicket(member);
             }
 
 
@@ -249,10 +237,7 @@ public class ButtonClick extends ListenerAdapter {
             }
 
             case "no" -> {
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setAllow(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                customChannel.openTicket(member);
 
                 event.reply("""
                 Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
@@ -265,22 +250,12 @@ public class ButtonClick extends ListenerAdapter {
                 Role paypalerRole = guild.getRoleById("938905340001542235");
 
                 if (member.getRoles().contains(paypalerRole)) {
-                    customChannel.getChannel().upsertPermissionOverride(event.getMember())
-                            .setAllow(Permission.MESSAGE_SEND)
-                            .setAllow(Permission.VIEW_CHANNEL)
-                            .queue();
-
-                    customChannel.getChannel().upsertPermissionOverride(paypalerRole)
-                            .setDeny(Permission.VIEW_CHANNEL)
-                            .queue();
+                    customChannel.muteTicket(paypalerRole);
                     event.reply(guild.getMemberById(customChannel.getChannel().getTopic()).getAsMention() + ", " + event.getMember().getAsMention() + " will be in charge of your PayPal order. Talk to him in this ticket!").queue();
                 } else {
                     event.reply("You are not a PayPal exchanger so click that button does not do anything!").queue();
                 }
-                customChannel.getChannel().upsertPermissionOverride(member)
-                        .setAllow(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                customChannel.openTicket(member);
             }
 
             // Button add the member role to a user
