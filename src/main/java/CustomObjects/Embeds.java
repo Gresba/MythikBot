@@ -18,12 +18,8 @@ public class Embeds {
     public static final EmbedBuilder HELP = new EmbedBuilder()
             .setTitle("**Better Alts Help**")
             .setColor(Color.CYAN)
-            .setDescription("Assistance for Better Alts bot")
+            .setDescription("Choose one of the follow options")
             .setThumbnail(logoUrl)
-            .addField("**Staff Commands**", "Run /staffhelp to view staff commands", false)
-            .addField("**User Commands**", "Run /userhelp to view user commands", false)
-            .addField("**Customer Commands**", "Run /customerhelp to view customer commands", false)
-            .addField("**Frequently Asked Questions**", "Run /faq to view questions that might have been answered", false)
             .addField("**Questions/Problems**", "Create a #ticket if you have any questions or problems", false);
 
     /**
@@ -39,13 +35,14 @@ public class Embeds {
                             **1.1)** No talking about selling/buying products not related to Better Alts
                             **1.2)** No spamming/ghost pinging
                             **1.3)** No releasing anyone's information without consent
-                            **1.4)** No sending NSFW or gore contents
-                            **1.5)** No comments that will discourage another user from buying
-                            **1.6)** No advertising unless you have permission
-                            **1.7)** No pinging staff members unless it's about an order
-                            **1.8)** No mass pinging
-                            **1.9)** Use channels according to their purpose
-                            **1.10)** Don't ask for free stuff
+                            **1.4)** No sending NSFW or gore contents.
+                            **1.5)** No comments that will discourage another user from buying.
+                            **1.6)** No advertising unless you have permission.
+                            **1.7)** No pinging staff members unless it's about an order.
+                            **1.8)** No mass pinging.
+                            **1.9)** Use channels according to their purpose.
+                            **1.10)** Don't ask for free stuff.
+                            **1.11)** Making threats will get you banned and will get your order revoked.
                             """, false)
             .addField("**Invites**",
                     """
@@ -112,7 +109,7 @@ public class Embeds {
                 .addField("**PayPal**", "Create a ticket to purchase and type PayPal as the payment method", false)
                 .addField("**Restocked**", "There is no estimated time of restock for any product. To be alert for restocks go to #store and react to the proper message", false)
                 .addField("**Warranty**", """
-                        All products have a 24 hour warranty. Except MFAs which have a 1 hour warranty. 
+                        All products have a 24 hour warranty. Except MFAs which have a 1 hour warranty.
                         During that warranty you have to confirm whether your products are working or we can not give you any reimbursements.
                         Leaving or commenting any negative feedback in any way before giving support a chance to resolve the issue will remove any warranty.
                         """, false);
@@ -146,7 +143,7 @@ public class Embeds {
                                 Amazon Gift Card (40% Fee)
                                           
                                 **PayPal**
-                                Create a new ticket -> Click \"Purchase\" -> Type only "PayPal" as the payment method
+                                Create a new ticket -> Click "Purchase" -> Type only "PayPal" as the payment method
                                 """, false);
 
     /**
@@ -157,7 +154,7 @@ public class Embeds {
                 .setColor(Color.RED)
                 .setDescription("Your ticket has been closed. If you have anymore issues then please make another ticket!")
                 .addField("**Discord**", "https://discord.gg/vzwJz3NK7a", false)
-                .addField("**Store**", "https://betteralts.com", false);;
+                .addField("**Store**", "https://betteralts.com", false);
 
     /**
      * Embed to show a user the options for a ticket
@@ -173,7 +170,14 @@ public class Embeds {
                         **General** - Ask a general questions and see FAQ
                         **Close** - Close the ticket
                         """)
-                .addField("**Note**", "Read all everything before choosing an option or your warranty may expire", false);
+                .addField("**Note**", """
+                        Read everything before choosing an option or your warranty may expire.
+                        
+                        Do **NOT** create new tickets unless your problem has changed.
+                        
+                        Do **NOT** create new tickets because a staff member isn't answering. That will only extend the wait time for your ticket.
+                        """, false);
+
 
     /**
      * Embed to ask if someone's ticket is related to an order
@@ -212,7 +216,7 @@ public class Embeds {
                                 /bch - Mythik's BCH addy
                                 /sol - Mythik's SOL addy
                                 /ada - Mythik's ADA addy
-                                /cashapp - Mythik's CashApp Username
+                                /cash_app - Mythik's CashApp Username
                                 /venmo - Mythik's Venmo Username
                                 """, false);
 
@@ -225,7 +229,7 @@ public class Embeds {
                 .addField("**Commands",
                         """
                                 /orders - View orders and amount spent
-                                /registerorder - Add an order to your profile
+                                /register_order - Add an order to your profile
                                 """, false);
 
     /**
@@ -238,10 +242,9 @@ public class Embeds {
                         """
                                 /ban - Ban a member
                                 /kick - Kick a member
-                                /mute - Mute a member
-                                /unmute - Unmute a member
+                                /timeout - Timeout a member
                                 /warn - Warn a member
-                                /autonuke - Autonuke a channel
+                                /auto_nuke - Auto-nuke a channel
                                 /nuke - nuke a channel
                                 """, false)
                 .addField("**Tickets**",
@@ -249,12 +252,12 @@ public class Embeds {
                                 /send - Send a product
                                 /close - Close a ticket
                                 /order - Check an order
-                                /cardcheck - Ask user to verify their card
-                                /openticket - Open a ticket for a user
+                                /card_check - Ask user to verify their card
+                                /open_ticket - Open a ticket for a user
                                 """, false)
                 .addField("**Directions**",
                         """
-                                *Run the* /directionslist *command to see all directions options*
+                                *Run the* /directions_list *command to see all directions options*
                                 /directions - View the directions to different scenarios
                                 """, false);
 
@@ -307,7 +310,7 @@ public class Embeds {
                             **2** - Click on the order
                             **3** - Check if the order is fraudulent (View Directions for this)
                             **4** - If the order is not fraudulent or customer verifies then send the product
-                            **5** - The command is /send <ORDERID> <MEMBER>
+                            **5** - The command is /send <ORDER_ID> <MEMBER>
                             **MAKE SURE THE MEMBER IS THE ONE PINGED INSIDE THE ORDER DETAILS MESSAGE.** There can be two people with the same name.
                             """, false);
 
@@ -324,7 +327,7 @@ public class Embeds {
                         - "Number of cards previously associated with this IP address (last 7 days)"
                         - "Number of cards previously associated with this device ID (last 7 days)"
                         - "Checkout behavior"
-                        **2** - If any of these match then run the /cardcheck command and copy and paste the last 4 digits of the card into the command
+                        **2** - If any of these match then run the /card_check command and copy and paste the last 4 digits of the card into the command
                         - "Previous Disputes from this IP address" = "Yes"
                         - "Number of cards previously associated with this IP address (last 7 days)" >= 3
                         - "Number of cards previously associated with this device ID (last 7 days)" >= 3
@@ -354,7 +357,7 @@ public class Embeds {
                 .setDescription("Dealing with inquiries related to Unbanned Products")
                     .addField("**Steps:**",
                             """
-                            **1** - Run /openticket and figure out the exact problem.
+                            **1** - Run /open_ticket and figure out the exact problem.
                             **2** - Check if warranty is passed
                             **3** - Make sure they're logging in with the right mode (Microsoft/Mojang)
                             **4** - Ban issue: Confirm the customer didn't get the account banned
@@ -362,20 +365,20 @@ public class Embeds {
                                 - Check the last login and if it is after the customer purchased tell them
                                     "It looks like the account was banned after you purchased. This usually means that your IP was marked as suspicious by Hypixel
                                     Unfortunately, but we cannot replacements for this. However, we recommend using Vypr VPN to avoid this in the future"
-                                - If the account was last logged in before their purchase then ping Mythik and tell the customer they need to wait for Mythik. 
-                            **5** - If the alts sent to the customer is blank there was no stock at the time the product was sent and tell them to wait for Mythik    
+                                - If the account was last logged in before their purchase then ping Mythik and tell the customer they need to wait for Mythik.
+                            **5** - If the alts sent to the customer is blank there was no stock at the time the product was sent and tell them to wait for Mythik.
                             """,
                             false);
 
     /**
-     * Embed to show staff how to deal with issues about a MFA
+     * Embed to show staff how to deal with issues about an MFA
      */
     public static final EmbedBuilder MINECRAFT_MFA_ISSUE = new EmbedBuilder()
                 .setTitle("**Issue with MFA**")
                 .setDescription("How to deal with inquiries related to Minecraft MFAs")
                 .addField("**Steps**",
                         """
-                            **1** - First run the command /openticket <MEMBER> and make sure that you know the exact problem.
+                            **1** - First run the command /open_ticket <MEMBER> and make sure that you know the exact problem.
                             **2** - Check if warranty is passed
                             **3** - If the account doesn't sign into the email
                                 - Make sure they're signing into the right email. Ask them to send **only** the email of the account and check which domain it is
@@ -395,9 +398,9 @@ public class Embeds {
                 .setDescription("What to look for and how to moderation chat")
                 .addField("**Steps**",
                         """
-                                **1** - Is the chat being auto-nuked every 30 minutes? If not run the /autonuke Minutes: 30 command in the channel
+                                **1** - Is the chat being auto-nuked every 30 minutes? If not run the /auto_nuke Minutes: 30 command in the channel
                                 **2** - Check if anyone is breaking any rules. If they are pinging then warn them. If it is any other rule breaking, mute them and delete their message.
-                                **3** - If anyone needs help then tell them to create a ticket 
+                                **3** - If anyone needs help then tell them to create a ticket.
                                 **4** - Make sure everyone is using the channels according to their purchase.
                                 """, false);
 
@@ -414,47 +417,6 @@ public class Embeds {
                                     **3** - Use common sense to answer the question. If you don't know the answer ping Mythik and tell the customer to wait for Mythik to respond
                                     """, false);
 
-
-    /**
-     * Embed to tell a user they got kicked
-     */
-    public static final EmbedBuilder KICK = new EmbedBuilder()
-                .setTitle("**Better Alts Moderation**")
-                .setDescription("You have been **KICKED**!")
-                .setFooter("Better Alts Moderation");
-
-    /**
-     * Embed to tell a user they received a warning
-     */
-    public static final EmbedBuilder WARNING = new EmbedBuilder()
-                .setTitle("**Better Alts Moderation**")
-                .setDescription("You have been **WARNED!**")
-                .setFooter("Better Alts Moderation");
-
-    /**
-     * Embed to tell a user they got muted
-     */
-    public static final EmbedBuilder MUTED = new EmbedBuilder()
-                .setTitle("**Better Alts Moderation**")
-                .setDescription("You have been **MUTED**!")
-                .setFooter("Better Alts Moderation");
-
-    /**
-     * Embed to tell a user they got unmuted
-     */
-    public static final EmbedBuilder UNMUTED = new EmbedBuilder()
-                .setTitle("**Better Alts Moderation**")
-                .setDescription("You have been **UNNMUTED**!")
-                .setFooter("Better Alts Moderation");
-
-    /**
-     * Embed to tell a user they got banned
-     */
-    public static final EmbedBuilder BANNED = new EmbedBuilder()
-                .setTitle("**Better Alts Moderation**")
-                .setDescription("You have been **BANNED**!")
-                .setFooter("Better Alts Moderation");
-
     /**
      * Embed to tell a user they got detected as an alt
      */
@@ -466,4 +428,24 @@ public class Embeds {
                         You will be able to join in 24 hours
                         """)
                 .setFooter("Better Alts Security");
+
+    public static EmbedBuilder createPunishmentEmbed(String punishmentType, String reason)
+    {
+        EmbedBuilder punishmentEmbed = new EmbedBuilder()
+                .setTitle("**Better Alts Moderation**")
+                .setDescription(String.format("You have been **%s**", punishmentType))
+                .addField("**REASON**", reason, false)
+                .setFooter("Better Alts Moderation")
+                .setThumbnail(logoUrl);
+        if(reason.equalsIgnoreCase("WARNED"))
+            punishmentEmbed.addField("**IMPORTANT**",
+                    """
+                    The next warning will result in an immediate ban.
+                    
+                    Make sure you read all the rules in the #rules channel.
+                    
+                    If you have any on-going order, you will not receive any support for the order since you will be banned.
+                    """, false);
+        return punishmentEmbed;
+    }
 }

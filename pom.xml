@@ -93,7 +93,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Bot.MythikBot</mainClass>
+                            <mainClass>Bot.BetterBot</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

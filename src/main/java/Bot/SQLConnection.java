@@ -32,25 +32,14 @@ public class SQLConnection {
     }
 
     /**
-     * Insert an order into the
+     * Return a string which contains the product(s) requested for
      *
-     * @param orderID
-     * @param member
-     * @param insertedDate
-     * @throws SQLException
+     * @param guildId The guild the request was sent from
+     * @param productType The type of product to retrieve
+     * @param amount The amount to get
+     * @return {String} The product(s)
      */
-    public static void insertOrder(String orderID, Member member, Date insertedDate) throws SQLException {
-        PreparedStatement insertOrder = connection.prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
-        insertOrder.setString(1, orderID);
-        insertOrder.setString(2, member.getId());
-        insertOrder.setDate(3, insertedDate);
-        insertOrder.executeUpdate();
-    }
-
-    /**
-     *
-     */
-    public static String getProductByName(String guildId, String accountType, int amount)
+    public static String getProductByName(String guildId, String productType, int amount)
     {
         String accounts = "";
 
@@ -61,8 +50,8 @@ public class SQLConnection {
             PreparedStatement deleteProductQuery = connection.prepareStatement("DELETE FROM Accounts WHERE (AccountType = ? AND GuildId = ?) LIMIT ?");
 
             // Setting the account type
-            retrieveProductQuery.setString(1, accountType);
-            deleteProductQuery.setString(1, accountType);
+            retrieveProductQuery.setString(1, productType);
+            deleteProductQuery.setString(1, productType);
 
             // Setting the guild id
             retrieveProductQuery.setString(2, guildId);
@@ -104,7 +93,7 @@ public class SQLConnection {
      *
      * @param orderID The order id related to the product
      * @param guildId The guild that the member belongs to
-     * @return
+     * @return {String}
      * @throws IOException
      * @throws InterruptedException
      */

@@ -1,19 +1,18 @@
 package BotObjects;
 
 public class GuildObject {
-    private String guildId;
+    private final String guildId;
     private String prefix;
     private int ticketLimit;
     private String serverOwnerId;
+    private String ticketCategoryId;
 
-    private String ticketCategoyId;
-
-    public GuildObject(String guildId, String prefix, int ticketLimit, String serverOwnerId, String ticketCategoyId) {
+    public GuildObject(String guildId, String prefix, int ticketLimit, String serverOwnerId, String ticketCategoryId) {
         this.guildId = guildId;
         this.prefix = prefix;
         this.ticketLimit = ticketLimit;
         this.serverOwnerId = serverOwnerId;
-        this.ticketCategoyId = ticketCategoyId;
+        this.ticketCategoryId = ticketCategoryId;
     }
 
     public String getGuildId() {
@@ -28,7 +27,7 @@ public class GuildObject {
     public String getServerOwnerId() {
         return serverOwnerId;
     }
-    public String getTicketCategoyId() { return ticketCategoyId; }
+    public String getTicketCategoryId() { return ticketCategoryId; }
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
@@ -39,5 +38,5 @@ public class GuildObject {
     public void setServerOwnerId(String serverOwnerId) {
         this.serverOwnerId = serverOwnerId;
     }
-    public void setTicketCategoyId(String ticketCategoyId) {this.ticketCategoyId = ticketCategoyId; }
+    public void setTicketCategoryId(String ticketCategoryId) {this.ticketCategoryId = ticketCategoryId; }
 }

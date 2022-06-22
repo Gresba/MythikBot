@@ -20,12 +20,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Calendar;
-import java.util.Date;
-
-import static Bot.SQLConnection.getStatement;
 
 public class ModalInteractionEvent extends ListenerAdapter {
     @Override
@@ -34,8 +30,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
         event.deferReply().queue();
 
         // Declaring regular variables
-        Statement statement = getStatement();
-
         CustomChannel customChannel = new CustomChannel(event.getJDA(), event.getTextChannel().getId());
 
         TextChannel channel = event.getTextChannel();
@@ -87,7 +81,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     } catch (SQLIntegrityConstraintViolationException e) {
                         channel.sendMessage(
                                 """
-                                        **[Fraud Detection]** 
+                                        **[Fraud Detection]**
                                         Unable to send the product. The product was already claimed
                                         """).queue();
                         e.printStackTrace();
@@ -147,12 +141,10 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         event.getHook().editOriginalEmbeds(productDescriptionEmbed.build()).queue();
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             } catch (IllegalArgumentException e){
                 event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
                 event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
@@ -174,7 +166,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     .setActionRow(Button.danger("close-ticket", "Close"))
                     .queue();
             if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
-                Role paypalExchangerRole = guild.getRoleById(938905340001542235l);
+                Role paypalExchangerRole = guild.getRoleById(938905340001542235L);
 
                 channel.upsertPermissionOverride(paypalExchangerRole)
                         .setAllow(Permission.MESSAGE_SEND)
@@ -183,7 +175,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                 EmbedBuilder paypalClaim = new EmbedBuilder()
                         .setTitle("**PayPal Order**")
-                                .setDescription("A paypaler will claim this order soon. Please be patient!");
+                                .setDescription("A PayPaler will claim this order soon. Please be patient!");
                 channel.sendMessageEmbeds(paypalClaim.build()).setActionRow(
                         Button.primary("paypal-claim-order", "PayPal Claim")
                 ).queue();

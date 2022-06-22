@@ -17,12 +17,11 @@ import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 public class CustomMember {
-    private JDA jda;
     private Member member;
-    private Guild guild;
+    private final Guild guild;
 
     /**
-     * Constuctor for the initializing the custom member
+     * Constructor for the initializing the custom member
      *
      * @param jda The jda of the bot
      * @param memberId The member id for the custom member
@@ -30,9 +29,8 @@ public class CustomMember {
      */
     public CustomMember(JDA jda, String memberId, String guildId)
     {
-        this.jda = jda;
-        member = jda.getGuildById(guildId).getMemberById(memberId);
-        guild = jda.getGuildById(guildId);
+        this.member = jda.getGuildById(guildId).getMemberById(memberId);
+        this.guild = jda.getGuildById(guildId);
     }
 
     /**
@@ -43,7 +41,7 @@ public class CustomMember {
     public void sendPrivateMessage(EmbedBuilder embedBuilder)
     {
         // Open a private channel with the member and send the DM
-        member.getUser().openPrivateChannel().flatMap(privateChannel ->
+        this.member.getUser().openPrivateChannel().flatMap(privateChannel ->
                 privateChannel.sendMessageEmbeds(embedBuilder.build())
         ).queue();
     }
@@ -57,16 +55,14 @@ public class CustomMember {
     public void ban(String reason, int delDays)
     {
         // Ban the user
-        guild.getMemberById(this.member.getId()).ban(delDays, reason).queue();
+        this.guild.getMemberById(this.member.getId()).ban(delDays, reason).queue();
 
         // Alert the user they got banned
-        sendPrivateMessage(Embeds.BANNED
-                .addField("**Reason**", reason, false)
-        );
+        sendPrivateMessage(Embeds.createPunishmentEmbed("BANNED", reason));
     }
 
     /**
-     * Times out a server in the guild with the given argument from the slash command that will call this method
+     * Times out a member in the guild with the given argument from the slash command that will call this method
      *
      * @param reason The reason for the time
      * @param amount The duration of the timeout depending on the timeUnit
@@ -75,27 +71,23 @@ public class CustomMember {
      */
     public void timeout(String reason, int amount, @Nonnull String timeUnitString) throws SQLException {
         // Check if member is already timed out
-        if(member.isTimedOut())
+        if(this.member.isTimedOut())
         {
-            // If they are then untime them out
-            guild.removeTimeout(member).queue();
+            this.guild.removeTimeout(this.member).queue();
         }else{
             TimeUnit timeUnit;
             switch (timeUnitString)
             {
-                case "minutes" ->
-                        timeUnit = TimeUnit.MINUTES;
-                case "hours" ->
-                        timeUnit = TimeUnit.HOURS;
-                case "days" ->
-                        timeUnit = TimeUnit.DAYS;
-                default ->
-                        timeUnit = TimeUnit.SECONDS;
+                case "minutes" -> timeUnit = TimeUnit.MINUTES;
+                case "hours" -> timeUnit = TimeUnit.HOURS;
+                case "days" -> timeUnit = TimeUnit.DAYS;
+                default -> timeUnit = TimeUnit.SECONDS;
             }
 
-            guild.timeoutFor(member, amount, timeUnit).queue();
+            sendPrivateMessage(Embeds.createPunishmentEmbed("TIMEOUT", reason));
+            this.guild.timeoutFor(this.member, amount, timeUnit).queue();
 
-            SQLConnection.updatePunishment("timeout", member, reason);
+            SQLConnection.updatePunishment("timeout", this.member, reason);
         }
     }
 
@@ -177,11 +169,11 @@ public class CustomMember {
                 outputFile.print(accounts);
 
                 // Send the customer the product
-                member.getUser().openPrivateChannel().flatMap(privateChannel ->
+                this.member.getUser().openPrivateChannel().flatMap(privateChannel ->
                         privateChannel.sendFile(new File("output"), "product.txt")
                 ).queue();
             }
-            guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
+            this.guild.addRoleToMember(this.member.getId(), this.guild.getRoleById("929116572063244339")).queue();
 
             return true;
         }
@@ -190,7 +182,7 @@ public class CustomMember {
     }
 
     /**
-     * Get a member
+     * Get the member associated with this custom member
      *
      * @return The custom member
      */

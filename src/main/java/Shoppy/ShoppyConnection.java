@@ -11,11 +11,9 @@ import java.net.http.HttpResponse;
 public class ShoppyConnection {
     private static final String ShoppyAPIKey;
 
-    private static HttpClient client;
+    private static final HttpClient client;
 
-    private static String domainURL;
-
-    private static HttpRequest request;
+    private static final String domainURL;
 
     static {
         ShoppyAPIKey = System.getenv("SHOPPY_API_KEY");
@@ -23,8 +21,16 @@ public class ShoppyConnection {
         domainURL = "https://shoppy.gg/api/v1/";
     }
 
+    /**
+     * Gets a Shoppy order with the order id passed in
+     *
+     * @param iD The order id of the order
+     * @return A shoppy order
+     * @throws IOException Using stream to access Shoppy data so must be caught
+     * @throws InterruptedException Thread issues can occur so must be caught
+     */
     public static ShoppyOrder getShoppyOrder(String iD) throws IOException, InterruptedException {
-        request = HttpRequest.newBuilder()
+        HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .header("Authorization", ShoppyAPIKey)
                 .uri(URI.create(domainURL + "orders/" + iD))

@@ -1,8 +1,6 @@
 package BotCommands;
 
 import Bot.BotProperty;
-import CustomObjects.DropDowns;
-import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomMember;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -10,11 +8,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 public class OwnerSlashCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        // Only accept commands from guilds or non null members
+        // Only accept commands from guilds or non-null members
         if (!event.getChannelType().isGuild() || event.getMember() == null)
             return;
         Guild guild = event.getGuild();
@@ -91,6 +86,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                 // REPLACE an order
                 case "replace" -> {
                     String orderID = event.getOption("order_id").getAsString();
+
                     CustomMember member = new CustomMember(jda, event.getOption("target_user").getAsMember().getId(), guild.getId());
                     int replacementAmount = (int) event.getOption("replacement_amount").getAsLong();
 
@@ -101,11 +97,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         guildOwner.sendProduct(orderID, accounts);
 
                         event.getHook().sendMessage("Accounts successfully sent").queue();
-                    } catch (IOException e) {
-                        System.out.println("**[LOG]** There was an issue with sending the product");
-                        event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
+                    } catch (IOException | InterruptedException e) {
                         System.out.println("**[LOG]** There was an issue with sending the product");
                         event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
                         e.printStackTrace();
@@ -119,7 +111,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     Member targetMember = event.getOption("target_member").getAsMember();
 
                     // Build the query
-                    String whiteListQuery = "";
+                    String whiteListQuery;
                     if (actionType.equalsIgnoreCase("add")) {
                         whiteListQuery = "INSERT INTO Whitelist VALUES ('" + targetMember.getId() + "')";
                     } else if(actionType.equalsIgnoreCase("remove")){
@@ -143,20 +135,20 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     }
                 }
 
-                // REMOVEORDER from the database
-                case "removeorder" ->{
+                // REMOVE_ORDER from the database
+                case "remove_order" ->{
                     String query = "DELETE FROM Orders WHERE OrderId='" + event.getOption("order_id").getAsString() + "'";
                     try {
                         statement.executeUpdate(query);
                         event.getHook().sendMessage("Order successfully removed from the database!").setEphemeral(true).queue();
                     } catch (SQLException e) {
-                        event.getHook().sendMessage("**[ERROR]** There was an error with removing the order from the databdase").queue();
+                        event.getHook().sendMessage("**[ERROR]** There was an error with removing the order from the database").queue();
                         e.printStackTrace();
                     }
                 }
 
-                // DELETEDM delete a DM with a user and the bot
-                case "deletedm" -> {
+                // DELETE_DM delete a DM with a user and the bot
+                case "delete_dm" -> {
 
                     // Get arguments passed into the command
                     Member targetMember = event.getOption("target_member").getAsMember();
@@ -182,8 +174,8 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     event.getHook().sendMessage("Successfully deleted DMs with the user " + targetMember.getAsMention()).setEphemeral(true).queue();
                 }
 
-                // SCANFILE scan a file
-                case "scanfile" -> {
+                // SCAN_FILE scan a file
+                case "scan_file" -> {
                     // The path of the file
                     String filePath = event.getOption("filepath").getAsString();
                     File folder = new File(filePath);
@@ -209,7 +201,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                 }
 
                 //
-                case "orderdetails" -> {
+                case "order_details" -> {
                     String orderId = event.getOption("order_id").getAsString();
                     Member member = event.getOption("target_member").getAsMember();
 

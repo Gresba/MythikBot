@@ -2,9 +2,8 @@ package BotCommands;
 
 import Bot.BotProperty;
 import CustomObjects.Embeds;
-import Bot.Response;;
+import Bot.Response;
 import Bot.SQLConnection;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -42,7 +41,6 @@ public class MessageAutoResponse extends ListenerAdapter {
                 guild.getTextChannelById("953923167305465916").retrieveMessageById("953923565894402048").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
                 guild.getTextChannelById("934489170456494161").retrieveMessageById("934736207701762088").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
             }else if(messageArr[0].equals("m!loadInvites1")){
-                System.out.println("Invitesfeasfd");
                 guild.retrieveInvites().queue(
                         invites ->
                         {
@@ -60,30 +58,6 @@ public class MessageAutoResponse extends ListenerAdapter {
                             }
                         }
                 );
-            }else if(messageArr[0].equalsIgnoreCase("m!test")){
-
-                Calendar calendar = Calendar.getInstance();
-                java.util.Date date = calendar.getTime();
-                long time = date.getTime();
-
-                // Insert the order into the database so the same order cannot be claimed twice
-                PreparedStatement insertOrder = null;
-                try {
-                    Timestamp timestamp = new Timestamp(time);
-                    System.out.println(calendar.getTimeInMillis());
-                    insertOrder = statement.getConnection().prepareStatement("INSERT INTO Test VALUES (?)");
-                    insertOrder.setTimestamp(1, timestamp);
-                    insertOrder.executeUpdate();
-
-                    PreparedStatement statement1 = statement.getConnection().prepareStatement("SELECT * FROM Test");
-                    ResultSet result = statement1.executeQuery();
-                    while(result.next())
-                    {
-                        System.out.println(result.getTimestamp(1).getTime());
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
         }
 
@@ -112,78 +86,27 @@ public class MessageAutoResponse extends ListenerAdapter {
                     break;
                 }
             }
-//            if (!member.getRoles().contains(guild.getRoleById("939559233010151476"))) {
-//                if (message.getMentionedMembers().size() > 0) {
-//
-//                    Member pingedMember = message.getMentionedMembers().get(0);
-//
-//
-//                    if (pingedMember.getRoles().contains(guild.getRoleById("939559233010151476")) && !member.getRoles().contains(guild.getRoleById("939559233010151476"))) {
-//                        String getWarningCount = "SELECT WarningCount FROM Users WHERE MemberID = '" + member.getId() + "'";
-//
-//                        try {
-//                            ResultSet warningCountReslt = null;
-//                            warningCountReslt = statement.executeQuery(getWarningCount);
-//                            int warningCount = 0;
-//
-//                            while (warningCountReslt.next()) {
-//                                warningCount = warningCountReslt.getInt(1) + 1;
-//                            }
-//                            if (warningCount == 3) {
-//                                member.getUser().openPrivateChannel().flatMap(privateChannel ->
-//                                        privateChannel.sendMessageEmbeds(Embed(Embeds.KICK, "pinging"))
-//                                ).queue();
-//
-//                                channel.sendMessage(member.getAsMention() + " has been kicked for pinging too much!").queue();
-//                                guild.kick(member).queue();
-//                            }
-//
-//                            if (warningCount == 5) {
-//                                member.getUser().openPrivateChannel().flatMap(privateChannel ->
-//                                        privateChannel.sendMessageEmbeds(Embed(Embeds.BAN, "pinging"))
-//                                ).queue();
-//
-//                                channel.sendMessage(member.getAsMention() + " has been banned for pinging too much!").queue();
-//
-//                                String setWarningCount = "UPDATE Users SET WarningCount = '0' WHERE MemberID = '" + member.getId() + "'";
-//
-//                                statement.executeUpdate(setWarningCount);
-//                                guild.ban(member, 0, "5 Warnings").queue();
-//                            }
-//
-//                            String setWarningCount = "UPDATE Users SET WarningCount = '" + warningCount + "' WHERE MemberID = '" + member.getId() + "'";
-//                            statement.executeUpdate(setWarningCount);
-//
-//                            channel.sendMessage(memberUser.getAsMention() + " do not ping staff members! **Warning:** " + warningCount + "/3\n3 warnings will result in a kick\n5 warnings wil result in a ban").queue();
-//                        } catch (SQLException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
 
-                String messageLowerCase = messageString.toLowerCase();
+            String messageLowerCase = messageString.toLowerCase();
 
-                // FILTERING MESSAGES FOR ADVERTISEMENTS
-                if (message.getMentionedMembers().size() > 5) {
-                    message.delete().queue();
-                    guild.addRoleToMember(member, guild.getRoleById("936718165130481705")).queue();
-                    channel.sendMessage("Botting detected! You have been muted! Make a ticket to appeal!").queue(message1 -> {
-                        message1.delete().queueAfter(30, TimeUnit.SECONDS);
-                    });
-                }
+            // FILTERING MESSAGES FOR ADVERTISEMENTS
+            if (message.getMentionedMembers().size() > 5) {
+                message.delete().queue();
+                guild.addRoleToMember(member, guild.getRoleById("936718165130481705")).queue();
+                channel.sendMessage("Bot detected! You have been muted! Make a ticket to appeal!").queue(message1 -> message1.delete().queueAfter(30, TimeUnit.SECONDS));
+            }
 
-                if (messageLowerCase.contains(" king") || messageLowerCase.contains("k i n g") || messageLowerCase.contains("king alts") || messageLowerCase.contains("kingalts")
-                        || messageLowerCase.contains("asteroid") || messageLowerCase.contains("alts.top")
-                        || messageLowerCase.contains("discord.gg") || messageLowerCase.contains("alts top")
-                        || messageLowerCase.contains("personic")) {
-                    message.delete().queue();
+            if (messageLowerCase.contains(" king") || messageLowerCase.contains("k i n g") || messageLowerCase.contains("king alts") || messageLowerCase.contains("kingalts")
+                    || messageLowerCase.contains("asteroid") || messageLowerCase.contains("alts.top")
+                    || messageLowerCase.contains("discord.gg") || messageLowerCase.contains("alts top")
+                    || messageLowerCase.contains("personic") || messageLowerCase.contains("alten")) {
+                message.delete().queue();
 
-                    String query = "SELECT WarningCount FROM Users WHERE MemberID = '" + member.getId() + "'";
-                    channel.sendMessage("You are not allowed to send that! Mythik will punish you :/").queue();
-                }
+                channel.sendMessage("You are not allowed to send that! Mythik will punish you.").queue();
             }
         }
     }
+}
 
 
 

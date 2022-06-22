@@ -5,6 +5,7 @@ import BotObjects.GuildObject;
 import CustomObjects.Embeds;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
+import CustomObjects.Modals;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,14 +20,13 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 public class ButtonClick extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
 
         // Checking if the member or guild is null
-        if(event.getMember() == null || event.getGuild() == null)
+        if (event.getMember() == null || event.getGuild() == null)
             return;
         Member member = event.getMember();
         Guild guild = event.getGuild();
@@ -41,7 +41,7 @@ public class ButtonClick extends ListenerAdapter {
             case "create-ticket" ->
 
                 // Creates a new ticket channel in the category configured
-                guild.createTextChannel(member.getUser().getName(), guild.getCategoryById(guildObject.getTicketCategoyId())).queue(
+                guild.createTextChannel(member.getUser().getName(), guild.getCategoryById(guildObject.getTicketCategoryId())).queue(
                     ticketChannel -> {
                         try {
                             customChannel.setChannel(ticketChannel.getId());
@@ -96,80 +96,22 @@ public class ButtonClick extends ListenerAdapter {
             }
 
             // PARTNERSHIP button for tickets
-            case "partnership-ticket" -> {
-                TextInput email = TextInput.create("email", "Email", TextInputStyle.SHORT)
-                        .setPlaceholder("Enter your E-mail")
-                        .setRequired(true)
-                        .build();
-                TextInput channelLink = TextInput.create("channel-link", "Channel Link", TextInputStyle.SHORT)
-                        .setPlaceholder("Your youtube channel link. Put N/A if none")
-                        .setRequired(true)
-                        .build();
-                TextInput discordLink = TextInput.create("discord-link", "Discord Link", TextInputStyle.SHORT)
-                        .setPlaceholder("Your discord channel invite link. Put N/A if none")
-                        .setRequired(true)
-                        .build();
-                TextInput sponsorshipService = TextInput.create("sponsorship-service", "Service", TextInputStyle.PARAGRAPH)
-                        .setPlaceholder("What can you provide for BetterAlts?")
-                        .setRequired(true)
-                        .build();
-                TextInput sponsorshipPayment = TextInput.create("sponsorship-payment", "Payments", TextInputStyle.PARAGRAPH)
-                        .setPlaceholder("What do you want for your service?")
-                        .setRequired(true)
-                        .build();
-                Modal modal = Modal.create("sponsorship-partnership", "Sponsorship/Partnership")
-                        .addActionRows(
-                                ActionRow.of(email),
-                                ActionRow.of(channelLink),
-                                ActionRow.of(discordLink),
-                                ActionRow.of(sponsorshipService),
-                                ActionRow.of(sponsorshipPayment))
-                        .build();
-                event.replyModal(modal).queue();
-            }
+            case "partnership-ticket" -> event.replyModal(Modals.PARTNERSHIP_MODAL).queue();
 
             // PURCHASE button for tickets
             case "purchase-ticket" -> {
 
-                // Input to ask for the product they want to purchase
-                TextInput purchaseItemName = TextInput.create("purchase-item-name", "Item Name", TextInputStyle.SHORT)
-                        .setPlaceholder("What product do you want to purchase?")
-                        .setRequired(true)
-                        .build();
-
-                // Input to ask for the amount they want to purchase
-                TextInput purchaseItemAmount = TextInput.create("purchase-item-amount", "Item Amount", TextInputStyle.SHORT)
-                        .setPlaceholder("How many do you need?")
-                        .setRequired(true)
-                        .build();
-
-                // Input to ask for the payment method they will be using
-                TextInput paymentMethod = TextInput.create("purchase-payment-method", "Payment Method", TextInputStyle.SHORT)
-                        .setPlaceholder("Please enter your payment method")
-                        .setRequired(true)
-                        .build();
-
-                // Create the modal and add the TextInputs
-                Modal purchaseModal = Modal.create("purchase-modal", "Purchase Item")
-                        .addActionRows(
-                                ActionRow.of(purchaseItemName),
-                                ActionRow.of(purchaseItemAmount),
-                                ActionRow.of(paymentMethod))
-                        .build();
-
                 // Show the modal to the client
-                event.replyModal(purchaseModal).queue();
+                event.replyModal(Modals.PURCHASE_MODAL).queue();
                 customChannel.openTicket(member);
             }
 
             // GENERAL QUESTIONS button for tickets
-            case "general-ticket" -> {
-                event.editMessageEmbeds(Embeds.FAQ.build())
-                        .setActionRow(
-                                Button.primary("not-answered-ticket", "Question Not Answered"),
-                                Button.danger("close-ticket", "Close")
-                        ).queue();
-            }
+            case "general-ticket" -> event.editMessageEmbeds(Embeds.FAQ.build())
+                    .setActionRow(
+                            Button.primary("not-answered-ticket", "Question Not Answered"),
+                            Button.danger("close-ticket", "Close")
+                    ).queue();
 
             // CLOSE TICKET button for tickets
             case "close-ticket" -> {
@@ -191,66 +133,36 @@ public class ButtonClick extends ListenerAdapter {
                 event.replyModal(orderClaimModal).queue();
             }
             case "order-replacement" -> {
-                TextInput replacementOrderID = TextInput.create("order-id", "Order ID", TextInputStyle.SHORT)
-                        .setPlaceholder("Enter your Order ID")
-                        .setRequired(true)
-                        .setMinLength(36)
-                        .setMaxLength(36)
-                        .build();
-                TextInput replacementAmount = TextInput.create("replacement-amount", "Replacement Amount", TextInputStyle.SHORT)
-                        .setPlaceholder("Amount of replacements you need")
-                        .setRequired(true)
-                        .setMinLength(1)
-                        .setMaxLength(3)
-                        .build();
-                TextInput replacementReason = TextInput.create("replacement-reason", "Replacement Reason", TextInputStyle.PARAGRAPH)
-                        .setPlaceholder("Reason for replacements/What is wrong with your product? Explain in details")
-                        .setRequired(true)
-                        .setMinLength(1)
-                        .build();
-                Modal replacementModal = Modal.create("replacement-modal", "Replacements")
-                        .addActionRows(
-                                ActionRow.of(replacementOrderID),
-                                ActionRow.of(replacementAmount),
-                                ActionRow.of(replacementReason)
-                        )
-                        .build();
-                event.replyModal(replacementModal).queue();
+                event.replyModal(Modals.REPLACEMENT_MODAL).queue();
 
                 // Allow user to type to send their order ID
                 customChannel.muteTicket(member);
             }
 
+            case "not-answered-ticket" -> // Ask the user if their ticket is related to an order
+                    event.replyEmbeds(Embeds.ORDER_RELATED.build())
+                            .addActionRow(
+                                    Button.primary("yes", "YES"),
+                                    Button.secondary("no", "NO")
+                            ).queue();
 
-            case "not-answered-ticket" -> {
-
-                // Ask the user if their ticket is related to an order
-                event.replyEmbeds(Embeds.ORDER_RELATED.build())
-                        .addActionRow(
-                                Button.primary("yes", "YES"),
-                                Button.secondary("no", "NO")
-                        ).queue();
-            }
-
-            case "yes" -> {
-                event.reply("Close this ticket and created a new one for \"Order\" or your warranty may expire").queue();
-            }
+            case "yes" -> event.reply("Close this ticket and created a new one for \"Order\" or your warranty may expire").queue();
 
             case "no" -> {
                 customChannel.openTicket(member);
 
                 event.reply("""
-                Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
-                
-                Staff members usually only look at tickets once a day so if you aren't descriptive you will have to wait until the next day to receive a response.
-                """).queue();
+                        Please ask your ticket. Be as **descriptive** as possible and explain the question/issue as best as you can.
+                                        
+                        Staff members usually only look at tickets once a day so if you aren't descriptive you will have to wait until the next day to receive a response.
+                        """).queue();
             }
 
             case "paypal-claim-order" -> {
-                Role paypalerRole = guild.getRoleById("938905340001542235");
+                Role paypalRole = guild.getRoleById("938905340001542235");
 
-                if (member.getRoles().contains(paypalerRole)) {
-                    customChannel.muteTicket(paypalerRole);
+                if (member.getRoles().contains(paypalRole)) {
+                    customChannel.muteTicket(paypalRole);
                     event.reply(guild.getMemberById(customChannel.getChannel().getTopic()).getAsMention() + ", " + event.getMember().getAsMention() + " will be in charge of your PayPal order. Talk to him in this ticket!").queue();
                 } else {
                     event.reply("You are not a PayPal exchanger so click that button does not do anything!").queue();
@@ -258,7 +170,7 @@ public class ButtonClick extends ListenerAdapter {
                 customChannel.openTicket(member);
             }
 
-            // Button add the member role to a user
+            // Add the member role to a user
             case "verify" -> {
                 guild.addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
 
@@ -283,23 +195,17 @@ public class ButtonClick extends ListenerAdapter {
 
             //
             case "staff-commands-help" -> {
-                if(member.hasPermission(Permission.ADMINISTRATOR))
+                if (member.hasPermission(Permission.ADMINISTRATOR))
                     event.editMessageEmbeds(Embeds.STAFF_HELP.build()).queue();
                 else
                     event.reply("You do not have permissions to view this!").setEphemeral(true).queue();
             }
 
-            case "user-command-help" -> {
-                event.editMessageEmbeds(Embeds.USER_HELP.build()).queue();
-            }
+            case "user-command-help" -> event.editMessageEmbeds(Embeds.USER_HELP.build()).queue();
 
-            case "customer-commands-help" -> {
-                event.editMessageEmbeds(Embeds.CUSTOMER_HELP.build()).queue();
-            }
+            case "customer-commands-help" -> event.editMessageEmbeds(Embeds.CUSTOMER_HELP.build()).queue();
 
-            case "faq-help" -> {
-                event.editMessageEmbeds(Embeds.FAQ.build()).queue();
-            }
+            case "faq-help" -> event.editMessageEmbeds(Embeds.FAQ.build()).queue();
         }
     }
 }

@@ -1,5 +1,6 @@
 package CustomObjects;
 
+import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -7,10 +8,11 @@ import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class CustomChannel {
-    private JDA jda;
-    private TextChannel customChannel;
+import java.io.IOException;
 
+public class CustomChannel {
+    private final JDA jda;
+    private TextChannel customChannel;
     /**
      * Constructor for initializing a ticket channel
      *
@@ -21,6 +23,13 @@ public class CustomChannel {
     {
         this.jda = jda;
         this.customChannel = jda.getTextChannelById(channelId);
+    }
+
+    public void sendProduct(String productType, int amount, String orderId) throws IOException, InterruptedException {
+        String guildId = customChannel.getGuild().getId();
+        CustomMember ticketOwner = new CustomMember(this.jda, customChannel.getTopic(), guildId);
+        String accounts = SQLConnection.getProductByName(guildId, productType, amount);
+        ticketOwner.sendProduct(orderId, accounts);
     }
 
     /**

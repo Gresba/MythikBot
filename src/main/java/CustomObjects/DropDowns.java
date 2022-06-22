@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 public class DropDowns {
-    public static SelectMenu RESTOCK_ROLES =
+    public static SelectMenu PRODUCTS =
             SelectMenu.create("select-roles")
                     .addOptions(SelectOption.of("Unbanned MFA", "unbanned-mfa")
                             .withDescription("MFAs unbanned on Hypixel")

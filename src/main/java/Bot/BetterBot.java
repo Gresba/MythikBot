@@ -16,14 +16,11 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import javax.security.auth.login.LoginException;
 import java.sql.*;
 
-import static Bot.SQLConnection.getStatement;
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
-public class MythikBot {
+public class BetterBot {
 
-    private static JDA jda;
     public static void main(String[] args) throws SQLException{
-        Statement statement = getStatement();
 
         ResultSet guildInfo = SQLConnection.getGuildInfo();
 
@@ -67,20 +64,19 @@ public class MythikBot {
 
         try {
 
-            jda = jdaBuilder.build().awaitReady();
+            JDA jda = jdaBuilder.build().awaitReady();
             jda.getPresence().setStatus(OnlineStatus.ONLINE);
             jda.getPresence().setActivity(Activity.playing("/help for help"));
 
             CommandListUpdateAction commands = jda.updateCommands();
 
-            jda.getGuildById("929101421272510524").updateCommands();
             // USER accessible slash commands
             commands.addCommands(
                     Commands.slash("eth", "Get Mythik's Ethereum Address"),
 
                     Commands.slash("btc", "Get Mythik's Bitcoin Address"),
 
-                    Commands.slash("ltc", "Get Mythik's Litecoin Address"),
+                    Commands.slash("ltc", "Get Mythik's Lite coin Address"),
 
                     Commands.slash("bch", "Get Mythik's Bitcoin Cash Address"),
 
@@ -90,7 +86,7 @@ public class MythikBot {
 
                     Commands.slash("venmo", "Get Mythik's Venmo Tag"),
 
-                    Commands.slash("cashapp", "Get Mythik's CashApp Tag"),
+                    Commands.slash("cash_app", "Get Mythik's CashApp Tag"),
 
                     Commands.slash("paypal", "Get Mythik's PayPal email"),
 
@@ -115,7 +111,7 @@ public class MythikBot {
 
                     // BAN command
                     Commands.slash("ban", "Ban a user from this server")
-                            .addOptions(new OptionData(USER, "user", "The user to ban")
+                            .addOptions(new OptionData(USER, "target_member", "The user to ban")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "reason", "The reason for the ban")
                                     .setRequired(true))
@@ -124,26 +120,19 @@ public class MythikBot {
 
                     // TIMEOUT command
                     Commands.slash("timeout", "Timeout a user")
-                            .addOptions(new OptionData(USER, "user", "The user to timeout")
+                            .addOptions(new OptionData(USER, "target_member", "The user to timeout")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "reason", "The reason for the timeout")
                                     .setRequired(true)),
 
-                    // UNTIMEOUT command
-                    Commands.slash("untimeout", "Un-timeout a user")
+                    // UN_TIMEOUT command
+                    Commands.slash("un_timeout", "Un-timeout a user")
                             .addOptions(new OptionData(USER, "user", "The user to un-timeout")
-                                    .setRequired(true)),
-
-                    // KICK command
-                    Commands.slash("kick", "Kick a user")
-                            .addOptions(new OptionData(USER, "user", "The user to kick")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "reason", "The reason for the kick")
                                     .setRequired(true)),
 
                     // WARN command
                     Commands.slash("warn", "Warn a user")
-                            .addOptions(new OptionData(USER, "user", "The user to warn")
+                            .addOptions(new OptionData(USER, "target_member", "The user to warn")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "reason", "The reason for the warning")
                                     .setRequired(true)),
@@ -151,8 +140,8 @@ public class MythikBot {
                     // NUKE command
                     Commands.slash("nuke", "Nuke the channel"),
 
-                    // AUTONUKE command
-                    Commands.slash("autonuke", "Turn nuke a channel")
+                    // AUTO_NUKE command
+                    Commands.slash("auto_nuke", "Turn nuke a channel")
                             .addOptions(new OptionData(INTEGER, "minutes", "How many minutes")),
 
                     // ORDER command
@@ -162,36 +151,36 @@ public class MythikBot {
                             .addOptions(new OptionData(BOOLEAN, "on_off", "Turn auto-nuke on or off")
                                             .setRequired(false)),
 
-                    // CARDCHECK command
-                    Commands.slash("cardcheck", "Send card check message")
+                    // CARD_CHECK command
+                    Commands.slash("card_check", "Send card check message")
                             .addOptions(new OptionData(STRING, "last_four_digits", "The last 4 digits of the card")
                                             .setRequired(true)),
 
-                    // DELETERESPONSE command
-                    Commands.slash("deleteresponse", "Delete a response to a trigger word")
+                    // DELETE_RESPONSE command
+                    Commands.slash("delete_response", "Delete a response to a trigger word")
                             .addOptions(new OptionData(STRING, "trigger_word", "The trigger words to delete response to")
                                     .setRequired(true)),
 
                     // CLOSE command
                     Commands.slash("close", "Close the ticket"),
 
-                    // OPENTICKET command
-                    Commands.slash("openticket", "Allow the creator of the ticket to speak")
+                    // OPEN_TICKET command
+                    Commands.slash("open_ticket", "Allow the creator of the ticket to speak")
                             .addOptions(new OptionData(USER, "target_user", "Person to open the ticket for", true)),
                     // SEND command
                     Commands.slash("send", "Send a product to a user")
                             .addOptions(new OptionData(STRING, "order_id", "The order ID", true))
                             .addOptions(new OptionData(USER, "target_user", "Person to send it to", true)),
 
-                    // DIRECTIONSLIST command
-                    Commands.slash("directionslist", "Get a list of all directions and what they are for"),
+                    // DIRECTIONS_LIST command
+                    Commands.slash("directions_list", "Get a list of all directions and what they are for"),
 
                     // DIRECTIONS command
                     Commands.slash("directions", "Get the directions for a specific direction")
                             .addOptions(new OptionData(STRING, "direction_name", "The direction you want to read", true, true)),
 
-                    // STAFFHELP command
-                    Commands.slash("staffhelp", "How to use staff features"),
+                    // STAFF_HELP command
+                    Commands.slash("staff_help", "How to use staff features"),
 
                     // ADDUSER command
                     Commands.slash("add_user", "Add a user to the database")
@@ -202,10 +191,7 @@ public class MythikBot {
 
             // OWNER Slash Commands
             commands.addCommands(
-                    // GENERATETICKET command
-                    Commands.slash("generateticket", "Generate a ticket in the channel you run this command."),
-
-                    Commands.slash("scanfile", "Scan")
+                    Commands.slash("scan_file", "Scan")
                             .addOptions(new OptionData(STRING, "filepath", "File path")
                                     .setRequired(true)),
                     // REPLACE command
@@ -231,8 +217,8 @@ public class MythikBot {
                             .addOptions(new OptionData(ATTACHMENT, "input_file", "The file with the products in it")
                                     .setRequired(true)),
 
-                    // ADDRESPONSE command
-                    Commands.slash("addresponse", "Add a response to a trigger word")
+                    // ADD_RESPONSE command
+                    Commands.slash("add_response", "Add a response to a trigger word")
                             .addOptions(new OptionData(STRING, "trigger", "The word(s) that will trigger the response")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "response", "The response that the word(s) will trigger")
@@ -246,26 +232,24 @@ public class MythikBot {
                             .addOptions(new OptionData(BOOLEAN, "direct_match", "Does the trigger word have to directly match or be in the message. Default false")
                                     .setRequired(false)),
 
-                    // DELETEDM command
-                    Commands.slash("deletedm", "Delete DMs with the target member")
+                    // DELETE_DM command
+                    Commands.slash("delete_dm", "Delete DMs with the target member")
                             .addOptions(new OptionData(USER, "target_member", "The member to delete the DMs with")
                                     .setRequired(true))
                             .addOptions(new OptionData(INTEGER, "amount_to_delete", "The amount of messages to delete")
                                     .setRequired(true)),
 
-                    // REMOVEORDER command
-                    Commands.slash("removeorder", "Remove an order from the database")
+                    // REMOVE_ORDER command
+                    Commands.slash("remove_order", "Remove an order from the database")
                             .addOptions(new OptionData(STRING, "order_id", "The order id to remove from the database")
                                     .setRequired(true)),
 
                     // ORDER_DETAILS commands
-                    Commands.slash("orderdetails", "Get the accounts already sent")
+                    Commands.slash("order_details", "Get the accounts already sent")
                             .addOptions(new OptionData(STRING, "order_id", "The order id you want to retrieve the accounts for")
                                     .setRequired(true))
                             .addOptions(new OptionData(USER, "target_member", "The members DMs to access")
-                                    .setRequired(true)),
-                    Commands.slash("rolesembed", "Add embed")
-
+                                    .setRequired(true))
             );
 
             jda.getGuildById("929101421272510524").updateCommands();

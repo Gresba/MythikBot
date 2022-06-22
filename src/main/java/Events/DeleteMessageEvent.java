@@ -3,11 +3,9 @@ package Events;
 import Bot.BotProperty;
 import Bot.MessageObj;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -16,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Map;
 
 public class DeleteMessageEvent extends ListenerAdapter {
 
@@ -47,19 +44,19 @@ public class DeleteMessageEvent extends ListenerAdapter {
         try{
             MessageObj deletedMsgObj = botProperty.getMessageHistory().get(deletedMsgId);
 
-            Member authorOfDeletedMsg = guild.getMemberById(deletedMsgObj.getSenderID());
+            Member authorOfDeletedMsg = guild.getMemberById(deletedMsgObj.senderID());
 
             EmbedBuilder deletedMsgEmbed = new EmbedBuilder();
 
             deletedMsgEmbed.setTitle("**Deleted a message**");
             deletedMsgEmbed.setAuthor(authorOfDeletedMsg.getUser().getAsTag(), authorOfDeletedMsg.getEffectiveAvatarUrl(),authorOfDeletedMsg.getEffectiveAvatarUrl());
-            deletedMsgEmbed.setDescription("**Message:** " + deletedMsgObj.getMessageContent());
+            deletedMsgEmbed.setDescription("**Message:** " + deletedMsgObj.messageContent());
 
             deletedMsgEmbed.addField("Channel", textChannel.getAsMention(), false);
-            deletedMsgEmbed.addField("Author", guild.getMemberById(deletedMsgObj.getSenderID()).getAsMention(), false);
+            deletedMsgEmbed.addField("Author", guild.getMemberById(deletedMsgObj.senderID()).getAsMention(), false);
             DateTimeFormatter FOMATTER = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy H:mm a");
 
-            deletedMsgEmbed.addField("Message Created", FOMATTER.format(deletedMsgObj.getTimeCreated().minusHours(5)), false);
+            deletedMsgEmbed.addField("Message Created", FOMATTER.format(deletedMsgObj.timeCreated().minusHours(5)), false);
 
             deletedMsgEmbed.setFooter(new Date().toString());
             deletedMsgEmbed.setColor(Color.RED);
