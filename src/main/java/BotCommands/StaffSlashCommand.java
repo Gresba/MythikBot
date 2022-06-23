@@ -22,7 +22,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +44,6 @@ public class StaffSlashCommand extends ListenerAdapter {
 
         CustomChannel channel = new CustomChannel(jda, event.getTextChannel().getId());
         CustomMember guildOwner = new CustomMember(jda, guildObject.getServerOwnerId(), guild.getId());
-
-        Statement statement = SQLConnection.getStatement();
 
         BotProperty botProperty = new BotProperty();
 
@@ -235,6 +232,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                                 // Send the product to the owner and the customer
                                 targetMember.sendProduct(orderId, product, productType);
                                 guildOwner.sendProduct(orderId, product, productType);
+
                             }catch (NullPointerException e){
 
                                 // If it's not that set means you can check with just the order id

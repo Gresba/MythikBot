@@ -44,9 +44,20 @@ public class SQLConnection {
 
         try {
             // Building the query
-            PreparedStatement retrieveProductQuery = connection.prepareStatement("SELECT AccountInfo FROM Accounts WHERE (AccountType = ? AND GuildId = ?) LIMIT ?");
+            PreparedStatement retrieveProductQuery = connection.prepareStatement(
+            """
+                SELECT AccountInfo
+                FROM Accounts
+                WHERE (AccountType = ? AND GuildId = ?)
+                LIMIT ?
+                """);
 
-            PreparedStatement deleteProductQuery = connection.prepareStatement("DELETE FROM Accounts WHERE (AccountType = ? AND GuildId = ?) LIMIT ?");
+            PreparedStatement deleteProductQuery = connection.prepareStatement(
+            """
+                DELETE FROM Accounts
+                WHERE (AccountType = ? AND GuildId = ?)
+                LIMIT ?
+                """);
 
             // Setting the account type
             retrieveProductQuery.setString(1, productType);
@@ -97,7 +108,11 @@ public class SQLConnection {
      */
     public static void insertPunishment(String punishmentType, Member member, String reason, String staffMemberId) throws SQLException {
 
-        PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments (Type, Reason, MemberId, StaffMemberId) VALUES (?, ?, ?, ?)");
+        PreparedStatement updatePunishmentQuery = connection.prepareStatement(
+        """
+            INSERT INTO Punishments (Type, Reason, MemberId, StaffMemberId)
+            VALUES (?, ?, ?, ?)
+            """);
 
         // Setting type, reason and member, respectively, for punishment
         updatePunishmentQuery.setString(1, punishmentType);
@@ -120,7 +135,11 @@ public class SQLConnection {
         java.util.Date date = new java.util.Date();
         long time = date.getTime();
 
-        PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
+        PreparedStatement insertOrder = statement.getConnection().prepareStatement(
+        """
+            INSERT INTO Orders (OrderID, MemberID, ClaimedDate)
+            VALUES (?, ?, ?)
+            """);
         insertOrder.setString(1, orderId);
         insertOrder.setString(2, MemberId);
         insertOrder.setTimestamp(3, new Timestamp(time));
@@ -135,11 +154,14 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static ResultSet getOrder(String orderId) throws SQLException {
-        PreparedStatement getOrder = statement.getConnection().prepareStatement("SELECT * FROM Orders WHERE OrderID = ?");
+        PreparedStatement getOrder = statement.getConnection().prepareStatement(
+        """
+            SELECT * FROM Orders
+            WHERE OrderID = ?
+            """);
         getOrder.setString(1, orderId);
 
-        ResultSet retrievedOrder = getOrder.executeQuery();
-        return retrievedOrder;
+        return getOrder.executeQuery();
     }
 
     /**
@@ -155,7 +177,11 @@ public class SQLConnection {
         try {
 
             // The SQL query to add the user into the database
-            PreparedStatement insertUserIntoDb = connection.prepareStatement("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement insertUserIntoDb = connection.prepareStatement(
+            """
+                INSERT INTO Users
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """);
 
             // Guild ID
             insertUserIntoDb.setString(1, guild.getId());
@@ -224,7 +250,12 @@ public class SQLConnection {
      * @throws SQLException Exception that must be caught when calling this method
      */
     public static void updateGuildInfo(GuildObject guild) throws SQLException {
-        PreparedStatement updateGuildQuery = connection.prepareStatement("UPDATE Guilds SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ? WHERE GuildID = ?");
+        PreparedStatement updateGuildQuery = connection.prepareStatement(
+        """
+            UPDATE Guilds
+            SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?
+            WHERE GuildID = ?
+            """);
         updateGuildQuery.setString(1, guild.getPrefix());
         updateGuildQuery.setInt(2, guild.getTicketLimit());
         updateGuildQuery.setString(3, guild.getServerOwnerId());
@@ -241,9 +272,13 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertGuild(Guild guild) throws SQLException {
-        PreparedStatement insertGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement insertGuildQuery = connection.prepareStatement(
+        """
+            INSERT INTO Guilds
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """);
 
-        // Guild Id
+        // Guild ID
         insertGuildQuery.setString(1, guild.getId());
 
         // Guild command prefix
@@ -278,7 +313,11 @@ public class SQLConnection {
      * @throws SQLException Common exception to be dealt with
      */
     public static void insertTicket(String ticketChannelId, String memberId) throws SQLException {
-        PreparedStatement insertTicketQuery = connection.prepareStatement("INSERT INTO Tickets VALUES (?, ?)");
+        PreparedStatement insertTicketQuery = connection.prepareStatement(
+        """
+            INSERT INTO Tickets
+            VALUES (?, ?)
+            """);
 
         insertTicketQuery.setString(1, ticketChannelId);
         insertTicketQuery.setString(2, memberId);
@@ -293,7 +332,11 @@ public class SQLConnection {
      * @throws SQLException Common SQL error which must be caught
      */
     public static void deleteTicket(String ticketChannelId) throws SQLException {
-        PreparedStatement deleteTicketQuery = connection.prepareStatement("DELETE FROM Tickets WHERE TicketId = ?");
+        PreparedStatement deleteTicketQuery = connection.prepareStatement(
+        """
+            DELETE FROM Tickets
+            WHERE TicketId = ?
+            """);
 
         deleteTicketQuery.setString(1, ticketChannelId);
 
@@ -308,7 +351,11 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertResponse(String guildId, Response response) throws SQLException {
-        PreparedStatement insertResponseQuery = connection.prepareStatement("INSERT INTO Response VALUES (?, ?, ?, ?, ?)");
+        PreparedStatement insertResponseQuery = connection.prepareStatement(
+        """
+            INSERT INTO Response
+            VALUES (?, ?, ?, ?, ?)
+            """);
 
         insertResponseQuery.setString(1, guildId);
         insertResponseQuery.setString(2, response.getTriggerString());
@@ -329,9 +376,11 @@ public class SQLConnection {
     public static void deleteResponse(String guildId, String triggerWord) throws SQLException {
         // Building the query
         PreparedStatement deleteResponseQuery = connection.prepareStatement(
-                "DELETE FROM Response " +
-                    "WHERE TriggerWord = ? )" +
-                    "AND GuildId = ?");
+        """
+            DELETE FROM Response
+            WHERE TriggerWord = ?
+            AND GuildId = ?
+            """);
 
         // Populating the query
         deleteResponseQuery.setString(1, triggerWord);

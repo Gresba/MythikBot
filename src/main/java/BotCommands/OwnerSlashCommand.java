@@ -45,7 +45,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
                 // UPLOAD a product into the database
                 case "upload" -> {
-                    String accountType = event.getOption("account_type").getAsString();
+                    String accountType = event.getOption("product_type").getAsString();
                     try {
                         File inputFile = event.getOption("input_file").getAsAttachment().downloadToFile().get();
                         Scanner input = new Scanner(inputFile);

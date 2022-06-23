@@ -220,7 +220,7 @@ public class BetterBot {
 
                     // UPLOAD command
                     Commands.slash("upload", "Upload a product to the database")
-                            .addOptions(new OptionData(STRING, "account_type", "The type of product to upload")
+                            .addOptions(new OptionData(STRING, "product_type", "The type of product to upload")
                                     .setRequired(true))
                             .addOptions(new OptionData(ATTACHMENT, "input_file", "The file with the products in it")
                                     .setRequired(true)),
