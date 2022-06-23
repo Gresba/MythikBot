@@ -1,5 +1,6 @@
 package CustomObjects;
 
+import Bot.BotProperty;
 import Bot.SQLConnection;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
@@ -51,14 +52,23 @@ public class CustomMember {
      *
      * @param reason The reason for the ban
      * @param delDays The amount of days which messages should be deleted sent by the member
+     * @param staffMember The staff member that banned the member
      */
-    public void ban(String reason, int delDays)
-    {
+    public void ban(String reason, int delDays,  Member staffMember) throws SQLException {
+        // Store the embed for a ban for future usage
+        EmbedBuilder banEmbed = Embeds.createPunishmentEmbed("BAN", reason, staffMember);
+
+        // Alert the member they got banned
+        sendPrivateMessage(banEmbed);
+
         // Ban the user
         this.guild.getMemberById(this.member.getId()).ban(delDays, reason).queue();
 
-        // Alert the user they got banned
-        sendPrivateMessage(Embeds.createPunishmentEmbed("BANNED", reason));
+        // Insert the punishment into the "punishments" table in the database
+        SQLConnection.insertPunishment("ban", this.member, reason, staffMember.getId());
+
+        // Log the punishment in the discord server
+        BotProperty.storeLog(guild, banEmbed, "Ban");
     }
 
     /**
@@ -67,9 +77,11 @@ public class CustomMember {
      * @param reason The reason for the time
      * @param amount The duration of the timeout depending on the timeUnit
      * @param timeUnitString The timeUnitString which will be converted into a TimeUnit
-     * @throws SQLException
+     * @param staffMember The staff member that timed out the member
+     * @throws SQLException Common SQL issues that must be caught
      */
-    public void timeout(String reason, int amount, @Nonnull String timeUnitString) throws SQLException {
+    public void timeout(String reason, int amount, @Nonnull String timeUnitString, Member staffMember) throws SQLException
+    {
         // Check if member is already timed out
         if(this.member.isTimedOut())
         {
@@ -84,22 +96,53 @@ public class CustomMember {
                 default -> timeUnit = TimeUnit.SECONDS;
             }
 
-            sendPrivateMessage(Embeds.createPunishmentEmbed("TIMEOUT", reason));
+            // Store the embed for a timeout embed for future usage
+            EmbedBuilder timeoutEmbed = Embeds.createPunishmentEmbed("TIMEOUT", reason, staffMember);
+
+            // Alert the member they have been warned
+            sendPrivateMessage(timeoutEmbed);
+
+            // Timeout the user from the guild
             this.guild.timeoutFor(this.member, amount, timeUnit).queue();
 
-            SQLConnection.updatePunishment("timeout", this.member, reason);
+            // Insert the punishment into the "punishments" table in the database
+            SQLConnection.insertPunishment("timeout", this.member, reason, staffMember.getId());
+
+            // Log the punishment in the server
+            BotProperty.storeLog(guild, timeoutEmbed, "TIMEOUT");
         }
     }
 
+    /**
+     * Sends a warning to a member, logs it and uploads it to the database
+     *
+     * @param reason The reason for a warning
+     * @param staffMember The staff member who gave the warning
+     * @throws SQLException Common SQL issues that must be caught
+     */
+    public void warn(String reason, Member staffMember) throws SQLException
+    {
+        // Store the embed for a warning embed for future usage
+        EmbedBuilder warningEmbed = Embeds.createPunishmentEmbed("WARNING", reason, staffMember);
+
+        // Alert the member they have been warned
+        sendPrivateMessage(warningEmbed);
+
+        // Insert the punishment into the "punishments" table in the database
+        SQLConnection.insertPunishment("warn", this.member, reason, staffMember.getId());
+
+        // Log the punishment in the server
+        BotProperty.storeLog(guild, warningEmbed, "Warning");
+    }
 
     /**
      * Send the product to the member with a description about the order
      *
      * @param orderId The order id for the order
      * @param productInfo The products the customer ordered
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException Not found files are common so must be caught
      */
-    public String sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
+    public void sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
 
         String productString;
         String productType;
@@ -157,7 +200,6 @@ public class CustomMember {
             ).queue();
         }
         guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
-        return productString;
     }
 
     /**

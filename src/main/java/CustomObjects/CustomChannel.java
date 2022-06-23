@@ -29,7 +29,7 @@ public class CustomChannel {
      */
     public void openTicket(IPermissionHolder permissionHolder)
     {
-        this.customChannel.upsertPermissionOverride(permissionHolder)
+        this.customChannel.putPermissionOverride(permissionHolder)
                 .setAllow(Permission.MESSAGE_SEND)
                 .setAllow(Permission.VIEW_CHANNEL);
     }

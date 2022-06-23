@@ -137,6 +137,6 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
 
         joinEmbed.setFooter("Member ID: " + member.getId());
 
-        botProperty.storeLog(event.getJDA(), joinEmbed, "Joined");
+        botProperty.storeLog(guild, joinEmbed, "Joined");
     }
 }

@@ -23,7 +23,7 @@ public class DeleteChannelEvent extends ListenerAdapter {
                     EmbedBuilder deletedChannelEmbed = new EmbedBuilder()
                             .setTitle("Deleted Channel")
                             .setDescription(list.get(0).getUser().getAsMention() + " deleted channel " + event.getChannel().getName());
-                    botProperty.storeLog(event.getJDA(), deletedChannelEmbed, "DeletedChannel");
+                    botProperty.storeLog(event.getGuild(), deletedChannelEmbed, "DeletedChannel");
                 }
         );
 

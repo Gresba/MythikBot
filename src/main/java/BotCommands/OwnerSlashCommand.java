@@ -3,6 +3,7 @@ package BotCommands;
 import Bot.BotProperty;
 import Bot.SQLConnection;
 import CustomObjects.CustomMember;
+import CustomObjects.Modals;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -40,6 +41,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
             event.deferReply().queue();
 
             switch (event.getName()) {
+                case "configure_server" -> event.replyModal(Modals.CONFIGURE_MODAL).queue();
 
                 // UPLOAD a product into the database
                 case "upload" -> {

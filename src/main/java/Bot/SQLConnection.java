@@ -1,5 +1,6 @@
 package Bot;
 
+import BotObjects.GuildObject;
 import CustomObjects.Response;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -91,15 +92,18 @@ public class SQLConnection {
      * @param punishmentType The type of punishment
      * @param member The member punished
      * @param reason The reason for the punishment
+     * @param staffMemberId The id of the staff member which punished
      * @throws SQLException  Common SQL exceptions to be dealt with
      */
-    public static void updatePunishment(String punishmentType, Member member, String reason) throws SQLException {
-        PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments (Type, Reason, MemberID) VALUES (?, ?, ?)");
+    public static void insertPunishment(String punishmentType, Member member, String reason, String staffMemberId) throws SQLException {
+
+        PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments (Type, Reason, MemberId, StaffMemberId) VALUES (?, ?, ?, ?)");
 
         // Setting type, reason and member, respectively, for punishment
         updatePunishmentQuery.setString(1, punishmentType);
         updatePunishmentQuery.setString(2, reason);
         updatePunishmentQuery.setString(3, member.getId());
+        updatePunishmentQuery.setString(4, staffMemberId);
 
         // Executing the query
         updatePunishmentQuery.executeUpdate();
@@ -110,14 +114,16 @@ public class SQLConnection {
      *
      * @param orderId The order id for the order
      * @param MemberId The member that claimed the order
-     * @param claimedDate The date the order was claimed
      * @throws SQLException Common SQL exceptions to be dealt with
      */
-    public static void addOrder(String orderId, String MemberId, Timestamp claimedDate) throws SQLException {
+    public static void addOrder(String orderId, String MemberId) throws SQLException {
+        java.util.Date date = new java.util.Date();
+        long time = date.getTime();
+
         PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
         insertOrder.setString(1, orderId);
         insertOrder.setString(2, MemberId);
-        insertOrder.setTimestamp(3, claimedDate);
+        insertOrder.setTimestamp(3, new Timestamp(time));
         insertOrder.executeUpdate();
     }
 
@@ -214,19 +220,16 @@ public class SQLConnection {
     /**
      * Update the server configuration info for the guild the method is called in
      *
-     * @param guild The id of the guild
-     * @param guildPrefix The prefix to use the commands for
-     * @param ticketLimit The amount of tickets a user can make in a guild
-     * @param serverOwnerID The server owner's Id
+     * @param guild The guild object where all the information about the guild is stored
      * @throws SQLException Exception that must be caught when calling this method
      */
-    public static void updateGuildInfo(Guild guild, String guildPrefix, int ticketLimit, String serverOwnerID, String ticketCategoryId) throws SQLException {
+    public static void updateGuildInfo(GuildObject guild) throws SQLException {
         PreparedStatement updateGuildQuery = connection.prepareStatement("UPDATE Guilds SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ? WHERE GuildID = ?");
-        updateGuildQuery.setString(1, guildPrefix);
-        updateGuildQuery.setInt(2, ticketLimit);
-        updateGuildQuery.setString(3, serverOwnerID);
-        updateGuildQuery.setString(4, ticketCategoryId);
-        updateGuildQuery.setString(5, guild.getId());
+        updateGuildQuery.setString(1, guild.getPrefix());
+        updateGuildQuery.setInt(2, guild.getTicketLimit());
+        updateGuildQuery.setString(3, guild.getServerOwnerId());
+        updateGuildQuery.setString(4, guild.getTicketCategoryId());
+        updateGuildQuery.setString(5, guild.getGuildId());
 
         updateGuildQuery.executeUpdate();
     }
@@ -238,15 +241,31 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertGuild(Guild guild) throws SQLException {
-        PreparedStatement insertGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?, ?)");
+        PreparedStatement insertGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+        // Guild Id
         insertGuildQuery.setString(1, guild.getId());
+
+        // Guild command prefix
         insertGuildQuery.setString(2, "b!");
+
+        // Ticket limited
         insertGuildQuery.setInt(3, 1);
+
+        // Server owner id
         insertGuildQuery.setString(4, "");
 
-        // TO DO: Implement this to database
-        // Ticket Category Id
+        // Ticket category id
         insertGuildQuery.setString(5, "");
+
+        // Staff role id
+        insertGuildQuery.setString(6, "");
+
+        // Log channel id
+        insertGuildQuery.setString(7, "");
+
+        // Customer role id
+        insertGuildQuery.setString(8, "");
 
         insertGuildQuery.executeUpdate();
     }

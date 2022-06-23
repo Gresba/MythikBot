@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Calendar;
 
 public class ModalInteractionEvent extends ListenerAdapter {
     @Override
@@ -58,12 +57,8 @@ public class ModalInteractionEvent extends ListenerAdapter {
                 if (event.getModalId().equals("claim-order-modal")){
 
                     try {
-                        Calendar calendar = Calendar.getInstance();
-                        java.util.Date date = calendar.getTime();
-                        long time = date.getTime();
-
                         // Insert the order into the database so the same order cannot be claimed twice
-                        SQLConnection.addOrder(orderId, member.getMember().getId(), new Timestamp(time));
+                        SQLConnection.addOrder(orderId, member.getMember().getId());
 
                         String product = SQLConnection.getProductByName(guild.getId(), order.getProduct().getTitle(), order.getQuantity());
 
@@ -140,11 +135,9 @@ public class ModalInteractionEvent extends ListenerAdapter {
                 }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException | NullPointerException e){
                 event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
                 e.printStackTrace();
-            } catch (NullPointerException e) {
-                event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
             }
         }else if(event.getModalId().equals("purchase-modal")){
             String purchaseItemName = event.getValue("purchase-item-name").getAsString();
@@ -204,14 +197,17 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
         }else if(event.getModalId().equals("configure-modal")){
             String prefix = event.getValue("configure-prefix").getAsString();
-            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
             String serverOwnerId = event.getValue("configure-server-owner").getAsString();
             String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
+            String staffRoleId = event.getValue("configure-staff-role").getAsString();
+            String logChannelId = event.getValue("configure-log-channel").getAsString();
+            String customerRoleId = event.getValue("configure-customer-role").getAsString();
+
+            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
 
             try {
-                SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId, ticketCategoryId);
-
-                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, ticketLimit, serverOwnerId, ticketCategoryId);
+                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, ticketLimit, serverOwnerId, ticketCategoryId, staffRoleId, logChannelId, customerRoleId);
+                SQLConnection.updateGuildInfo(configuredGuild);
 
                 BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                 event.getHook().sendMessage("Successfully configured server").queue();

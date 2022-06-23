@@ -14,7 +14,7 @@ public class CustomTime {
 
         int index = 0;
         while (number != 0) {
-            int result = 0;
+            int result;
             switch (index) {
                 case 0:
                     result = number / 29030400;

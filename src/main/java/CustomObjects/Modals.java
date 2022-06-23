@@ -102,5 +102,29 @@ public class Modals {
                             TextInput.create("configure-ticket-category", "Ticket Category Id", TextInputStyle.SHORT)
                                     .setPlaceholder("The category the tickets will be put into (Ex. 838934740177383435")
                                     .setRequired(true)
-                                    .build())).build();
+                                    .build()
+                    ),
+
+                    ActionRow.of(
+                            TextInput.create("configure-staff-role", "Staff Role Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("The role id for staff members (Ex. 838934740177383435")
+                                    .setRequired(true)
+                                    .build()
+                    ),
+
+                    ActionRow.of(
+                            TextInput.create("configure-log-channel", "Log Channel Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("The channel id for the log channel (Ex. 349347445373834933")
+                                    .setRequired(true)
+                                    .build()
+                    ),
+
+                    ActionRow.of(
+                            TextInput.create("configure-customer-role", "Customer Role Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("The role for a customer (Ex. 349347445373834933")
+                                    .setRequired(true)
+                                    .build()
+                    )
+            )
+            .build();
 }

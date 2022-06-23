@@ -16,6 +16,13 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import javax.security.auth.login.LoginException;
 import java.sql.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
 public class BetterBot {
@@ -34,8 +41,19 @@ public class BetterBot {
             int guildTicketLimit = guildInfo.getInt(3);
             String guildOwner = guildInfo.getString(4);
             String ticketCategoryId = guildInfo.getString(5);
+            String staffRoleId = guildInfo.getString(6);
+            String logChannelId = guildInfo.getString(7);
+            String customerRoleId = guildInfo.getString(8);
 
-            GuildObject guildObject = new GuildObject(guildId, guildPrefix, guildTicketLimit, guildOwner, ticketCategoryId);
+            GuildObject guildObject = new GuildObject(
+                    guildId,
+                    guildPrefix,
+                    guildTicketLimit,
+                    guildOwner,
+                    ticketCategoryId,
+                    staffRoleId,
+                    logChannelId,
+                    customerRoleId);
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
@@ -106,7 +124,7 @@ public class BetterBot {
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "order_id", "The order id associated with this order")
                                     .setRequired(true))
-                            .addOptions(new OptionData(STRING, "account_type", "The type of product to send")
+                            .addOptions(new OptionData(STRING, "product_type", "The type of product to send")
                                     .setRequired(false))
                             .addOptions(new OptionData(INTEGER, "amount", "The amount to send")
                                     .setRequired(false)),
@@ -169,10 +187,6 @@ public class BetterBot {
                     // OPEN_TICKET command
                     Commands.slash("open_ticket", "Allow the creator of the ticket to speak")
                             .addOptions(new OptionData(USER, "target_user", "Person to open the ticket for", true)),
-                    // SEND command
-                    Commands.slash("send", "Send a product to a user")
-                            .addOptions(new OptionData(STRING, "order_id", "The order ID", true))
-                            .addOptions(new OptionData(USER, "target_user", "Person to send it to", true)),
 
                     // DIRECTIONS_LIST command
                     Commands.slash("directions_list", "Get a list of all directions and what they are for"),

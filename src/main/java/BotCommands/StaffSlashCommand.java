@@ -1,17 +1,16 @@
 package BotCommands;
 
 import Bot.BotProperty;
+import BotObjects.GuildObject;
 import CustomObjects.Embeds;
 import CustomObjects.Response;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
 import CustomObjects.CustomMember;
-import CustomObjects.Modals;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,28 +33,25 @@ public class StaffSlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 
         // Only accept commands from guilds
-        if (!event.getChannelType().isGuild() || event.getMember() == null)
+        if (!event.getChannelType().isGuild() || event.getMember() == null || event.getMember().getUser().isBot())
             return;
         Guild guild = event.getGuild();
 
         JDA jda = event.getJDA();
 
-        Member sender = event.getMember();
+        Member staffMember = event.getMember();
+
+        GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
 
         CustomChannel channel = new CustomChannel(jda, event.getTextChannel().getId());
-        CustomMember guildOwner = new CustomMember(jda, "976956826472050689", guild.getId());
+        CustomMember guildOwner = new CustomMember(jda, guildObject.getServerOwnerId(), guild.getId());
 
         Statement statement = SQLConnection.getStatement();
 
         BotProperty botProperty = new BotProperty();
 
-        if (sender.getUser().isBot())
-            return;
-        if (sender.hasPermission(Permission.ADMINISTRATOR)) {
-
+        if (staffMember.getRoles().contains(guild.getRoleById(guildObject.getStaffRoleId()))) {
             switch (event.getName()) {
-                case "configure_server" -> event.replyModal(Modals.CONFIGURE_MODAL).queue();
-
                 // BAN COMMAND CONTROLLER
                 case "ban" -> {
                     // Get the values from the arguments passed in through the slash command
@@ -64,11 +59,16 @@ public class StaffSlashCommand extends ListenerAdapter {
                     String banReason = Objects.requireNonNull(event.getOption("reason")).getAsString();
                     int delete_days = (int) Objects.requireNonNull(event.getOption("delete_days")).getAsLong();
 
+                    // Ban the user
+                    try {
+                        banTarget.ban(banReason, delete_days, staffMember);
+                    } catch (SQLException e) {
+                        event.reply("**[ERROR]** There was an issue with adding the ban to the database").queue();
+                        throw new RuntimeException(e);
+                    }
+
                     // Acknowledge the event and alert that the user was banned
                     event.reply(banTarget.getMember().getAsMention() + " banned. **Reason:** " + banReason).queue();
-
-                    // Ban the user
-                    banTarget.ban(banReason, delete_days);
                 }
 
                 case "timeout" -> {
@@ -78,8 +78,9 @@ public class StaffSlashCommand extends ListenerAdapter {
                     String durationType = Objects.requireNonNull(event.getOption("duration_type")).getAsString();
 
                     try {
-                        timeoutTarget.timeout(timeoutReason, duration, durationType);
+                        timeoutTarget.timeout(timeoutReason, duration, durationType, staffMember);
                     } catch (SQLException e) {
+                        event.reply("**[ERROR]** There was an issue with adding the timeout to the database").queue();
                         throw new RuntimeException(e);
                     }
                 }
@@ -90,25 +91,24 @@ public class StaffSlashCommand extends ListenerAdapter {
                     CustomMember warnTarget = new CustomMember(jda, event.getOption("target_member").getAsMember().getId(), guild.getId());
                     String warnReason = event.getOption("reason").getAsString();
 
+                    // Alert the user they got banned
+                    try {
+                        warnTarget.warn(warnReason, staffMember);
+                    } catch (SQLException e) {
+                        event.reply("**[ERROR]** There was an issue with adding the warning to the database").queue();
+                        throw new RuntimeException(e);
+                    }
+
                     // Acknowledge the event
                     event.reply(warnTarget.getMember().getAsMention() + " warned! **Reason:** " + warnReason).queue();
-
-                    // Alert the user they got banned
-                    warnTarget.sendPrivateMessage(Embeds.createPunishmentEmbed("WARNED", warnReason));
-
                 }
 
                 case "add_response" -> {
                     String triggerWord = event.getOption("trigger").getAsString();
 
                     String response = event.getOption("response").getAsString();
-                    boolean deleteTriggerMsg = false;
-                    boolean contains = false;
-
-                    if (event.getOption("delete_trigger") != null)
-                        deleteTriggerMsg = event.getOption("delete_trigger").getAsBoolean();
-                    else if (event.getOption("contains") != null)
-                        contains = event.getOption("delete_if_contains").getAsBoolean();
+                    boolean deleteTriggerMsg = event.getOption("delete_trigger").getAsBoolean();
+                    boolean contains = event.getOption("delete_if_contains").getAsBoolean();
 
                     try {
                         // Populating response members
@@ -118,9 +118,9 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                         BotProperty.getResponseHashMap().put(triggerWord, responseObj);
 
-                        // Checking if the response trigger word is already in the database
+                    // Checking if the response trigger word is already in the database
                     } catch (SQLIntegrityConstraintViolationException e) {
-                        channel.getChannel().sendMessage("**Error: ** That trigger word is already used! Use another one!").queue();
+                        channel.getChannel().sendMessage("**[ERROR]** That trigger word is already used! Use another one!").queue();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -138,7 +138,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                         statement.executeUpdate(removeResponseQuery);
                         event.reply("**Success:** Response successfully deleted").queue();
                     } catch (Exception e) {
-                        event.reply("**FAILURE:** There was an error in deleting that triggerKey! Make sure it exist!").queue();
+                        event.reply("**[ERROR]** There was an error in deleting that triggerKey! Make sure it exist!").queue();
                         e.printStackTrace();
                     }
                 }
@@ -168,8 +168,7 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                 // AUTO_NUKE slash command to auto-nuke a channel every given minutes
                 case "auto_nuke" -> {
-                    event.deferReply().queue();
-                    event.getHook().sendMessage("Auto Nuke Starting...").queue();
+                    event.reply("Auto Nuke Starting...").queue();
                     final String[] channelId = {channel.getChannel().getId()};
                     Timer timer = new Timer();
                     int begin = 0;
@@ -209,14 +208,11 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                     if(!targetMember.getMember().getId().equalsIgnoreCase(event.getMember().getId())) {
                         try {
-                            // Get the current time of this command to store when the product was sent
-                            java.util.Date date = new java.util.Date();
-                            long time = date.getTime();
-                            SQLConnection.addOrder(orderId, targetMember.getMember().getId(), new Timestamp(time));
+                            SQLConnection.addOrder(orderId, targetMember.getMember().getId());
 
                             // Check if the product type is set
                             try {
-                                String productType = event.getOption("account_type").getAsString();
+                                String productType = event.getOption("product_type").getAsString();
 
                                 /**
                                  * If it's set that means that sender is sending a personal order
@@ -237,7 +233,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                             }
                             event.reply(targetMember.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {
-                            event.reply("**ERROR** Could not successfully sent product!").queue();
+                            event.reply("**[ERROR]** Could not successfully sent product!").queue();
                             e.printStackTrace();
                         } catch (SQLIntegrityConstraintViolationException e) {
                             channel.getChannel().sendMessage("""
@@ -251,17 +247,16 @@ public class StaffSlashCommand extends ListenerAdapter {
                         }
                     }else{
                         // Alert Mythik of a corrupt staff member
-                        botProperty.corruptStaffAlert(event.getJDA(), guild, sender.getUser(), "SENDING ACCOUNTS TO HIMSELF **Order ID:** " + orderId);
+                        botProperty.corruptStaffAlert(guild, staffMember.getUser(), orderId);
                         event.reply("Corrupt Staff Member Detected! " + event.getMember().getUser().getAsMention()).queue();
                     }
                 }
 
                 // ORDER slash command to view a Shoppy order
                 case "order" -> {
-                    ShoppyConnection shoppyConnection = new ShoppyConnection();
                     String orderID = event.getOption("order_id").getAsString();
                     try {
-                        ShoppyOrder order = shoppyConnection.getShoppyOrder(orderID);
+                        ShoppyOrder order = ShoppyConnection.getShoppyOrder(orderID);
 
                         event.replyEmbeds(order.sendOrderEmbed().build()).queue();
                     } catch (NullPointerException e){

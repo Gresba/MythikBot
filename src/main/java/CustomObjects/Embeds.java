@@ -429,22 +429,23 @@ public class Embeds {
                         """)
                 .setFooter("Better Alts Security");
 
-    public static EmbedBuilder createPunishmentEmbed(String punishmentType, String reason)
+    public static EmbedBuilder createPunishmentEmbed(String punishmentType, String reason, Member moderator)
     {
         EmbedBuilder punishmentEmbed = new EmbedBuilder()
                 .setTitle("**Better Alts Moderation**")
-                .setDescription(String.format("You have been **%s**", punishmentType))
+                .setDescription(String.format("**Punishment: **", punishmentType))
                 .addField("**REASON**", reason, false)
+                .addField("**MODERATOR**", moderator.getAsMention(), false)
                 .setFooter("Better Alts Moderation")
                 .setThumbnail(logoUrl);
-        if(reason.equalsIgnoreCase("WARNED"))
+        if(punishmentType.equalsIgnoreCase("WARNING"))
             punishmentEmbed.addField("**IMPORTANT**",
                     """
                     The next warning will result in an immediate ban.
                     
                     Make sure you read all the rules in the #rules channel.
                     
-                    If you have any on-going order, you will not receive any support for the order since you will be banned.
+                    If you have any on-going order, you will not receive any support for the order since if you are banned.
                     """, false);
         return punishmentEmbed;
     }
