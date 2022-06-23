@@ -64,36 +64,6 @@ public class ShoppyOrder {
         return orderEmbed;
     }
 
-
-    public String getAccountList(ShoppyOrder orderObject, int amount, Guild guild)
-    {
-        String accounts = "";
-        String accountType = orderObject.getProduct().getTitle();
-        if(amount == 0)
-            amount = orderObject.getQuantity();
-
-        String retrieveAccountsQuery = "SELECT AccountInfo FROM accounts WHERE AccountType = '" + accountType + "' LIMIT " + amount;
-
-        String deleteQuery = "DELETE FROM accounts WHERE AccountType = '" + accountType + "' LIMIT " + amount;
-
-        ResultSet resultSet = null;
-        try {
-            resultSet = statement.executeQuery(retrieveAccountsQuery);
-
-            while (resultSet.next()) {
-
-                String account = resultSet.getString(1);
-
-                accounts += account + "\n";
-            }
-
-            statement.executeUpdate(deleteQuery);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return accounts;
-    }
-
     public boolean requiresVerification(Member member, String paymentMethod) {
         if (paymentMethod.equalsIgnoreCase("LTC") || paymentMethod.equalsIgnoreCase("BTC") || paymentMethod.equalsIgnoreCase("ETH")) {
             return false;

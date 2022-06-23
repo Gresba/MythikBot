@@ -178,16 +178,16 @@ public class CustomMember {
 
         // If the product is out of stock then alert the customer
         if(productString == null){
-            orderEmbed.addField("Alts", "No accounts in the database. Contact a staff", false);
+            orderEmbed.addField("**Product**", "No stock! Don't worry contact the owner!", false);
 
             // If the product length is less than 1000 then put it in the embed
         }else if (productString.length() < 1000) {
 
             // Add products to the description
             if(productString.length() == 0)
-                orderEmbed.addField("Alts", "No Stock! Don't worry contact the owner!", false);
+                orderEmbed.addField("**Product**", "No Stock! Don't worry contact the owner!", false);
             else
-                orderEmbed.addField("Alts", "```" + productString + "```", false);
+                orderEmbed.addField("**Product**", "```" + productString + "```", false);
             sendPrivateMessage(orderEmbed);
 
         // If the product length is greater than 1000 then put it in a file
@@ -228,10 +228,10 @@ public class CustomMember {
         this.member =  guild.getMemberById(memberId);
     }
 
-    public String setOrderDescription(String accountType)
+    public String setOrderDescription(String productType)
     {
-        if(accountType.toLowerCase().contains("mfa")) {
-            return "Thank you for ordering " + accountType + "\n" +
+        if(productType.toLowerCase().contains("mfa")) {
+            return "Thank you for ordering " + productType + "\n" +
                     """
                     **Format:** email:emailPassword:MinecraftPassword
                     **Mail Site:** rambler.ru (Check the domain of your account)
@@ -240,21 +240,21 @@ public class CustomMember {
                     *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
                     *If the account requires migration, then migrate it.*
                     """;
-        }else if(accountType.toLowerCase().contains("unbanned") ){
-            return "Thank you for ordering " + accountType +
+        }else if(productType.toLowerCase().contains("unbanned") ){
+            return "Thank you for ordering " + productType +
                     "" +
                     "**Format:** email:password:username\n" +
                     "" +
                     "Use VyprVPN to avoid getting them security banned on Hypixel";
-        }else if(accountType.toLowerCase().contains("hypixel") || accountType.toLowerCase().contains("nfa")){
-            return "Thank you for ordering " + accountType + "\n" +
+        }else if(productType.toLowerCase().contains("hypixel") || productType.toLowerCase().contains("nfa")){
+            return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password:username";
-        }else if(accountType.toLowerCase().contains("vypr")){
-            return "Thank you for ordering " + accountType + "\n" +
+        }else if(productType.toLowerCase().contains("vypr")){
+            return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password\n" +
                     "**Note:** Don't change password or you may lose access fast";
-        }else if(accountType.contains("Yahoo")){
-            return "Thank you for ordering " + accountType + "\n" +
+        }else if(productType.contains("Yahoo")){
+            return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password | Total Mails: <number of mails>\n" +
                     "Log into the email at yahoo.com";
         }else{

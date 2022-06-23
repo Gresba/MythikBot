@@ -250,8 +250,8 @@ public class BetterBot {
                                     .setRequired(true)),
 
                     // ORDER_DETAILS commands
-                    Commands.slash("order_details", "Get the accounts already sent")
-                            .addOptions(new OptionData(STRING, "order_id", "The order id you want to retrieve the accounts for")
+                    Commands.slash("order_details", "Get the product info for an order already sent")
+                            .addOptions(new OptionData(STRING, "order_id", "The order id you want to retrieve the product for")
                                     .setRequired(true))
                             .addOptions(new OptionData(USER, "target_member", "The members DMs to access")
                                     .setRequired(true))

@@ -239,7 +239,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                                 targetMember.sendProduct(orderId);
                                 guildOwner.sendProduct(orderId);
                             }
-                            event.reply(targetMember.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
+                            event.reply(targetMember.getMember().getAsMention() + " product have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {
                             event.reply("**[ERROR]** Could not successfully sent product!").queue();
                             e.printStackTrace();

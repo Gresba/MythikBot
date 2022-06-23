@@ -45,21 +45,20 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
                 // UPLOAD a product into the database
                 case "upload" -> {
-                    String accountType = event.getOption("product_type").getAsString();
+                    String productType = event.getOption("product_type").getAsString();
                     try {
                         File inputFile = event.getOption("input_file").getAsAttachment().downloadToFile().get();
                         Scanner input = new Scanner(inputFile);
 
                         String query = "INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES";
-                        int accountNumber = 0;
+                        int productNumber = 0;
 
                         // Build the query
                         while (input.hasNext()) {
-                            String accountInfo = input.nextLine();
-                            System.out.println("Account Number " + accountNumber + ": " + accountInfo);
+                            String productInfo = input.nextLine();
 
-                            query += "('" + accountInfo + "', '" + accountType + "', '" + guild.getId() + "'),";
-                            accountNumber++;
+                            query += "('" + productInfo + "', '" + productType + "', '" + guild.getId() + "'),";
+                            productNumber++;
 
                             // Replace the last character ',' with a ';'
                         }
@@ -68,7 +67,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         inputFile.delete();
 
                         statement.executeUpdate(query);
-                        event.getHook().sendMessage(accountNumber + " " + accountType + " successfully uploaded!").setEphemeral(true).queue();
+                        event.getHook().sendMessage(productNumber + " " + productType + " successfully uploaded!").setEphemeral(true).queue();
                     } catch (InterruptedException e) {
                         event.getHook().sendMessage("**[ERROR]** Interrupted exception").setEphemeral(true).queue();
                         e.printStackTrace();
@@ -79,7 +78,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         event.getHook().sendMessage("**[ERROR]** File not found exception").setEphemeral(true).queue();
                         e.printStackTrace();
                     } catch (SQLException e) {
-                        event.getHook().sendMessage("**[ERROR]** Accounts could not be uploaded").setEphemeral(true).queue();
+                        event.getHook().sendMessage("**[ERROR]** Product could not be uploaded").setEphemeral(true).queue();
                         e.printStackTrace();
                     }
                 }
@@ -142,7 +141,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                             privateChannel.getHistory().retrievePast(amountToDelete).queue(
                                 messages -> {
 
-                                    // Delete and print the accounts
+                                    // Delete and print the product
                                     for (Message msg : messages) {
                                         msg.delete().queue();
                                     }
@@ -192,7 +191,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                                 privateChannel.getHistory().retrievePast(100).queue(
                                     messages -> {
 
-                                        // Delete and print the accounts
+                                        // Delete and print the product
                                         for (Message msg : messages) {
                                             if(msg.getEmbeds().get(0).getFields().get(0).getValue().equalsIgnoreCase(orderId))
                                             {
@@ -201,7 +200,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                                                 EmbedBuilder embedBuilder = new EmbedBuilder()
                                                         .setTitle("Retrieved Order")
                                                                 .addField("Order ID", orderId, false)
-                                                                        .addField("Alts", msg.getEmbeds().get(0).getFields().get(1).getValue(), false);
+                                                                        .addField("Product", msg.getEmbeds().get(0).getFields().get(1).getValue(), false);
                                                 guildOwner.sendPrivateMessage(
                                                         embedBuilder
                                                 );
