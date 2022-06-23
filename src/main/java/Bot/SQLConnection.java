@@ -318,4 +318,26 @@ public class SQLConnection {
 
         insertResponseQuery.executeUpdate();
     }
+
+    /**
+     * Delete a response from the Response table by finding the trigger word and guild id
+     *
+     * @param guildId The id of the guild the response belongs to
+     * @param triggerWord The word that will trigger the response
+     * @throws SQLException Common SQL exceptions to be dealt with
+     */
+    public static void deleteResponse(String guildId, String triggerWord) throws SQLException {
+        // Building the query
+        PreparedStatement deleteResponseQuery = connection.prepareStatement(
+                "DELETE FROM Response " +
+                    "WHERE TriggerWord = ? )" +
+                    "AND GuildId = ?");
+
+        // Populating the query
+        deleteResponseQuery.setString(1, triggerWord);
+        deleteResponseQuery.setString(2, guildId);
+
+        // Executing the query
+        deleteResponseQuery.executeUpdate();
+    }
 }

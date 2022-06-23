@@ -2,6 +2,7 @@ package CustomObjects;
 
 import Bot.BotProperty;
 import Bot.SQLConnection;
+import BotObjects.GuildObject;
 import Shoppy.ShoppyConnection;
 import Shoppy.ShoppyOrder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -144,6 +145,9 @@ public class CustomMember {
      */
     public void sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
 
+        GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
+
+        // Variables for information about the order
         String productString;
         String productType;
 
@@ -186,7 +190,7 @@ public class CustomMember {
                 orderEmbed.addField("Alts", "```" + productString + "```", false);
             sendPrivateMessage(orderEmbed);
 
-            // If the product length is greater than 1000 then put it in a file
+        // If the product length is greater than 1000 then put it in a file
         }else{
             sendPrivateMessage(orderEmbed);
 
@@ -199,7 +203,9 @@ public class CustomMember {
                     privateChannel.sendFile(new File("output"), "product.txt")
             ).queue();
         }
-        guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
+
+        // Give the new customer the configured customer role
+        guild.addRoleToMember(member.getId(), guild.getRoleById(guildObject.getCustomerRoleId())).queue();
     }
 
     /**

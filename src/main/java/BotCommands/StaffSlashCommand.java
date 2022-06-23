@@ -114,28 +114,38 @@ public class StaffSlashCommand extends ListenerAdapter {
                         // Populating response members
                         Response responseObj = new Response(deleteTriggerMsg, contains, response, triggerWord);
 
+                        // Insert the response information into the database
                         SQLConnection.insertResponse(guild.getId(), responseObj);
 
+                        // Add the response to the global map
                         BotProperty.getResponseHashMap().put(triggerWord, responseObj);
+
+                        // Alert the user the response was successfully added
+                        event.reply("Successfully added a response" +
+                                "**Trigger Word:** " + triggerWord +
+                                "**Delete Message:** " + deleteTriggerMsg +
+                                "**Delete Message if it contains:** " + contains +
+                                "**Response:** " + response).queue();
 
                     // Checking if the response trigger word is already in the database
                     } catch (SQLIntegrityConstraintViolationException e) {
-                        channel.getChannel().sendMessage("**[ERROR]** That trigger word is already used! Use another one!").queue();
-                    } catch (Exception e) {
+                        event.reply("**[ERROR]** That trigger word is already used! Use another one!").queue();
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        event.reply("**[ERROR]** Could not add that response to the database").queue();
                         e.printStackTrace();
                     }
-                    event.reply("**Trigger Word:** " + triggerWord +
-                            "**Delete Message:** " + deleteTriggerMsg +
-                            "**Delete Message if it contains:** " + contains +
-                            "**Response:** " + response).queue();
                 }
 
                 case "delete_response" -> {
-                    String deleteWord = event.getOption("trigger_word").getAsString();
-                    BotProperty.getResponseHashMap().remove(deleteWord);
-                    String removeResponseQuery = "DELETE FROM Responses WHERE TriggerWord = '" + deleteWord + "'";
+                    String triggerWord = event.getOption("trigger_word").getAsString();
+
+                    // Remove the response from the hashMap
+                    BotProperty.getResponseHashMap().remove(triggerWord);
                     try {
-                        statement.executeUpdate(removeResponseQuery);
+
+                        // Remove the response from the database
+                        SQLConnection.deleteResponse(guild.getId(), triggerWord);
                         event.reply("**Success:** Response successfully deleted").queue();
                     } catch (Exception e) {
                         event.reply("**[ERROR]** There was an error in deleting that triggerKey! Make sure it exist!").queue();
