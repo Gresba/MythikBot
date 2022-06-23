@@ -163,8 +163,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         PrintStream outputFile = new PrintStream("output");
 
                         for (File file : listOfFiles) {
-                            Scanner inputFile = null;
-                            inputFile = new Scanner(file);
+                            Scanner inputFile = new Scanner(file);
                             while(inputFile.hasNext())
                             {
                                 outputFile.println(inputFile.nextLine());

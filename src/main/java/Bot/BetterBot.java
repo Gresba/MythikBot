@@ -51,7 +51,6 @@ public class BetterBot {
         jdaBuilder.addEventListeners(
                 new DeleteChannelEvent(),
                 new MemberJoinGuildEvent(),
-                new UserCommand(),
                 new MessageAutoResponse(),
                 new DeleteMessageEvent(),
                 new JoinGuildEvent(),
@@ -216,16 +215,13 @@ public class BetterBot {
                     Commands.slash("add_response", "Add a response to a trigger word")
                             .addOptions(new OptionData(STRING, "trigger", "The word(s) that will trigger the response")
                                     .setRequired(true))
-                            .addOptions(new OptionData(STRING, "response", "The response that the word(s) will trigger")
+                            .addOptions(new OptionData(STRING, "response", "The response that will be sent by the bot")
                                     .setRequired(true))
                             .addOptions(new OptionData(BOOLEAN, "delete_trigger", "Delete message containing the trigger word. Default to false")
-                                    .setRequired(false))
-                            .addOptions(new OptionData(BOOLEAN, "delete_response","Delete the response. Default to false")
-                                    .setRequired(false))
-                            .addOptions(new OptionData(INTEGER, "delete_delay", "How long in seconds to delete the response. Default 0")
-                                    .setRequired(false))
-                            .addOptions(new OptionData(BOOLEAN, "direct_match", "Does the trigger word have to directly match or be in the message. Default false")
-                                    .setRequired(false)),
+                                    .setRequired(true))
+                            .addOptions(new OptionData(BOOLEAN, "delete_if_contains","Respond if the message contains this word or character(s)")
+                                    .setRequired(true)),
+
 
                     // DELETE_DM command
                     Commands.slash("delete_dm", "Delete DMs with the target member")

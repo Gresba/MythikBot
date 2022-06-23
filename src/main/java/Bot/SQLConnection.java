@@ -1,11 +1,9 @@
 package Bot;
 
-import Shoppy.ShoppyConnection;
-import Shoppy.ShoppyOrder;
+import CustomObjects.Response;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
-import java.io.IOException;
 import java.sql.*;
 
 public class SQLConnection {
@@ -93,6 +91,7 @@ public class SQLConnection {
      * @param punishmentType The type of punishment
      * @param member The member punished
      * @param reason The reason for the punishment
+     * @throws SQLException  Common SQL exceptions to be dealt with
      */
     public static void updatePunishment(String punishmentType, Member member, String reason) throws SQLException {
         PreparedStatement updatePunishmentQuery = connection.prepareStatement("INSERT INTO Punishments (Type, Reason, MemberID) VALUES (?, ?, ?)");
@@ -112,6 +111,7 @@ public class SQLConnection {
      * @param orderId The order id for the order
      * @param MemberId The member that claimed the order
      * @param claimedDate The date the order was claimed
+     * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void addOrder(String orderId, String MemberId, Timestamp claimedDate) throws SQLException {
         PreparedStatement insertOrder = statement.getConnection().prepareStatement("INSERT INTO Orders (OrderID, MemberID, ClaimedDate) VALUES (?, ?, ?)");
@@ -126,7 +126,7 @@ public class SQLConnection {
      *
      * @param orderId The order id of an order
      * @return {ResultSet} The result of the query
-     * @throws SQLException
+     * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static ResultSet getOrder(String orderId) throws SQLException {
         PreparedStatement getOrder = statement.getConnection().prepareStatement("SELECT * FROM Orders WHERE OrderID = ?");
@@ -188,8 +188,8 @@ public class SQLConnection {
      * Get the information about a guild or every guild depending on whether the argument is empty
      *
      * @param guildId Optional param for the id to get the guild information for
-     *
      * @return ResultSet The result of a query to get a guild's information
+     * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static ResultSet getGuildInfo(String ...guildId) throws SQLException {
         String query;
@@ -235,7 +235,7 @@ public class SQLConnection {
      * Adds a default record of a guild in the Guilds table
      *
      * @param guild The id of the guild
-     * @throws SQLException
+     * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertGuild(Guild guild) throws SQLException {
         PreparedStatement insertGuildQuery = connection.prepareStatement("INSERT INTO Guilds VALUES (?, ?, ?, ?, ?)");
@@ -252,7 +252,7 @@ public class SQLConnection {
     }
 
     /**
-     * Inserts a new ticket record into the database
+     * Inserts a new ticket record into the Tickets table
      *
      * @param ticketChannelId The channel id of the new ticket channel
      * @param memberId The member of the creator of the ticket
@@ -267,11 +267,36 @@ public class SQLConnection {
         insertTicketQuery.executeUpdate();
     }
 
+    /**
+     * Delete a ticket record from the database
+     *
+     * @param ticketChannelId The id of the ticket channel to delete
+     * @throws SQLException Common SQL error which must be caught
+     */
     public static void deleteTicket(String ticketChannelId) throws SQLException {
         PreparedStatement deleteTicketQuery = connection.prepareStatement("DELETE FROM Tickets WHERE TicketId = ?");
 
         deleteTicketQuery.setString(1, ticketChannelId);
 
         deleteTicketQuery.executeUpdate();
+    }
+
+    /**
+     * Inserts a new record of a response to the Response table which will be used to respond to members depending on the trigger word
+     *
+     * @param guildId The id of the guild that the response will be associated
+     * @param response The response object to populate the record
+     * @throws SQLException Common SQL exceptions to be dealt with
+     */
+    public static void insertResponse(String guildId, Response response) throws SQLException {
+        PreparedStatement insertResponseQuery = connection.prepareStatement("INSERT INTO Response VALUES (?, ?, ?, ?, ?)");
+
+        insertResponseQuery.setString(1, guildId);
+        insertResponseQuery.setString(2, response.getTriggerString());
+        insertResponseQuery.setString(3, response.getResponse());
+        insertResponseQuery.setBoolean(4, response.isDeleteTriggerMsg());
+        insertResponseQuery.setBoolean(5, response.isContains());
+
+        insertResponseQuery.executeUpdate();
     }
 }

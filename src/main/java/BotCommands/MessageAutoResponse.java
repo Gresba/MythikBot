@@ -3,7 +3,7 @@ package BotCommands;
 import Bot.BotProperty;
 import Bot.MessageObj;
 import CustomObjects.Embeds;
-import Bot.Response;
+import CustomObjects.Response;
 import Bot.SQLConnection;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -80,28 +80,23 @@ public class MessageAutoResponse extends ListenerAdapter {
         }
 
         if (!memberUser.isBot()) {
-            if(channel.getId().equalsIgnoreCase("965030819041255454")){
-               channel.sendMessage("""
-                       Thank you for your suggestion. We will add it if there are enough people that want this!
-                       
-                       Make a suggestion for a new product down below.
-                               """).queue();
-            }
 
             // Auto Response Code
             HashMap<String, Response> responses = BotProperty.getResponseHashMap();
 
             for (Map.Entry<String, Response> set : responses.entrySet()) {
+                Response responseObj = set.getValue();
+
                 if (messageString.toLowerCase().contains(set.getKey())) {
-                    Response response = set.getValue();
-                    if (response.isDeleteTriggerMsg())
-                        message.delete().queue();
-                    channel.sendMessage(response.getResponse()).queue(responseMsg -> {
-                        if (response.isDeleteResponse()) {
-                            responseMsg.delete().queueAfter(response.getDeleteDelay(), TimeUnit.SECONDS);
-                        }
-                    });
-                    break;
+
+                    if ((responseObj.isContains() && messageString.toLowerCase().contains(responseObj.getTriggerString().toLowerCase())) ||
+                         messageString.equalsIgnoreCase(responseObj.getTriggerString()))
+                    {
+                        if (responseObj.isDeleteTriggerMsg())
+                            message.delete().queue();
+                        channel.sendMessage(responseObj.getResponse()).queue();
+                        break;
+                    }
                 }
             }
 

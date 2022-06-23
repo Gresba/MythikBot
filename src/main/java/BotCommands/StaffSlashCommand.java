@@ -2,7 +2,7 @@ package BotCommands;
 
 import Bot.BotProperty;
 import CustomObjects.Embeds;
-import Bot.Response;
+import CustomObjects.Response;
 import Bot.SQLConnection;
 import CustomObjects.CustomChannel;
 import CustomObjects.CustomMember;
@@ -103,21 +103,19 @@ public class StaffSlashCommand extends ListenerAdapter {
 
                     String response = event.getOption("response").getAsString();
                     boolean deleteTriggerMsg = false;
-                    boolean deleteResponse = false;
-                    int deleteDelay = 0;
+                    boolean contains = false;
+
                     if (event.getOption("delete_trigger") != null)
                         deleteTriggerMsg = event.getOption("delete_trigger").getAsBoolean();
-                    else if (event.getOption("delete_response") != null)
-                        deleteResponse = event.getOption("delete_response").getAsBoolean();
-                    else if (event.getOption("delete_delay") != null)
-                        deleteDelay = (int) event.getOption("delete_delay").getAsLong();
+                    else if (event.getOption("contains") != null)
+                        contains = event.getOption("delete_if_contains").getAsBoolean();
+
                     try {
                         // Populating response members
-                        Response responseObj = new Response(deleteResponse, deleteTriggerMsg, response, deleteDelay);
+                        Response responseObj = new Response(deleteTriggerMsg, contains, response, triggerWord);
 
-                        //
-                        String responseAddQuery = "INSERT INTO Responses VALUES ('" + triggerWord + "', '" + response + "', " + deleteTriggerMsg + ", " + guild.getId() + "')";
-                        statement.executeUpdate(responseAddQuery);
+                        SQLConnection.insertResponse(guild.getId(), responseObj);
+
                         BotProperty.getResponseHashMap().put(triggerWord, responseObj);
 
                         // Checking if the response trigger word is already in the database
@@ -126,8 +124,10 @@ public class StaffSlashCommand extends ListenerAdapter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    event.reply("**Trigger Word:** " + triggerWord + " | **Delete Message:** " + deleteTriggerMsg + " | **Delete Message After:** " + deleteDelay +
-                            " Seconds\nResponse: " + response).queue();
+                    event.reply("**Trigger Word:** " + triggerWord +
+                            "**Delete Message:** " + deleteTriggerMsg +
+                            "**Delete Message if it contains:** " + contains +
+                            "**Response:** " + response).queue();
                 }
 
                 case "delete_response" -> {
@@ -212,6 +212,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                             // Get the current time of this command to store when the product was sent
                             java.util.Date date = new java.util.Date();
                             long time = date.getTime();
+                            SQLConnection.addOrder(orderId, targetMember.getMember().getId(), new Timestamp(time));
 
                             // Check if the product type is set
                             try {
@@ -234,7 +235,6 @@ public class StaffSlashCommand extends ListenerAdapter {
                                 targetMember.sendProduct(orderId);
                                 guildOwner.sendProduct(orderId);
                             }
-                            SQLConnection.addOrder(orderId, targetMember.getMember().getId(), new Timestamp(time));
                             event.reply(targetMember.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {
                             event.reply("**ERROR** Could not successfully sent product!").queue();
