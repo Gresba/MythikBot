@@ -116,7 +116,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                         Response responseObj = new Response(deleteResponse, deleteTriggerMsg, response, deleteDelay);
 
                         //
-                        String responseAddQuery = "INSERT INTO Responses VALUES ('" + triggerWord + "', '" + response + "', " + deleteTriggerMsg + ", " + deleteResponse + ", " + deleteDelay + ",'" + guild.getId() + "')";
+                        String responseAddQuery = "INSERT INTO Responses VALUES ('" + triggerWord + "', '" + response + "', " + deleteTriggerMsg + ", " + guild.getId() + "')";
                         statement.executeUpdate(responseAddQuery);
                         BotProperty.getResponseHashMap().put(triggerWord, responseObj);
 

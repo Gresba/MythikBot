@@ -1,7 +1,5 @@
 package Bot;
 
-import java.util.HashMap;
-
 public class Response {
     private boolean deleteResponse;
     private boolean deleteTriggerMsg;

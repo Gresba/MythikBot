@@ -87,27 +87,6 @@ public class SQLConnection {
         return accounts;
     }
 
-
-    /**
-     * Get the product from the order ID
-     *
-     * @param orderID The order id related to the product
-     * @param guildId The guild that the member belongs to
-     * @return {String}
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public static String getProductDetails(String orderID, String guildId, int amount) throws IOException, InterruptedException {
-        ShoppyOrder orderObject = ShoppyConnection.getShoppyOrder(orderID);
-
-        String productType = orderObject.getProduct().getTitle();
-
-        if(amount == 0)
-            amount = orderObject.getQuantity();
-
-        return getProductByName(guildId, productType, amount);
-    }
-
     /**
      * Update the punishment table for a punishment
      *

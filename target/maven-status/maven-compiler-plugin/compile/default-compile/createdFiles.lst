@@ -16,7 +16,6 @@ BotCommands\MessageAutoResponse.class
 Bot\Response.class
 Shoppy\ShoppyProduct.class
 Events\DeleteMessageEvent.class
-Bot\MythikBot.class
 Events\MemberJoinGuildEvent.class
 BotCommands\StaffSlashCommand.class
 Bot\CustomTime.class

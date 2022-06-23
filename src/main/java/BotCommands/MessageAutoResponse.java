@@ -1,6 +1,7 @@
 package BotCommands;
 
 import Bot.BotProperty;
+import Bot.MessageObj;
 import CustomObjects.Embeds;
 import Bot.Response;
 import Bot.SQLConnection;
@@ -33,6 +34,23 @@ public class MessageAutoResponse extends ListenerAdapter {
         String[] messageArr = messageString.split("/");
 
         Statement statement = SQLConnection.getStatement();
+
+        if(!memberUser.isBot())
+        {
+            MessageObj messageObj = new MessageObj(messageString, member.getId(), message.getTimeCreated().toZonedDateTime());
+
+            if(MessageObj.getMessageCount() > 100)
+            {
+                // Decrement the count and remove the last message from the hashMap and queue
+                MessageObj.setMessageCount(MessageObj.getMessageCount() - 1);
+                String poppedId = BotProperty.getMessageHistoryQueue().poll();
+                BotProperty.getMessageHistory().remove(poppedId);
+            }
+
+            // Add the messages to the queue and hashMap
+            BotProperty.getMessageHistory().put(message.getId(), messageObj);
+            BotProperty.getMessageHistoryQueue().add(message.getId());
+        }
 
         if(member.getId().equalsIgnoreCase("976956826472050689"))
         {

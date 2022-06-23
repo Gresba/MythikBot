@@ -2,6 +2,7 @@ package Events;
 
 import Bot.BotProperty;
 import Bot.SQLConnection;
+import BotObjects.GuildObject;
 import CustomObjects.CustomChannel;
 import CustomObjects.CustomMember;
 import Shoppy.ShoppyConnection;
@@ -64,10 +65,10 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         // Insert the order into the database so the same order cannot be claimed twice
                         SQLConnection.addOrder(orderId, member.getMember().getId(), new Timestamp(time));
 
-                        String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
+                        String product = SQLConnection.getProductByName(guild.getId(), order.getProduct().getTitle(), order.getQuantity());
 
-                        member.sendProduct(order.getId(), accounts, order.getProduct().getType());
-                        guildOwner.sendProduct(order.getId(), accounts, order.getProduct().getType());
+                        member.sendProduct(order.getId(), product, order.getProduct().getType());
+                        guildOwner.sendProduct(order.getId(), product, order.getProduct().getType());
 
                         event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                     } catch (IOException | InterruptedException e) {
@@ -123,6 +124,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                     }else{
                         String replacementAmount = event.getValue("replacement-amount").getAsString();
                         String replacementReason = event.getValue("replacement-reason").getAsString();
+
 
                         productDescriptionEmbed
                                 .addField("**User**", member.getMember().getAsMention(), false)
@@ -209,7 +211,9 @@ public class ModalInteractionEvent extends ListenerAdapter {
             try {
                 SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId, ticketCategoryId);
 
-                BotProperty.guildsHashMap.get(guild.getId()).setTicketCategoryId(ticketCategoryId);
+                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, ticketLimit, serverOwnerId, ticketCategoryId);
+
+                BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                 event.getHook().sendMessage("Successfully configured server").queue();
             } catch (SQLException e) {
                 e.printStackTrace();
