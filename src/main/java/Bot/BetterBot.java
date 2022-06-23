@@ -21,6 +21,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class BetterBot {
 
     public static void main(String[] args) throws SQLException{
+        Statement statement = SQLConnection.getStatement();
 
         ResultSet guildInfo = SQLConnection.getGuildInfo();
 
@@ -39,6 +40,8 @@ public class BetterBot {
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
         }
+
+        statement.close();
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("MYTHIK_BOT_API_KEY"))
                 .setChunkingFilter(ChunkingFilter.ALL)

@@ -64,17 +64,12 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         // Insert the order into the database so the same order cannot be claimed twice
                         SQLConnection.addOrder(orderId, member.getMember().getId(), new Timestamp(time));
 
-                        if(order.getPaid_at() != null)
-                        {
-                            String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
+                        String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
 
-                            member.sendProduct(order.getId(), accounts, order.getProduct().getType());
-                            guildOwner.sendProduct(order.getId(), accounts, order.getProduct().getType());
+                        member.sendProduct(order.getId(), accounts, order.getProduct().getType());
+                        guildOwner.sendProduct(order.getId(), accounts, order.getProduct().getType());
 
-                            event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
-                        }else{
-                            event.getHook().sendMessage("Sorry, but this order has not been paid for. If this is a mistake, contact Mythik and he will resolved this").queue();
-                        }
+                        event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                     } catch (IOException | InterruptedException e) {
                         channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
                         e.printStackTrace();
@@ -213,6 +208,8 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
             try {
                 SQLConnection.updateGuildInfo(guild, prefix, ticketLimit, serverOwnerId, ticketCategoryId);
+
+                BotProperty.guildsHashMap.get(guild.getId()).setTicketCategoryId(ticketCategoryId);
                 event.getHook().sendMessage("Successfully configured server").queue();
             } catch (SQLException e) {
                 e.printStackTrace();

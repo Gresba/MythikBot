@@ -206,7 +206,6 @@ public class StaffSlashCommand extends ListenerAdapter {
                     CustomMember targetMember = new CustomMember(jda, Objects.requireNonNull(event.getOption("target_member")).getAsMember().getId(), guild.getId());
                     String orderId = Objects.requireNonNull(event.getOption("order_id")).getAsString();
 
-                    String productType = event.getOption("account_type").getAsString();
 
                     if(!targetMember.getMember().getId().equalsIgnoreCase(event.getMember().getId())) {
                         try {
@@ -215,12 +214,8 @@ public class StaffSlashCommand extends ListenerAdapter {
                             long time = date.getTime();
 
                             // Check if the product type is set
-                            if(productType == null)
-                            {
-                                // If it's not that set means you can check with just the order id
-                                targetMember.sendProduct(orderId);
-                                guildOwner.sendProduct(orderId);
-                            }else{
+                            try {
+                                String productType = event.getOption("account_type").getAsString();
 
                                 /**
                                  * If it's set that means that sender is sending a personal order
@@ -233,6 +228,11 @@ public class StaffSlashCommand extends ListenerAdapter {
                                 // Send the product to the owner and the customer
                                 targetMember.sendProduct(orderId, product, productType);
                                 guildOwner.sendProduct(orderId, product, productType);
+                            }catch (NullPointerException e){
+
+                                // If it's not that set means you can check with just the order id
+                                targetMember.sendProduct(orderId);
+                                guildOwner.sendProduct(orderId);
                             }
                             SQLConnection.addOrder(orderId, targetMember.getMember().getId(), new Timestamp(time));
                             event.reply(targetMember.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();

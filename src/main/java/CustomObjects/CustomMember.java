@@ -99,7 +99,7 @@ public class CustomMember {
      * @param productInfo The products the customer ordered
      * @throws FileNotFoundException
      */
-    public void sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
+    public String sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
 
         String productString;
         String productType;
@@ -157,6 +157,7 @@ public class CustomMember {
             ).queue();
         }
         guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
+        return productString;
     }
 
     /**

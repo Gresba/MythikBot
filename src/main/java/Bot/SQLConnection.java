@@ -246,8 +246,8 @@ public class SQLConnection {
         updateGuildQuery.setString(1, guildPrefix);
         updateGuildQuery.setInt(2, ticketLimit);
         updateGuildQuery.setString(3, serverOwnerID);
-        updateGuildQuery.setString(4, guild.getId());
-        updateGuildQuery.setString(5, ticketCategoryId);
+        updateGuildQuery.setString(4, ticketCategoryId);
+        updateGuildQuery.setString(5, guild.getId());
 
         updateGuildQuery.executeUpdate();
     }
@@ -285,7 +285,7 @@ public class SQLConnection {
         insertTicketQuery.setString(1, ticketChannelId);
         insertTicketQuery.setString(2, memberId);
 
-        insertTicketQuery.executeQuery();
+        insertTicketQuery.executeUpdate();
     }
 
     public static void deleteTicket(String ticketChannelId) throws SQLException {
