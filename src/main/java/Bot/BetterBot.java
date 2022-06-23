@@ -99,15 +99,15 @@ public class BetterBot {
             // STAFF accessible commands
             commands.addCommands(
                     // SEND_ALTS command
-                    Commands.slash("send_alts", "Send alts to a user")
-                            .addOptions(new OptionData(USER, "target_member", "The member to send the alts to")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "account_type", "The type of account to send")
+                    Commands.slash("send_product", "Send the product to a member")
+                            .addOptions(new OptionData(USER, "target_member", "The member to send the product to")
                                     .setRequired(true))
                             .addOptions(new OptionData(STRING, "order_id", "The order id associated with this order")
                                     .setRequired(true))
+                            .addOptions(new OptionData(STRING, "account_type", "The type of product to send")
+                                    .setRequired(false))
                             .addOptions(new OptionData(INTEGER, "amount", "The amount to send")
-                                    .setRequired(true)),
+                                    .setRequired(false)),
 
                     // BAN command
                     Commands.slash("ban", "Ban a user from this server")
@@ -193,14 +193,6 @@ public class BetterBot {
             commands.addCommands(
                     Commands.slash("scan_file", "Scan")
                             .addOptions(new OptionData(STRING, "filepath", "File path")
-                                    .setRequired(true)),
-                    // REPLACE command
-                    Commands.slash("replace", "Send replacements for an order")
-                            .addOptions(new OptionData(STRING, "order_id", "The order ID")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(USER, "target_user", "Person to send it to")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(INTEGER, "replacement_amount", "Amount of replacements to send")
                                     .setRequired(true)),
 
                     // WHITELIST add/remove command

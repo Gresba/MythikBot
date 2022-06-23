@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -61,8 +60,8 @@ public class OwnerSlashCommand extends ListenerAdapter {
                             accountNumber++;
 
                             // Replace the last character ',' with a ';'
-                            query = query.substring(0, query.length() - 1) + ";";
                         }
+                        query = query.substring(0, query.length() - 1) + ";";
 
                         inputFile.delete();
 
@@ -79,27 +78,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         e.printStackTrace();
                     } catch (SQLException e) {
                         event.getHook().sendMessage("**[ERROR]** Accounts could not be uploaded").setEphemeral(true).queue();
-                        e.printStackTrace();
-                    }
-                }
-
-                // REPLACE an order
-                case "replace" -> {
-                    String orderID = event.getOption("order_id").getAsString();
-
-                    CustomMember member = new CustomMember(jda, event.getOption("target_user").getAsMember().getId(), guild.getId());
-                    int replacementAmount = (int) event.getOption("replacement_amount").getAsLong();
-
-                    try {
-                        String accounts = SQLConnection.getProductDetails(orderID, guild.getId(), replacementAmount);
-
-                        member.sendProduct(orderID, accounts);
-                        guildOwner.sendProduct(orderID, accounts);
-
-                        event.getHook().sendMessage("Accounts successfully sent").queue();
-                    } catch (IOException | InterruptedException e) {
-                        System.out.println("**[LOG]** There was an issue with sending the product");
-                        event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
                         e.printStackTrace();
                     }
                 }

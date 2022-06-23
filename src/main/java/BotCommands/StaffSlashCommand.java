@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -56,23 +55,6 @@ public class StaffSlashCommand extends ListenerAdapter {
         if (sender.hasPermission(Permission.ADMINISTRATOR)) {
 
             switch (event.getName()) {
-                case "send_alts" -> {
-                    CustomMember target_member = new CustomMember(jda, Objects.requireNonNull(event.getOption("target_member")).getAsMember().getId(), guild.getId());
-                    String accountType = Objects.requireNonNull(event.getOption("account_type")).getAsString();
-                    int amount = Objects.requireNonNull(event.getOption("amount")).getAsInt();
-                    String orderId = Objects.requireNonNull(event.getOption("order_id")).getAsString();
-
-                    String accounts = SQLConnection.getProductByName(guild.getId(), accountType, amount);
-
-                    try {
-                        target_member.sendAlts(accounts, orderId, accountType);
-                        guildOwner.sendAlts(accounts, orderId, accountType);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    event.reply(target_member.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
-                }
                 case "configure_server" -> event.replyModal(Modals.CONFIGURE_MODAL).queue();
 
                 // BAN COMMAND CONTROLLER
@@ -219,47 +201,57 @@ public class StaffSlashCommand extends ListenerAdapter {
                     });
                 }
 
-                // SEND slash command to view an order
-                case "send" -> {
-                    // Get the options
-                    String orderID = event.getOption("order_id").getAsString();
-                    CustomMember targetMember = new CustomMember(jda, event.getOption("target_user").getAsMember().getId(), guild.getId());
+                case "send_product" -> {
+                    // Retrieving the required fields
+                    CustomMember targetMember = new CustomMember(jda, Objects.requireNonNull(event.getOption("target_member")).getAsMember().getId(), guild.getId());
+                    String orderId = Objects.requireNonNull(event.getOption("order_id")).getAsString();
 
-                    // Check if the admin is sending accounts to himself
+                    String productType = event.getOption("account_type").getAsString();
+
                     if(!targetMember.getMember().getId().equalsIgnoreCase(event.getMember().getId())) {
                         try {
+                            // Get the current time of this command to store when the product was sent
                             java.util.Date date = new java.util.Date();
-                            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
                             long time = date.getTime();
 
-                            SQLConnection.addDefaultUser(guild, targetMember.getMember());
+                            // Check if the product type is set
+                            if(productType == null)
+                            {
+                                // If it's not that set means you can check with just the order id
+                                targetMember.sendProduct(orderId);
+                                guildOwner.sendProduct(orderId);
+                            }else{
 
-                            // Insert the order into the database so the same order cannot be claimed twice
-                            SQLConnection.addOrder(orderID, targetMember.getMember().getId(), new Timestamp(time));
+                                /**
+                                 * If it's set that means that sender is sending a personal order
+                                 *
+                                 * Get the information about the order including the amount and the product itself
+                                 */
+                                int amount = Objects.requireNonNull(event.getOption("amount")).getAsInt();
+                                String product = SQLConnection.getProductByName(guild.getId(), productType, amount);
 
-                            String accounts = SQLConnection.getProductDetails(orderID, guild.getId(), 0);
-
-                            targetMember.sendProduct(orderID, accounts);
-                            guildOwner.sendProduct(orderID, accounts);
-
-                            event.getHook().sendMessage("Accounts successfully sent. Check your DMs! " + targetMember.getMember().getAsMention()).queue();
+                                // Send the product to the owner and the customer
+                                targetMember.sendProduct(orderId, product, productType);
+                                guildOwner.sendProduct(orderId, product, productType);
+                            }
+                            SQLConnection.addOrder(orderId, targetMember.getMember().getId(), new Timestamp(time));
+                            event.reply(targetMember.getMember().getAsMention() + " accounts have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {
-                            event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
+                            event.reply("**ERROR** Could not successfully sent product!").queue();
                             e.printStackTrace();
                         } catch (SQLIntegrityConstraintViolationException e) {
-                            channel.getChannel().sendMessage(
-                                    """
-                                            **[Fraud Detection]** 
-                                            Unable to send the product. The product was already claimed.
-                                            """).queue();
-                            e.printStackTrace();
-                        } catch (SQLException e){
-                            event.getHook().sendMessage("**[ERROR]** There was an issue with registering the order to the database").queue();
+                            channel.getChannel().sendMessage("""
+                                    That order has already been claimed or that order id has already been registered in the database
+                                    
+                                    BetterBot has blocked the ability to send these product. Mythik will manually have to review this.
+                                    """).queue();
+                        } catch (SQLException e) {
+                            event.reply("**ERROR** Could not upload order to database").queue();
                             e.printStackTrace();
                         }
                     }else{
                         // Alert Mythik of a corrupt staff member
-                        botProperty.corruptStaffAlert(event.getJDA(), guild, sender.getUser(), "SENDING ACCOUNTS TO HIMSELF **Order ID:** " + orderID);
+                        botProperty.corruptStaffAlert(event.getJDA(), guild, sender.getUser(), "SENDING ACCOUNTS TO HIMSELF **Order ID:** " + orderId);
                         event.reply("Corrupt Staff Member Detected! " + event.getMember().getUser().getAsMention()).queue();
                     }
                 }

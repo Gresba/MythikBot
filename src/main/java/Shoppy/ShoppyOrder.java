@@ -64,6 +64,7 @@ public class ShoppyOrder {
         return orderEmbed;
     }
 
+
     public String getAccountList(ShoppyOrder orderObject, int amount, Guild guild)
     {
         String accounts = "";

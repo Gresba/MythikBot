@@ -25,7 +25,7 @@ public class ShoppyConnection {
      * Gets a Shoppy order with the order id passed in
      *
      * @param iD The order id of the order
-     * @return A shoppy order
+     * @return A Shoppy order
      * @throws IOException Using stream to access Shoppy data so must be caught
      * @throws InterruptedException Thread issues can occur so must be caught
      */

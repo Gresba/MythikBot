@@ -93,26 +93,54 @@ public class CustomMember {
 
 
     /**
+     * Send the product to the member with a description about the order
      *
+     * @param orderId The order id for the order
+     * @param productInfo The products the customer ordered
+     * @throws FileNotFoundException
      */
-    public void sendAlts(String accounts, String orderId, String accountType) throws FileNotFoundException {
+    public void sendProduct(String orderId, String ...productInfo) throws IOException, InterruptedException {
+
+        String productString;
+        String productType;
+
+        // Check if the product has not been retrieved
+        if(productInfo == null) {
+
+            // Get the order from Shoppy
+            ShoppyOrder shoppyOrder = ShoppyConnection.getShoppyOrder(orderId);
+
+            // Fill the information for the embed
+            orderId = shoppyOrder.getId();
+            productType = shoppyOrder.getProduct().getTitle();
+
+            // Get the product
+            productString = SQLConnection.getProductByName(guild.getId(), shoppyOrder.getProduct().getTitle(), shoppyOrder.getQuantity());
+
+        // If the product has already been retrieved then set the product and product type for the order embed
+        }else{
+            productString = productInfo[0];
+            productType = productInfo[1];
+        }
+
         EmbedBuilder orderEmbed = new EmbedBuilder()
                 .setTitle("**Better Alts Order**")
                 .addField("**Order ID:**", orderId, false)
-                .setDescription(setOrderDescription(accountType));
+                .addField("**Member:**", this.member.getAsMention(), false)
+                .setDescription(setOrderDescription(productType));
 
         // If the product is out of stock then alert the customer
-        if(accounts == null){
+        if(productString == null){
             orderEmbed.addField("Alts", "No accounts in the database. Contact a staff", false);
 
             // If the product length is less than 1000 then put it in the embed
-        }else if (accounts.length() < 1000) {
+        }else if (productString.length() < 1000) {
 
             // Add products to the description
-            if(accounts.length() == 0)
+            if(productString.length() == 0)
                 orderEmbed.addField("Alts", "No Stock! Don't worry contact the owner!", false);
             else
-                orderEmbed.addField("Alts", "```" + accounts + "```", false);
+                orderEmbed.addField("Alts", "```" + productString + "```", false);
             sendPrivateMessage(orderEmbed);
 
             // If the product length is greater than 1000 then put it in a file
@@ -121,7 +149,7 @@ public class CustomMember {
 
             // Create a text file and add the product to it
             PrintStream outputFile = new PrintStream("output");
-            outputFile.print(accounts);
+            outputFile.print(productString);
 
             // Send the customer the product
             member.getUser().openPrivateChannel().flatMap(privateChannel ->
@@ -129,56 +157,6 @@ public class CustomMember {
             ).queue();
         }
         guild.addRoleToMember(member.getId(), guild.getRoleById("929116572063244339")).queue();
-    }
-
-    /**
-     * Send a product to a user
-     *
-     * @param orderID The order ID for the product
-     * @return Whether the accounts were successfully sent or not
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public boolean sendProduct(String orderID, String accounts) throws IOException, InterruptedException {
-        ShoppyOrder orderObject = ShoppyConnection.getShoppyOrder(orderID);
-
-        // Check if the account was paid for
-        if (orderObject.getPaid_at() != null) {
-
-            EmbedBuilder orderEmbed = new EmbedBuilder()
-                    .setTitle("**Better Alts Order**")
-                    .addField("**Order ID:**", orderID, false)
-                    .setDescription(setOrderDescription(orderObject.getProduct().getTitle()));
-
-            // If the product is out of stock then alert the customer
-            if(accounts == null){
-                orderEmbed.addField("Alts", "No accounts in the database. Contact a staff", false);
-
-            // If the product length is less than 1000 then put it in the embed
-            }else if (accounts.length() < 1000) {
-
-                // Add products to the description
-                orderEmbed.addField("Alts", "```" + accounts + "```", false);
-                sendPrivateMessage(orderEmbed);
-
-            // If the product length is greater than 1000 then put it in a file
-            }else{
-                sendPrivateMessage(orderEmbed);
-                // Create a text file and add the product to it
-                PrintStream outputFile = new PrintStream("output");
-                outputFile.print(accounts);
-
-                // Send the customer the product
-                this.member.getUser().openPrivateChannel().flatMap(privateChannel ->
-                        privateChannel.sendFile(new File("output"), "product.txt")
-                ).queue();
-            }
-            this.guild.addRoleToMember(this.member.getId(), this.guild.getRoleById("929116572063244339")).queue();
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

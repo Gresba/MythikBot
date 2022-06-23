@@ -1,18 +1,15 @@
 package CustomObjects;
 
-import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-
-import java.io.IOException;
 
 public class CustomChannel {
     private final JDA jda;
     private TextChannel customChannel;
+
     /**
      * Constructor for initializing a ticket channel
      *
@@ -25,37 +22,40 @@ public class CustomChannel {
         this.customChannel = jda.getTextChannelById(channelId);
     }
 
-    public void sendProduct(String productType, int amount, String orderId) throws IOException, InterruptedException {
-        String guildId = customChannel.getGuild().getId();
-        CustomMember ticketOwner = new CustomMember(this.jda, customChannel.getTopic(), guildId);
-        String accounts = SQLConnection.getProductByName(guildId, productType, amount);
-        ticketOwner.sendProduct(orderId, accounts);
-    }
-
     /**
-     * Allows the passed in member to speak in a custom channel
+     * Let a role or member speak and view the ticket
      *
-     * @param member The member that will be allowed to speak
+     * @param permissionHolder The role or member to give permissions to
      */
-    public void openTicket(Member member)
+    public void openTicket(IPermissionHolder permissionHolder)
     {
-        this.customChannel.upsertPermissionOverride(member)
+        this.customChannel.upsertPermissionOverride(permissionHolder)
                 .setAllow(Permission.MESSAGE_SEND)
-                .setAllow(Permission.VIEW_CHANNEL)
-                .queue();
+                .setAllow(Permission.VIEW_CHANNEL);
     }
 
     /**
-     * Denies the ability for a member to speak in a custom channel
+     * Prevent a role or member to speak in the ticket
      *
-     * @param permissionTarget The target either a role or member that will be muted from the chat
+     * @param permissionHolder The role or member to give permissions to
      */
-    public void muteTicket(IPermissionHolder permissionTarget)
+    public void muteTicket(IPermissionHolder permissionHolder)
     {
-        this.customChannel.upsertPermissionOverride(permissionTarget)
+        this.customChannel.upsertPermissionOverride(permissionHolder)
                 .setDeny(Permission.MESSAGE_SEND)
-                .setAllow(Permission.VIEW_CHANNEL)
-                .queue();
+                .setAllow(Permission.VIEW_CHANNEL);
+    }
+
+    /**
+     * Prevent a role or member to speak or view the ticket
+     *
+     * @param permissionHolder The role or member to give permissions to
+     */
+    public void hideTicket(IPermissionHolder permissionHolder)
+    {
+        this.customChannel.upsertPermissionOverride(permissionHolder)
+                .setDeny(Permission.MESSAGE_SEND)
+                .setDeny(Permission.VIEW_CHANNEL);
     }
 
     /**

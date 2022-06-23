@@ -68,8 +68,8 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         {
                             String accounts = SQLConnection.getProductDetails(orderId, guild.getId(), 0);
 
-                            member.sendProduct(orderId, accounts);
-                            guildOwner.sendProduct(orderId, accounts);
+                            member.sendProduct(order.getId(), accounts, order.getProduct().getType());
+                            guildOwner.sendProduct(order.getId(), accounts, order.getProduct().getType());
 
                             event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                         }else{
