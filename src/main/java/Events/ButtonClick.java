@@ -53,7 +53,7 @@ public class ButtonClick extends ListenerAdapter {
                             SQLConnection.insertTicket(ticketChannel.getId(), member.getId());
 
                             // Setting permissions to allow ticket creator to view channel but can't send messages yet
-                            ticketChannel.putPermissionOverride(member)
+                            ticketChannel.upsertPermissionOverride(member)
                                     .setDeny(Permission.MESSAGE_SEND)
                                     .setAllow(Permission.VIEW_CHANNEL)
                                     .queue();
