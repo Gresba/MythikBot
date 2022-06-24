@@ -39,7 +39,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
         JDA jda = event.getJDA();
 
         CustomMember member = new CustomMember(jda, event.getMember().getId(), guild.getId());
-        CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getServerOwnerId(), guild.getId());
 
         // Checking if the modal is either for a replacement or claiming order
         if (event.getModalId().equals("claim-order-modal") || event.getModalId().equals("replacement-modal"))
@@ -62,8 +61,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                         String product = SQLConnection.getProductByName(guild.getId(), order.getProduct().getTitle(), order.getQuantity());
 
-                        member.sendProduct(order.getId(), product, order.getProduct().getType());
-                        guildOwner.sendProduct(order.getId(), product, order.getProduct().getType());
+                        member.sendProduct(order.getId(), product, order.getProduct().getTitle());
 
                         event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                     } catch (IOException | InterruptedException e) {

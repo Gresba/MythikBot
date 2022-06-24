@@ -15,13 +15,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 import java.sql.*;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -57,6 +51,15 @@ public class BetterBot {
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
+
+        }
+            System.out.println(BotProperty.guildsHashMap.size());
+            for (Map.Entry<String, GuildObject> entry : BotProperty.guildsHashMap.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                System.out.print(key);
+                System.out.println(value);
+
         }
 
         statement.close();
@@ -120,14 +123,11 @@ public class BetterBot {
             commands.addCommands(
                     // SEND_ALTS command
                     Commands.slash("send_product", "Send the product to a member")
-                            .addOptions(new OptionData(USER, "target_member", "The member to send the product to")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "order_id", "The order id associated with this order")
-                                    .setRequired(true))
-                            .addOptions(new OptionData(STRING, "product_type", "The type of product to send")
-                                    .setRequired(false))
-                            .addOptions(new OptionData(INTEGER, "amount", "The amount to send")
-                                    .setRequired(false)),
+                            .addOptions(new OptionData(USER, "target_member", "The member to send the product to", true))
+                            .addOptions(new OptionData(STRING, "order_id", "The order id associated with this order", true))
+                            .addOptions(new OptionData(STRING, "product_type", "The type of product to send", false))
+                            .addOptions(new OptionData(INTEGER, "amount", "The amount to send", false))
+                            .addOptions(new OptionData(STRING, "override", "If true, it will send even if the order id is already registered", false)),
 
                     // BAN command
                     Commands.slash("ban", "Ban a user from this server")
@@ -202,7 +202,12 @@ public class BetterBot {
                     Commands.slash("add_user", "Add a user to the database")
                             .addOptions(new OptionData(USER, "member", "The member to add to the database", true)),
 
-                    Commands.slash("configure_server", "Configure the discord server")
+                    Commands.slash("configure", "Configure the discord server").addSubcommands(
+                            new SubcommandData("server", "Configure server information (Bot Prefix, Server Owner)"),
+                            new SubcommandData("tickets", "Configure ticket system (Ticket Category, Ticket Limit)"),
+                            new SubcommandData("roles", "Configure roles (Staff Roles, Customer Role, Member Role)"),
+                            new SubcommandData("channels", "Configure channels (Log Channel, Leave Channel, Join Channel)")
+                    )
             );
 
             // OWNER Slash Commands

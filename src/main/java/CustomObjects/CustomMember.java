@@ -147,6 +147,8 @@ public class CustomMember {
 
         GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
 
+        CustomMember serverOwner = new CustomMember(guild.getJDA(), guildObject.getServerOwnerId(), guild.getId());
+
         // Variables for information about the order
         String productString;
         String productType;
@@ -170,6 +172,8 @@ public class CustomMember {
             productType = productInfo[1];
         }
 
+        System.out.println(productType);
+
         EmbedBuilder orderEmbed = new EmbedBuilder()
                 .setTitle("**Better Alts Order**")
                 .addField("**Order ID:**", orderId, false)
@@ -181,7 +185,7 @@ public class CustomMember {
             orderEmbed.addField("**Product**", "No stock! Don't worry contact the owner!", false);
 
             // If the product length is less than 1000 then put it in the embed
-        }else if (productString.length() < 1000) {
+        }else if (productString.length() < 1500) {
 
             // Add products to the description
             if(productString.length() == 0)
@@ -189,6 +193,7 @@ public class CustomMember {
             else
                 orderEmbed.addField("**Product**", "```" + productString + "```", false);
             sendPrivateMessage(orderEmbed);
+            serverOwner.sendPrivateMessage(orderEmbed);
 
         // If the product length is greater than 1000 then put it in a file
         }else{
@@ -198,8 +203,12 @@ public class CustomMember {
             PrintStream outputFile = new PrintStream("output");
             outputFile.print(productString);
 
-            // Send the customer the product
+            // Send the customer and the owner
             member.getUser().openPrivateChannel().flatMap(privateChannel ->
+                    privateChannel.sendFile(new File("output"), "product.txt")
+            ).queue();
+
+            serverOwner.getMember().getUser().openPrivateChannel().flatMap(privateChannel ->
                     privateChannel.sendFile(new File("output"), "product.txt")
             ).queue();
         }

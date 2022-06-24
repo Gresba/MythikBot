@@ -32,8 +32,9 @@ public class StaffSlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 
         // Only accept commands from guilds
-        if (!event.getChannelType().isGuild() || event.getMember() == null || event.getMember().getUser().isBot())
+        if (!event.getChannelType().isGuild() || event.getMember() == null || event.getMember().getUser().isBot()) {
             return;
+        }
         Guild guild = event.getGuild();
 
         JDA jda = event.getJDA();
@@ -43,12 +44,12 @@ public class StaffSlashCommand extends ListenerAdapter {
         GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
 
         CustomChannel channel = new CustomChannel(jda, event.getTextChannel().getId());
-        CustomMember guildOwner = new CustomMember(jda, guildObject.getServerOwnerId(), guild.getId());
 
         BotProperty botProperty = new BotProperty();
 
         if (staffMember.getRoles().contains(guild.getRoleById(guildObject.getStaffRoleId()))) {
             switch (event.getName()) {
+
                 // BAN COMMAND CONTROLLER
                 case "ban" -> {
                     // Get the values from the arguments passed in through the slash command
@@ -212,32 +213,25 @@ public class StaffSlashCommand extends ListenerAdapter {
                     CustomMember targetMember = new CustomMember(jda, Objects.requireNonNull(event.getOption("target_member")).getAsMember().getId(), guild.getId());
                     String orderId = Objects.requireNonNull(event.getOption("order_id")).getAsString();
 
-
                     if(!targetMember.getMember().getId().equalsIgnoreCase(event.getMember().getId())) {
                         try {
-                            SQLConnection.addOrder(orderId, targetMember.getMember().getId());
+                            if(event.getOption("override") == null)
+                                SQLConnection.addOrder(orderId, targetMember.getMember().getId());
 
                             // Check if the product type is set
                             try {
                                 String productType = event.getOption("product_type").getAsString();
 
-                                /**
-                                 * If it's set that means that sender is sending a personal order
-                                 *
-                                 * Get the information about the order including the amount and the product itself
-                                 */
                                 int amount = Objects.requireNonNull(event.getOption("amount")).getAsInt();
                                 String product = SQLConnection.getProductByName(guild.getId(), productType, amount);
 
                                 // Send the product to the owner and the customer
                                 targetMember.sendProduct(orderId, product, productType);
-                                guildOwner.sendProduct(orderId, product, productType);
 
                             }catch (NullPointerException e){
 
                                 // If it's not that set means you can check with just the order id
                                 targetMember.sendProduct(orderId);
-                                guildOwner.sendProduct(orderId);
                             }
                             event.reply(targetMember.getMember().getAsMention() + " product have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {
@@ -249,6 +243,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                                     
                                     BetterBot has blocked the ability to send these product. Mythik will manually have to review this.
                                     """).queue();
+                            e.printStackTrace();
                         } catch (SQLException e) {
                             event.reply("**ERROR** Could not upload order to database").queue();
                             e.printStackTrace();

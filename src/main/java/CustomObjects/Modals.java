@@ -78,8 +78,11 @@ public class Modals {
                                     .setMinLength(1)
                                     .build())).build();
 
-    // CONFIGURE_MODAL: Modal for configuring the server
-    public static Modal CONFIGURE_MODAL = Modal.create("configure-modal", "Configure Server")
+
+    /**
+     * SERVER GENERAL INFO CONFIGURATION
+     */
+    public static Modal CONFIGURE_SERVER = Modal.create("configure-server-modal", "Configure Server")
             .addActionRows(
                     ActionRow.of(
                             TextInput.create("configure-prefix", "Bot Prefix", TextInputStyle.SHORT)
@@ -87,20 +90,43 @@ public class Modals {
                                     .build()
                     ),
                     ActionRow.of(
+                            TextInput.create("configure-server-owner", "Server Owner", TextInputStyle.SHORT)
+                                    .setPlaceholder("The member id of the owner (Ex. 938989740177383435)")
+                                    .setRequired(true)
+                                    .build()
+                    )
+            )
+            .build();
+
+    /**
+     * SERVER TICKET SYSTEM CONFIGURATION
+     */
+    public static Modal CONFIGURE_TICKETS = Modal.create("configure-ticket-modal", "Configure Ticket System")
+            .addActionRows(
+                    ActionRow.of(
                             TextInput.create("configure-ticket-limit", "Ticket Limit", TextInputStyle.SHORT)
                                     .setPlaceholder("The max tickets a user can have at once (Ex. 1)")
                                     .setRequired(true)
                                     .build()
                     ),
-                    ActionRow.of(
-                            TextInput.create("configure-server-owner", "Server Owner", TextInputStyle.SHORT)
-                                    .setPlaceholder("The member id of the owner (Ex. 938989740177383435)")
-                                    .setRequired(true)
-                                    .build()
-                    ),
+
                     ActionRow.of(
                             TextInput.create("configure-ticket-category", "Ticket Category Id", TextInputStyle.SHORT)
-                                    .setPlaceholder("The category the tickets will be put into (Ex. 838934740177383435")
+                                    .setPlaceholder("The id for the category the tickets will be put into (Ex. 838934740177383435")
+                                    .setRequired(true)
+                                    .build()
+                    )
+            )
+            .build();
+
+    /**
+     * SERVER ROLES CONFIGURATION
+     */
+    public static Modal CONFIGURE_ROLES = Modal.create("configure-roles-modal", "Configure Roles")
+            .addActionRows(
+                    ActionRow.of(
+                            TextInput.create("configure-customer-role", "Customer Role Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("The role for a customer (Ex. 349347445373834933")
                                     .setRequired(true)
                                     .build()
                     ),
@@ -113,15 +139,36 @@ public class Modals {
                     ),
 
                     ActionRow.of(
+                            TextInput.create("configure-member-role", "Member Role Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("The role id for members allowed to view channel (Ex. 838934740177383435")
+                                    .setRequired(true)
+                                    .build()
+                    )
+            )
+            .build();
+
+    /**
+     * SERVER CHANNEL CONFIGURATION
+     */
+    public static Modal CONFIGURE_CHANNELS = Modal.create("configure-ticket-modal", "Configure Channels")
+            .addActionRows(
+                    ActionRow.of(
                             TextInput.create("configure-log-channel", "Log Channel Id", TextInputStyle.SHORT)
-                                    .setPlaceholder("The channel id for the log channel (Ex. 349347445373834933")
+                                    .setPlaceholder("Log channel id (Ex. 349347445373834933)")
                                     .setRequired(true)
                                     .build()
                     ),
 
                     ActionRow.of(
-                            TextInput.create("configure-customer-role", "Customer Role Id", TextInputStyle.SHORT)
-                                    .setPlaceholder("The role for a customer (Ex. 349347445373834933")
+                            TextInput.create("configure-join-channel", "Join Channel Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("Join channel id (Ex. 349347445373834933)")
+                                    .setRequired(true)
+                                    .build()
+                    ),
+
+                    ActionRow.of(
+                            TextInput.create("configure-leave-channel", "Leave Channel Id", TextInputStyle.SHORT)
+                                    .setPlaceholder("Leave channel id (Ex. 349347445373834933)")
                                     .setRequired(true)
                                     .build()
                     )

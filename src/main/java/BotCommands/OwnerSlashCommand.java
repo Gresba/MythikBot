@@ -38,10 +38,18 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
         // If send contains the role "Owner" then allow them to use this command
         if (sender.getId().equalsIgnoreCase(guildOwner.getMember().getId())) {
-            event.deferReply().queue();
 
-            switch (event.getName()) {
-                case "configure_server" -> event.replyModal(Modals.CONFIGURE_MODAL).queue();
+            switch (event.getName())
+            {
+                case "configure" -> {
+                    switch (event.getSubcommandName()) {
+                        case "tickets" -> event.replyModal(Modals.CONFIGURE_TICKETS).queue();
+                        case "server" -> event.replyModal(Modals.CONFIGURE_SERVER).queue();
+                        case "roles" -> event.replyModal(Modals.CONFIGURE_ROLES).queue();
+                        case "channels" -> event.replyModal(Modals.CONFIGURE_CHANNELS).queue();
+                    }
+                }
+
 
                 // UPLOAD a product into the database
                 case "upload" -> {

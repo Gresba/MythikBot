@@ -18,16 +18,16 @@ public class GuildObject {
             int ticketLimit,
             String serverOwnerId,
             String ticketCategoryId,
-            String logChannelId,
             String staffRoleId,
+            String logChannelId,
             String customerRoleId) {
         this.guildId = guildId;
         this.prefix = prefix;
         this.ticketLimit = ticketLimit;
         this.serverOwnerId = serverOwnerId;
         this.ticketCategoryId = ticketCategoryId;
-        this.logChannelId = logChannelId;
         this.staffRoleId = staffRoleId;
+        this.logChannelId = logChannelId;
         this.customerRoleId = customerRoleId;
     }
 
@@ -65,4 +65,18 @@ public class GuildObject {
         this.staffRoleId = staffRoleId;
     }
     public void setCustomerRoleId(String customerRoleId) { this.customerRoleId = customerRoleId; }
+
+    @Override
+    public String toString() {
+        return "GuildObject{" +
+                "guildId='" + guildId + '\'' +
+                ", ticketLimit=" + ticketLimit +
+                ", prefix='" + prefix + '\'' +
+                ", serverOwnerId='" + serverOwnerId + '\'' +
+                ", ticketCategoryId='" + ticketCategoryId + '\'' +
+                ", logChannelId='" + logChannelId + '\'' +
+                ", staffRoleId='" + staffRoleId + '\'' +
+                ", customerRoleId='" + customerRoleId + '\'' +
+                '}';
+    }
 }
