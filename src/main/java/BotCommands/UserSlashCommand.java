@@ -30,7 +30,7 @@ public class UserSlashCommand extends ListenerAdapter {
             case "paypal" -> event.reply("""
                     **PayPal Email:** betteralts01@gmail.com
                     Make sure the payment is **PayPal Friends and Family** or you will not receive the product and pay a refund fee.
-                    **NOTE:** If you did not specifically click *friends and family* option that means you did not send using friends and family""");
+                    **NOTE:** If you did not specifically click *friends and family* option that means you did not send using friends and family""").queue();
 
             // HELP COMMAND
             case "help" ->

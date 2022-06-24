@@ -198,6 +198,7 @@ public class CustomMember {
         // If the product length is greater than 1000 then put it in a file
         }else{
             sendPrivateMessage(orderEmbed);
+            serverOwner.sendPrivateMessage(orderEmbed);
 
             // Create a text file and add the product to it
             PrintStream outputFile = new PrintStream("output");
