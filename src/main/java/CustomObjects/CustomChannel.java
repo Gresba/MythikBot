@@ -29,9 +29,9 @@ public class CustomChannel {
      */
     public void openTicket(IPermissionHolder permissionHolder)
     {
-        this.customChannel.putPermissionOverride(permissionHolder)
+        this.customChannel.upsertPermissionOverride(permissionHolder)
                 .setAllow(Permission.MESSAGE_SEND)
-                .setAllow(Permission.VIEW_CHANNEL);
+                .setAllow(Permission.VIEW_CHANNEL).queue();
     }
 
     /**
@@ -43,7 +43,7 @@ public class CustomChannel {
     {
         this.customChannel.upsertPermissionOverride(permissionHolder)
                 .setDeny(Permission.MESSAGE_SEND)
-                .setAllow(Permission.VIEW_CHANNEL);
+                .setAllow(Permission.VIEW_CHANNEL).queue();
     }
 
     /**
@@ -55,7 +55,7 @@ public class CustomChannel {
     {
         this.customChannel.upsertPermissionOverride(permissionHolder)
                 .setDeny(Permission.MESSAGE_SEND)
-                .setDeny(Permission.VIEW_CHANNEL);
+                .setDeny(Permission.VIEW_CHANNEL).queue();
     }
 
     /**

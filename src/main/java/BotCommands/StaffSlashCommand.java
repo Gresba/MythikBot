@@ -231,7 +231,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                             }catch (NullPointerException e){
 
                                 // If it's not that set means you can check with just the order id
-                                targetMember.sendProduct(orderId);
+                                targetMember.sendProduct(orderId, null);
                             }
                             event.reply(targetMember.getMember().getAsMention() + " product have been sent. Check your DMs!").queue();
                         } catch (IOException | InterruptedException e) {

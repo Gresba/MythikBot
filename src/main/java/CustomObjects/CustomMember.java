@@ -185,7 +185,7 @@ public class CustomMember {
             orderEmbed.addField("**Product**", "No stock! Don't worry contact the owner!", false);
 
             // If the product length is less than 1000 then put it in the embed
-        }else if (productString.length() < 1500) {
+        }else if (productString.length() < 1000) {
 
             // Add products to the description
             if(productString.length() == 0)
