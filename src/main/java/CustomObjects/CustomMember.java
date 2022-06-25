@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -147,7 +148,7 @@ public class CustomMember {
 
         GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
 
-        CustomMember serverOwner = new CustomMember(guild.getJDA(), guildObject.getServerOwnerId(), guild.getId());
+        CustomMember serverOwner = new CustomMember(guild.getJDA(), guildObject.getOwnerId(), guild.getId());
 
         // Variables for information about the order
         String productString;

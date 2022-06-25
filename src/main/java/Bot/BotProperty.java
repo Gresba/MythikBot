@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -22,6 +23,10 @@ public class BotProperty {
     }
 
     public BotProperty()
+    {
+
+    }
+    public static void insertGuild()
     {
 
     }

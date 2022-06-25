@@ -196,21 +196,44 @@ public class ModalInteractionEvent extends ListenerAdapter {
         }else if(event.getModalId().equals("configure-modal")){
             String prefix = event.getValue("configure-prefix").getAsString();
             String serverOwnerId = event.getValue("configure-server-owner").getAsString();
-            String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
             String staffRoleId = event.getValue("configure-staff-role").getAsString();
             String logChannelId = event.getValue("configure-log-channel").getAsString();
             String customerRoleId = event.getValue("configure-customer-role").getAsString();
-
-            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
+            String memberRoleId = event.getValue("configure-member-role").getAsString();
+            String joinChannelId = event.getValue("configure-join-channel").getAsString();
+            String leaveChannelId = event.getValue("configure-leave-channel").getAsString();
 
             try {
-                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, ticketLimit, serverOwnerId, ticketCategoryId, staffRoleId, logChannelId, customerRoleId);
+                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, 0, serverOwnerId, null, staffRoleId, logChannelId, customerRoleId, memberRoleId, joinChannelId, leaveChannelId);
                 SQLConnection.updateGuildInfo(configuredGuild);
 
                 BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                 event.getHook().sendMessage("Successfully configured server").queue();
             } catch (SQLException e) {
                 e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }else if(event.getModalId().equalsIgnoreCase("configure-ticket-modal")){
+            String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
+            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
+            GuildObject configuredGuild = new GuildObject(
+                    guild.getId(),
+                    null, ticketLimit,
+                    null, ticketCategoryId,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+
+            try {
+                SQLConnection.updateGuildInfo(configuredGuild);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }
     }

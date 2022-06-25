@@ -38,6 +38,10 @@ public class BetterBot {
             String staffRoleId = guildInfo.getString(6);
             String logChannelId = guildInfo.getString(7);
             String customerRoleId = guildInfo.getString(8);
+            String memberRoleId = guildInfo.getString(8);
+            String joinChannelId = guildInfo.getString(8);
+            String leaveChannelId = guildInfo.getString(8);
+
 
             GuildObject guildObject = new GuildObject(
                     guildId,
@@ -47,18 +51,13 @@ public class BetterBot {
                     ticketCategoryId,
                     staffRoleId,
                     logChannelId,
-                    customerRoleId);
+                    customerRoleId,
+                    memberRoleId,
+                    joinChannelId,
+                    leaveChannelId);
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
-
-        }
-            System.out.println(BotProperty.guildsHashMap.size());
-            for (Map.Entry<String, GuildObject> entry : BotProperty.guildsHashMap.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                System.out.print(key);
-                System.out.println(value);
 
         }
 

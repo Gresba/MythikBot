@@ -29,7 +29,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
         Guild guild = event.getGuild();
         JDA jda = event.getJDA();
         Member sender = event.getMember();
-        CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getServerOwnerId(), guild.getId());
+        CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getOwnerId(), guild.getId());
         Statement statement = SQLConnection.getStatement();
 
         // If the sender is the bot then exit
@@ -158,7 +158,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         }
                     );
 
-                    event.getHook().sendMessage("Successfully deleted DMs with the user " + targetMember.getAsMention()).setEphemeral(true).queue();
+                    event.reply("Successfully deleted DMs with the user " + targetMember.getAsMention()).setEphemeral(true).queue();
                 }
 
                 // SCAN_FILE scan a file
