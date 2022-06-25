@@ -5,6 +5,7 @@ import CustomObjects.Response;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
+import java.lang.reflect.Field;
 import java.sql.*;
 
 public class SQLConnection {
@@ -36,11 +37,11 @@ public class SQLConnection {
      * @param guildId The guild the request was sent from
      * @param productType The type of product to retrieve
      * @param amount The amount to get
-     * @return {String} The product(s)
+     * @return The product(s)
      */
     public static String getProductByName(String guildId, String productType, int amount)
     {
-        String accounts = "";
+        String product = "";
 
         try {
             // Building the query
@@ -59,7 +60,7 @@ public class SQLConnection {
                 LIMIT ?
                 """);
 
-            // Setting the account type
+            // Setting the product type
             retrieveProductQuery.setString(1, productType);
             deleteProductQuery.setString(1, productType);
 
@@ -67,23 +68,23 @@ public class SQLConnection {
             retrieveProductQuery.setString(2, guildId);
             deleteProductQuery.setString(2, guildId);
 
-            // Setting the amount of accounts to get
+            // Setting the amount of product to get
             retrieveProductQuery.setInt(3, amount);
             deleteProductQuery.setInt(3, amount);
 
-            // Executing the query to get the accounts
+            // Executing the query to get the product
             ResultSet resultSet = retrieveProductQuery.executeQuery();
 
             statement.close();
 
-            // Loop through the result set to get the accounts
+            // Loop through the result set to get the product
             while (resultSet.next()) {
 
-                // Get the account
-                String account = resultSet.getString(1);
+                // Get the product
+                String productInfo = resultSet.getString(1);
 
                 // Add the account to the string that will be returned
-                accounts += account + "\n";
+                product += productInfo + "\n";
             }
 
             // Delete the accounts retrieved from the database
@@ -94,7 +95,7 @@ public class SQLConnection {
             e.printStackTrace();
         }
 
-        return accounts;
+        return product;
     }
 
     /**
@@ -107,7 +108,6 @@ public class SQLConnection {
      * @throws SQLException  Common SQL exceptions to be dealt with
      */
     public static void insertPunishment(String punishmentType, Member member, String reason, String staffMemberId) throws SQLException {
-
         PreparedStatement updatePunishmentQuery = connection.prepareStatement(
         """
             INSERT INTO Punishments (Type, Reason, MemberId, StaffMemberId)
@@ -249,18 +249,52 @@ public class SQLConnection {
      * @param guild The guild object where all the information about the guild is stored
      * @throws SQLException Exception that must be caught when calling this method
      */
-    public static void updateGuildInfo(GuildObject guild) throws SQLException {
+    public static void updateGuildInfo(GuildObject guild) throws SQLException, IllegalAccessException {
         PreparedStatement updateGuildQuery = connection.prepareStatement(
         """
             UPDATE Guilds
-            SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?
+            SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?, StaffId = ?, LogChannelId = ?, 
+                CustomerRoleId = ?, MemberRoleId = ?, JoinChannelId = ?, LeaveChannelId = ?
             WHERE GuildID = ?
             """);
-        updateGuildQuery.setString(1, guild.getPrefix());
-        updateGuildQuery.setInt(2, guild.getTicketLimit());
-        updateGuildQuery.setString(3, guild.getServerOwnerId());
-        updateGuildQuery.setString(4, guild.getTicketCategoryId());
-        updateGuildQuery.setString(5, guild.getGuildId());
+
+        int counter = 1;
+
+        // Loops through the fields in the guilds class
+        for (Field field : guild.getClass().getDeclaredFields()) {
+
+            // Gets the type of field and checks
+            switch (field.getClass().getSimpleName())
+            {
+                // If the datatype is a String then do the appropriate for a string
+                case "String" -> {
+
+                    // Store the value
+                    String fieldValue = String.valueOf(field.get(guild));
+
+                    // If the value isn't set then use the current value
+                    if(fieldValue == null) {
+                        String oldFieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
+                        fieldValue = oldFieldValue;
+                    }else{
+                        field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
+                    }
+                    updateGuildQuery.setString(counter++, fieldValue);
+                }
+
+                // If the datatype is an int then do the appropriate for an int
+                case "int" -> {
+                    int fieldValue = (int)field.get(guild);
+                    if(fieldValue == 0) {
+                        int oldFieldValue = (int)field.get(BotProperty.guildsHashMap.get(guild.getGuildId()));
+                        fieldValue = oldFieldValue;
+                    }else{
+                        field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
+                    }
+                    updateGuildQuery.setInt(counter++, fieldValue);
+                }
+            }
+        }
 
         updateGuildQuery.executeUpdate();
     }
@@ -344,7 +378,7 @@ public class SQLConnection {
     }
 
     /**
-     * Inserts a new record of a response to the Response table which will be used to respond to members depending on the trigger word
+     * Inserts a new record of a response to the Responses table which will be used to respond to members depending on the trigger word
      *
      * @param guildId The id of the guild that the response will be associated
      * @param response The response object to populate the record
@@ -353,7 +387,7 @@ public class SQLConnection {
     public static void insertResponse(String guildId, Response response) throws SQLException {
         PreparedStatement insertResponseQuery = connection.prepareStatement(
         """
-            INSERT INTO Response
+            INSERT INTO Responses
             VALUES (?, ?, ?, ?, ?)
             """);
 
@@ -367,7 +401,7 @@ public class SQLConnection {
     }
 
     /**
-     * Delete a response from the Response table by finding the trigger word and guild id
+     * Delete a response from the Responses table by finding the trigger word and guild id
      *
      * @param guildId The id of the guild the response belongs to
      * @param triggerWord The word that will trigger the response
@@ -377,7 +411,7 @@ public class SQLConnection {
         // Building the query
         PreparedStatement deleteResponseQuery = connection.prepareStatement(
         """
-            DELETE FROM Response
+            DELETE FROM Responses
             WHERE TriggerWord = ?
             AND GuildId = ?
             """);
