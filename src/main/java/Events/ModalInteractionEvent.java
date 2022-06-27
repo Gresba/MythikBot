@@ -157,12 +157,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
                             .setActionRow(Button.danger("close-ticket", "Close"))
                             .queue();
                     if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
-                        Role paypalExchangerRole = guild.getRoleById(938905340001542235L);
-
-                        channel.upsertPermissionOverride(paypalExchangerRole)
-                                .setAllow(Permission.MESSAGE_SEND)
-                                .setAllow(Permission.VIEW_CHANNEL)
-                                .queue();
 
                         EmbedBuilder paypalClaim = new EmbedBuilder()
                                 .setTitle("**PayPal Order**")
@@ -171,7 +165,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                                 Button.primary("paypal-claim-order", "PayPal Claim")
                         ).queue();
 
-                        channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
+                        channel.sendMessage(guild.getMemberById(BotProperty.guildsHashMap.get(guild.getId()).getOwnerId()).getAsMention() + " there is a PayPal order!").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
                         channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){
