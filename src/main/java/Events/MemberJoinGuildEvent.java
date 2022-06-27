@@ -47,7 +47,7 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
             invitesHashMap.put(invite.getCode(), invite);
         }
 
-        event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById("945973060027166750")).queue();
+        event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(BotProperty.guildsHashMap.get(guild.getId()).getMemberRoleId())).queue();
 
         try {
             // Get all the invites from the database
@@ -107,12 +107,12 @@ public class MemberJoinGuildEvent extends ListenerAdapter {
         // Compare the invites to the values in the database
             // If any of the values are different that means that is the invite link that was used
 
-        // Incrememnt Counter for inviter
+        // Increment Counter for inviter
 
         int createdMinusJoinedEpochSeconds = (int)(member.getTimeJoined().toEpochSecond() - member.getTimeCreated().toEpochSecond());
 
         // Check if the account is an alt. 86400 epoch seconds = 1 day.
-        if(createdMinusJoinedEpochSeconds < 12000 || member.getUser().getName().toLowerCase().contains("NFT"))
+        if(createdMinusJoinedEpochSeconds < 12000 || member.getUser().getName().toLowerCase().contains("nft"))
         {
             customMember.sendPrivateMessage(Embeds.ALT_DETECTION);
 

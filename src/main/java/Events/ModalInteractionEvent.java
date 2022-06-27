@@ -219,7 +219,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                         SQLConnection.updateGuildInfo(configuredGuild);
 
-                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                         event.getHook().sendMessage("Successfully configured server").queue();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -248,7 +247,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                         SQLConnection.updateGuildInfo(configuredGuild);
 
-                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                         event.getHook().sendMessage("Successfully configured server").queue();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -307,7 +305,6 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                         SQLConnection.updateGuildInfo(configuredGuild);
 
-                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
                         event.getHook().sendMessage("Successfully configured server").queue();
                     } catch (SQLException e) {
                         e.printStackTrace();

@@ -26,10 +26,6 @@ public class BotProperty {
     {
 
     }
-    public static void insertGuild()
-    {
-
-    }
 
     public static void storeLog(Guild guild, EmbedBuilder embedBuilder, String logType)
     {
@@ -40,9 +36,9 @@ public class BotProperty {
         // Figure out which channels to send the logs to
         if(logType.equalsIgnoreCase("Joined"))
         {
-            channelID = "929114231679365121";
+            channelID = BotProperty.guildsHashMap.get(guild.getId()).getJoinChannelId();
         } else if(logType.equalsIgnoreCase("Left")){
-            channelID = "937170925655310386";
+            channelID = BotProperty.guildsHashMap.get(guild.getId()).getLeaveChannelId();
 
         // Any action which isn't a join or leave
         } else {

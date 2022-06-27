@@ -150,7 +150,7 @@ public class Modals {
     /**
      * SERVER CHANNEL CONFIGURATION
      */
-    public static Modal CONFIGURE_CHANNELS = Modal.create("configure-ticket-modal", "Configure Channels")
+    public static Modal CONFIGURE_CHANNELS = Modal.create("configure-channels-modal", "Configure Channels")
             .addActionRows(
                     ActionRow.of(
                             TextInput.create("configure-log-channel", "Log Channel Id", TextInputStyle.SHORT)
