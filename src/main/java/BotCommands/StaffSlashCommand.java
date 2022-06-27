@@ -47,7 +47,7 @@ public class StaffSlashCommand extends ListenerAdapter {
 
         BotProperty botProperty = new BotProperty();
 
-        if (staffMember.getRoles().contains(guild.getRoleById(guildObject.getStaffRoleId()))) {
+        if (staffMember.getRoles().contains(guild.getRoleById(guildObject.getStaffId()))) {
             switch (event.getName()) {
 
                 // BAN COMMAND CONTROLLER

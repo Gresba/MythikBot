@@ -41,7 +41,7 @@ public class SQLConnection {
      */
     public static String getProductByName(String guildId, String productType, int amount)
     {
-        String product = "";
+        StringBuilder product = new StringBuilder();
 
         try {
             // Building the query
@@ -84,7 +84,7 @@ public class SQLConnection {
                 String productInfo = resultSet.getString(1);
 
                 // Add the account to the string that will be returned
-                product += productInfo + "\n";
+                product.append(productInfo).append("\n");
             }
 
             // Delete the accounts retrieved from the database
@@ -95,7 +95,7 @@ public class SQLConnection {
             e.printStackTrace();
         }
 
-        return product;
+        return product.toString();
     }
 
     /**
@@ -252,30 +252,36 @@ public class SQLConnection {
     public static void updateGuildInfo(GuildObject guild) throws SQLException, IllegalAccessException {
         PreparedStatement updateGuildQuery = connection.prepareStatement(
         """
+            
             UPDATE Guilds
-            SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?, StaffId = ?, LogChannelId = ?, 
+            SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?, StaffId = ?, LogChannelId = ?,
                 CustomerRoleId = ?, MemberRoleId = ?, JoinChannelId = ?, LeaveChannelId = ?
             WHERE GuildID = ?
             """);
 
         int counter = 1;
 
+        System.out.println("GUILDS HASH MAP BEFORE");
+        BotProperty.guildsHashMap.forEach((s, guildObject) -> {
+            System.out.println(guildObject);
+        });
+        System.out.println(guild);
         // Loops through the fields in the guilds class
         for (Field field : guild.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
 
             // Gets the type of field and checks
-            switch (field.getClass().getSimpleName())
+            switch (field.getType().toString())
             {
                 // If the datatype is a String then do the appropriate for a string
-                case "String" -> {
-
+                case "class java.lang.String" -> {
                     // Store the value
                     String fieldValue = String.valueOf(field.get(guild));
 
                     // If the value isn't set then use the current value
-                    if(fieldValue == null) {
-                        String oldFieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
-                        fieldValue = oldFieldValue;
+                    if(fieldValue.equalsIgnoreCase("null")) {
+                        System.out.println("Field Title: " + field.getName() + " | Value: " + field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
+                        fieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
                     }else{
                         field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
                     }
@@ -284,10 +290,10 @@ public class SQLConnection {
 
                 // If the datatype is an int then do the appropriate for an int
                 case "int" -> {
-                    int fieldValue = (int)field.get(guild);
+
+                    int fieldValue = (int) field.get(guild);
                     if(fieldValue == 0) {
-                        int oldFieldValue = (int)field.get(BotProperty.guildsHashMap.get(guild.getGuildId()));
-                        fieldValue = oldFieldValue;
+                        fieldValue = (int) field.get(BotProperty.guildsHashMap.get(guild.getGuildId()));
                     }else{
                         field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
                     }
@@ -295,6 +301,11 @@ public class SQLConnection {
                 }
             }
         }
+        System.out.println("GUILDS HASH MAP AFTER");
+
+        BotProperty.guildsHashMap.forEach((s, guildObject) -> {
+            System.out.println(guildObject);
+        });
 
         updateGuildQuery.executeUpdate();
     }

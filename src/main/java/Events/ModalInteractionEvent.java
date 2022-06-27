@@ -65,17 +65,17 @@ public class ModalInteractionEvent extends ListenerAdapter {
 
                         event.getHook().sendMessage("Accounts successfully sent! Check DMs " + member.getMember().getAsMention()).queue();
                     } catch (IOException | InterruptedException e) {
-                        channel.sendMessage("**[LOG]** There was an issue with sending the product").queue();
+                        event.getHook().sendMessage("**[LOG]** There was an issue with sending the product").queue();
                         e.printStackTrace();
                     } catch (SQLIntegrityConstraintViolationException e) {
-                        channel.sendMessage(
+                        event.getHook().sendMessage(
                                 """
                                         **[Fraud Detection]**
                                         Unable to send the product. The product was already claimed
                                         """).queue();
                         e.printStackTrace();
                     } catch (SQLException e){
-                        event.reply("**[ERROR]** There was an issue with registering the order to the database").queue();
+                        event.getHook().sendMessage("**[ERROR]** There was an issue with registering the order to the database").queue();
                         e.printStackTrace();
                     }
 
@@ -137,103 +137,184 @@ public class ModalInteractionEvent extends ListenerAdapter {
                 event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
                 e.printStackTrace();
             }
-        }else if(event.getModalId().equals("purchase-modal")){
-            String purchaseItemName = event.getValue("purchase-item-name").getAsString();
-            String purchaseItemAmount = event.getValue("purchase-item-amount").getAsString();
-            String purchasePaymentMethod = event.getValue("purchase-payment-method").getAsString();
+        }else{
+            switch (event.getModalId())
+            {
+                case "purchase-modal" -> {
+                    String purchaseItemName = event.getValue("purchase-item-name").getAsString();
+                    String purchaseItemAmount = event.getValue("purchase-item-amount").getAsString();
+                    String purchasePaymentMethod = event.getValue("purchase-payment-method").getAsString();
 
-            EmbedBuilder purchaseEmbed = new EmbedBuilder()
-                    .setTitle("**Better Alts Purchase**")
-                    .setDescription("The details of what you requested to purchase. If there are any incorrect details please re-submit the form!")
-                    .setColor(Color.blue)
-                    .addField("**Item**", purchaseItemName, false)
-                    .addField("**Amount**", purchaseItemAmount, false)
-                    .addField("**Payment Method**", purchasePaymentMethod, false);
+                    EmbedBuilder purchaseEmbed = new EmbedBuilder()
+                            .setTitle("**Better Alts Purchase**")
+                            .setDescription("The details of what you requested to purchase. If there are any incorrect details please re-submit the form!")
+                            .setColor(Color.blue)
+                            .addField("**Item**", purchaseItemName, false)
+                            .addField("**Amount**", purchaseItemAmount, false)
+                            .addField("**Payment Method**", purchasePaymentMethod, false);
 
-            event.getHook().editOriginalEmbeds(purchaseEmbed.build())
-                    .setActionRow(Button.danger("close-ticket", "Close"))
-                    .queue();
-            if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
-                Role paypalExchangerRole = guild.getRoleById(938905340001542235L);
+                    event.getHook().editOriginalEmbeds(purchaseEmbed.build())
+                            .setActionRow(Button.danger("close-ticket", "Close"))
+                            .queue();
+                    if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
+                        Role paypalExchangerRole = guild.getRoleById(938905340001542235L);
 
-                channel.upsertPermissionOverride(paypalExchangerRole)
-                        .setAllow(Permission.MESSAGE_SEND)
-                        .setAllow(Permission.VIEW_CHANNEL)
-                        .queue();
+                        channel.upsertPermissionOverride(paypalExchangerRole)
+                                .setAllow(Permission.MESSAGE_SEND)
+                                .setAllow(Permission.VIEW_CHANNEL)
+                                .queue();
 
-                EmbedBuilder paypalClaim = new EmbedBuilder()
-                        .setTitle("**PayPal Order**")
+                        EmbedBuilder paypalClaim = new EmbedBuilder()
+                                .setTitle("**PayPal Order**")
                                 .setDescription("A PayPaler will claim this order soon. Please be patient!");
-                channel.sendMessageEmbeds(paypalClaim.build()).setActionRow(
-                        Button.primary("paypal-claim-order", "PayPal Claim")
-                ).queue();
+                        channel.sendMessageEmbeds(paypalClaim.build()).setActionRow(
+                                Button.primary("paypal-claim-order", "PayPal Claim")
+                        ).queue();
 
-                channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
-            }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
-                channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
-            }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){
-                channel.sendMessage(member.getMember().getAsMention() + " we do not accept paysafe card as a payment method! Close the ticket when you see this.").queue();
-            }
-        }else if(event.getModalId().equals("sponsorship-partnership")){
-            String email = event.getValue("email").getAsString();
-            String channelLink = event.getValue("channel-link").getAsString();
-            String discordLink = event.getValue("discord-link").getAsString();
-            String sponsorshipService = event.getValue("sponsorship-service").getAsString();
-            String sponsorshipPayment = event.getValue("sponsorship-payment").getAsString();
+                        channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
+                    }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
+                        channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
+                    }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){
+                        channel.sendMessage(member.getMember().getAsMention() + " we do not accept paysafe card as a payment method! Close the ticket when you see this.").queue();
+                    }
+                }
 
-            EmbedBuilder partnershipEmbed = new EmbedBuilder()
-                    .setTitle("**Sponsorship/Partnership Application**")
-                    .setAuthor(member.getMember().getUser().getAsTag())
-                    .setColor(Color.CYAN)
-                    .addField("**User**", member.getMember().getAsMention(), false)
-                    .addField("**Email**", email, false)
-                    .addField("**Youtube Channel Link**", channelLink, false)
-                    .addField("**Discord Channel Link**", discordLink, false)
-                    .addField("**Service**", sponsorshipService, false)
-                    .addField("**Payment**", sponsorshipPayment, false);
-            event.getHook().editOriginalEmbeds(partnershipEmbed.build()).queue();
+                case "sponsorship-partnership" -> {
+                    String email = event.getValue("email").getAsString();
+                    String channelLink = event.getValue("channel-link").getAsString();
+                    String discordLink = event.getValue("discord-link").getAsString();
+                    String sponsorshipService = event.getValue("sponsorship-service").getAsString();
+                    String sponsorshipPayment = event.getValue("sponsorship-payment").getAsString();
 
-        }else if(event.getModalId().equals("configure-modal")){
-            String prefix = event.getValue("configure-prefix").getAsString();
-            String serverOwnerId = event.getValue("configure-server-owner").getAsString();
-            String staffRoleId = event.getValue("configure-staff-role").getAsString();
-            String logChannelId = event.getValue("configure-log-channel").getAsString();
-            String customerRoleId = event.getValue("configure-customer-role").getAsString();
-            String memberRoleId = event.getValue("configure-member-role").getAsString();
-            String joinChannelId = event.getValue("configure-join-channel").getAsString();
-            String leaveChannelId = event.getValue("configure-leave-channel").getAsString();
+                    EmbedBuilder partnershipEmbed = new EmbedBuilder()
+                            .setTitle("**Sponsorship/Partnership Application**")
+                            .setAuthor(member.getMember().getUser().getAsTag())
+                            .setColor(Color.CYAN)
+                            .addField("**User**", member.getMember().getAsMention(), false)
+                            .addField("**Email**", email, false)
+                            .addField("**Youtube Channel Link**", channelLink, false)
+                            .addField("**Discord Channel Link**", discordLink, false)
+                            .addField("**Service**", sponsorshipService, false)
+                            .addField("**Payment**", sponsorshipPayment, false);
+                    event.getHook().editOriginalEmbeds(partnershipEmbed.build()).queue();
+                }
 
-            try {
-                GuildObject configuredGuild = new GuildObject(guild.getId(), prefix, 0, serverOwnerId, null, staffRoleId, logChannelId, customerRoleId, memberRoleId, joinChannelId, leaveChannelId);
-                SQLConnection.updateGuildInfo(configuredGuild);
+                case "configure-server-modal" -> {
+                    String prefix = event.getValue("configure-prefix").getAsString();
+                    String serverOwnerId = event.getValue("configure-server-owner").getAsString();
 
-                BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
-                event.getHook().sendMessage("Successfully configured server").queue();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }else if(event.getModalId().equalsIgnoreCase("configure-ticket-modal")){
-            String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
-            int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
-            GuildObject configuredGuild = new GuildObject(
-                    guild.getId(),
-                    null, ticketLimit,
-                    null, ticketCategoryId,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
+                    try {
+                        GuildObject configuredGuild = new GuildObject(
+                                prefix,
+                                0,
+                                null,
+                                null,
+                                serverOwnerId,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                guild.getId());
 
-            try {
-                SQLConnection.updateGuildInfo(configuredGuild);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                        SQLConnection.updateGuildInfo(configuredGuild);
+
+                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
+                        event.getHook().sendMessage("Successfully configured server").queue();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                case "configure-ticket-modal" -> {
+                    String ticketCategoryId = event.getValue("configure-ticket-category").getAsString();
+                    int ticketLimit = Integer.valueOf(event.getValue("configure-ticket-limit").getAsString());
+
+                    try {
+                        GuildObject configuredGuild = new GuildObject(
+                                null,
+                                ticketLimit,
+                                null,
+                                ticketCategoryId,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                guild.getId());
+
+                        SQLConnection.updateGuildInfo(configuredGuild);
+
+                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
+                        event.getHook().sendMessage("Successfully configured server").queue();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                case "configure-roles-modal" -> {
+                    String staffRoleId = event.getValue("configure-staff-role").getAsString();
+                    String customerRoleId = event.getValue("configure-customer-role").getAsString();
+                    String memberRoleId = event.getValue("configure-member-role").getAsString();
+
+                    try {
+                        GuildObject configuredGuild = new GuildObject(
+                                null,
+                                0,
+                                null,
+                                null,
+                                staffRoleId,
+                                null,
+                                customerRoleId,
+                                memberRoleId,
+                                null,
+                                null,
+                                guild.getId());
+
+                        SQLConnection.updateGuildInfo(configuredGuild);
+
+                        event.getHook().sendMessage("Successfully configured server").queue();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                case "configure-channels-modal" -> {
+                    String logChannelId = event.getValue("configure-log-channel").getAsString();
+                    String joinChannelId = event.getValue("configure-join-channel").getAsString();
+                    String leaveChannelId = event.getValue("configure-leave-channel").getAsString();
+
+                    try {
+                        GuildObject configuredGuild = new GuildObject(
+                                null,
+                                0,
+                                null,
+                                null,
+                                null,
+                                logChannelId,
+                                null,
+                                null,
+                                joinChannelId,
+                                leaveChannelId,
+                                guild.getId());
+
+                        SQLConnection.updateGuildInfo(configuredGuild);
+
+                        BotProperty.guildsHashMap.put(guild.getId(), configuredGuild);
+                        event.getHook().sendMessage("Successfully configured server").queue();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
     }

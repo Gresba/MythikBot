@@ -244,18 +244,17 @@ public class CustomMember {
         if(productType.toLowerCase().contains("mfa")) {
             return "Thank you for ordering " + productType + "\n" +
                     """
-                    **Format:** email:emailPassword:MinecraftPassword
-                    **Mail Site:** rambler.ru (Check the domain of your account)
-                    **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
-                    **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM
-                    *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
-                    *If the account requires migration, then migrate it.*
-                    """;
+                            **Format:** email:emailPassword:MinecraftPassword
+                            "Use a clean IP to avoid getting them security banned";    
+                            **Mail Site:** rambler.ru (Check the domain of your account)
+                            **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
+                            **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM
+                            *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
+                            *If the account requires migration, then migrate it.*
+                            """;
         }else if(productType.toLowerCase().contains("unbanned") ){
-            return "Thank you for ordering " + productType +
-                    "" +
+            return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password:username\n" +
-                    "" +
                     "Use VyprVPN to avoid getting them security banned on Hypixel";
         }else if(productType.toLowerCase().contains("hypixel") || productType.toLowerCase().contains("nfa")){
             return "Thank you for ordering " + productType + "\n" +
@@ -264,10 +263,14 @@ public class CustomMember {
             return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password\n" +
                     "**Note:** Don't change password or you may lose access fast";
-        }else if(productType.contains("Yahoo")){
+        }else if(productType.contains("Yahoo")) {
             return "Thank you for ordering " + productType + "\n" +
                     "**Format:** email:password | Total Mails: <number of mails>\n" +
                     "Log into the email at yahoo.com";
+        }else if(productType.toLowerCase().contains("skyblock")){
+            return "Thank you for ordering " + productType + "\n" +
+                    "**Format:** email:password:username\n" +
+                    "You can use the command /networth <name> in chat to view the items of value for your account";
         }else{
             return  "There was an issue with the order, created a ticket in the discord server";
         }

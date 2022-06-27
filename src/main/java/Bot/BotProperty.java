@@ -61,10 +61,10 @@ public class BotProperty {
      */
     public void corruptStaffAlert(Guild guild, User corruptStaff, String orderId)
     {
-        Member serverOwner = guild.getMemberById(BotProperty.guildsHashMap.get(guild.getId()).getServerOwnerId());
+        Member serverOwner = guild.getMemberById(BotProperty.guildsHashMap.get(guild.getId()).getOwnerId());
 
         // Remove the configured staff member role
-        guild.removeRoleFromMember(guild.getMemberById(corruptStaff.getId()), guild.getRoleById(guildsHashMap.get(guild.getId()).getStaffRoleId())).queue();
+        guild.removeRoleFromMember(guild.getMemberById(corruptStaff.getId()), guild.getRoleById(guildsHashMap.get(guild.getId()).getStaffId())).queue();
 
         // Alert the user that they have been detected
         corruptStaff.openPrivateChannel().queue(

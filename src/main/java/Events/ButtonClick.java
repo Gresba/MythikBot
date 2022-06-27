@@ -32,6 +32,7 @@ public class ButtonClick extends ListenerAdapter {
         Guild guild = event.getGuild();
 
         GuildObject guildObject = BotProperty.guildsHashMap.get(guild.getId());
+        System.out.println(guildObject);
 
         CustomChannel customChannel = new CustomChannel(event.getJDA(), event.getTextChannel().getId());
 

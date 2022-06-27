@@ -75,7 +75,7 @@ public class OwnerSlashCommand extends ListenerAdapter {
                         inputFile.delete();
 
                         statement.executeUpdate(query);
-                        event.getHook().sendMessage(productNumber + " " + productType + " successfully uploaded!").setEphemeral(true).queue();
+                        event.reply(productNumber + " " + productType + " successfully uploaded!").setEphemeral(true).queue();
                     } catch (InterruptedException e) {
                         event.getHook().sendMessage("**[ERROR]** Interrupted exception").setEphemeral(true).queue();
                         e.printStackTrace();

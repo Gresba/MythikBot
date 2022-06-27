@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 import java.sql.*;
-import java.util.Map;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -38,13 +37,12 @@ public class BetterBot {
             String staffRoleId = guildInfo.getString(6);
             String logChannelId = guildInfo.getString(7);
             String customerRoleId = guildInfo.getString(8);
-            String memberRoleId = guildInfo.getString(8);
-            String joinChannelId = guildInfo.getString(8);
-            String leaveChannelId = guildInfo.getString(8);
+            String memberRoleId = guildInfo.getString(9);
+            String joinChannelId = guildInfo.getString(10);
+            String leaveChannelId = guildInfo.getString(11);
 
 
             GuildObject guildObject = new GuildObject(
-                    guildId,
                     guildPrefix,
                     guildTicketLimit,
                     guildOwner,
@@ -54,7 +52,8 @@ public class BetterBot {
                     customerRoleId,
                     memberRoleId,
                     joinChannelId,
-                    leaveChannelId);
+                    leaveChannelId,
+                    guildId);
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
