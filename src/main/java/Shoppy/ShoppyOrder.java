@@ -1,17 +1,9 @@
 package Shoppy;
 
-import Bot.SQLConnection;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 
 public class ShoppyOrder {
-    private Statement statement;
-
     private String id;
     private String email;
 
@@ -35,10 +27,6 @@ public class ShoppyOrder {
 
     private double price;
 
-    public ShoppyOrder()
-    {
-        statement = SQLConnection.getStatement();
-    }
 
     public EmbedBuilder sendOrderEmbed()
     {
@@ -62,25 +50,6 @@ public class ShoppyOrder {
                     .setDescription("That order ID does not exist!");
         }
         return orderEmbed;
-    }
-
-    public boolean requiresVerification(Member member, String paymentMethod) {
-        if (paymentMethod.equalsIgnoreCase("LTC") || paymentMethod.equalsIgnoreCase("BTC") || paymentMethod.equalsIgnoreCase("ETH")) {
-            return false;
-        }
-
-        try {
-            PreparedStatement selectVerifiedUser = statement.getConnection().prepareStatement("SELECT * FROM WhiteList WHERE MemberID = ?");
-            selectVerifiedUser.setString(1, member.getId());
-
-            ResultSet resultSet = selectVerifiedUser.executeQuery();
-            if (resultSet.next())
-                return false;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return true;
     }
 
     public ShoppyProduct getProduct() {

@@ -165,7 +165,9 @@ public class ModalInteractionEvent extends ListenerAdapter {
                                 Button.primary("paypal-claim-order", "PayPal Claim")
                         ).queue();
 
-                        channel.sendMessage(guild.getMemberById(BotProperty.guildsHashMap.get(guild.getId()).getOwnerId()).getAsMention() + " there is a PayPal order!").queue();
+                        customChannel.openTicket(guild.getRoleById("938905340001542235"));
+
+                        channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
                         channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){

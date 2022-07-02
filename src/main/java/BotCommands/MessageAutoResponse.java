@@ -33,8 +33,6 @@ public class MessageAutoResponse extends ListenerAdapter {
 
         String[] messageArr = messageString.split("/");
 
-        Statement statement = SQLConnection.getStatement();
-
         if(!memberUser.isBot())
         {
             MessageObj messageObj = new MessageObj(messageString, member.getId(), message.getTimeCreated().toZonedDateTime());
@@ -58,24 +56,6 @@ public class MessageAutoResponse extends ListenerAdapter {
             {
                 guild.getTextChannelById("953923167305465916").retrieveMessageById("953923565894402048").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
                 guild.getTextChannelById("934489170456494161").retrieveMessageById("934736207701762088").complete().editMessageEmbeds(Embeds.RULES.build()).queue();
-            }else if(messageArr[0].equals("m!loadInvites1")){
-                guild.retrieveInvites().queue(
-                        invites ->
-                        {
-                            String query = "INSERT INTO Invites (Code, InviteCount, MemberID) VALUES";
-
-                            for (Invite invite: invites)
-                            {
-                                query += "('" + invite.getCode() + "', " + invite.getUses() + ", '" + invite.getInviter().getId() + "'),";
-                            }
-                            query = query.substring(0, query.length() - 1) + ";";
-                            try {
-                                statement.executeUpdate(query);
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                );
             }
         }
 

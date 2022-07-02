@@ -14,9 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
@@ -30,7 +28,6 @@ public class OwnerSlashCommand extends ListenerAdapter {
         JDA jda = event.getJDA();
         Member sender = event.getMember();
         CustomMember guildOwner = new CustomMember(jda, BotProperty.guildsHashMap.get(guild.getId()).getOwnerId(), guild.getId());
-        Statement statement = SQLConnection.getStatement();
 
         // If the sender is the bot then exit
         if (sender.getUser().isBot())
@@ -56,26 +53,9 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     String productType = event.getOption("product_type").getAsString();
                     try {
                         File inputFile = event.getOption("input_file").getAsAttachment().downloadToFile().get();
-                        Scanner input = new Scanner(inputFile);
 
-                        String query = "INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES";
-                        int productNumber = 0;
-
-                        // Build the query
-                        while (input.hasNext()) {
-                            String productInfo = input.nextLine();
-
-                            query += "('" + productInfo + "', '" + productType + "', '" + guild.getId() + "'),";
-                            productNumber++;
-
-                            // Replace the last character ',' with a ';'
-                        }
-                        query = query.substring(0, query.length() - 1) + ";";
-
-                        inputFile.delete();
-
-                        statement.executeUpdate(query);
-                        event.reply(productNumber + " " + productType + " successfully uploaded!").setEphemeral(true).queue();
+                        event.reply(SQLConnection.uploadProducts(guild.getId(), productType, inputFile) + " " + productType + " successfully uploaded!")
+                                .setEphemeral(true).queue();
                     } catch (InterruptedException e) {
                         event.getHook().sendMessage("**[ERROR]** Interrupted exception").setEphemeral(true).queue();
                         e.printStackTrace();
@@ -91,42 +71,10 @@ public class OwnerSlashCommand extends ListenerAdapter {
                     }
                 }
 
-                // WHITELIST either add or remove a customer from the whitelist
-                case "whitelist" -> {
-                    // Get the arguments passed in
-                    String actionType = event.getOption("action").getAsString();
-                    Member targetMember = event.getOption("target_member").getAsMember();
-
-                    // Build the query
-                    String whiteListQuery;
-                    if (actionType.equalsIgnoreCase("add")) {
-                        whiteListQuery = "INSERT INTO Whitelist VALUES ('" + targetMember.getId() + "')";
-                    } else if(actionType.equalsIgnoreCase("remove")){
-                        whiteListQuery = "DELETE FROM Whitelist WHERE MemberID = '" + targetMember.getId() + "'";
-                    } else {
-                        event.getHook().sendMessage("That is not a valid action type. Either add or remove!").setEphemeral(true).queue();
-                        return;
-                    }
-
-                    // Execute the query and handle any exceptions
-                    try {
-                        statement.executeUpdate(whiteListQuery);
-                        event.getHook().sendMessage("User successfully added to the whitelist").queue();
-                    // Check if entry is already in the database
-                    }catch (SQLIntegrityConstraintViolationException e){
-                        event.getHook().sendMessage("That user is already in the whitelist!").setEphemeral(true).queue();
-                        e.printStackTrace();
-                    }catch (SQLException e) {
-                        event.getHook().sendMessage("There was an error with adding that member to the whitelist!").setEphemeral(true).queue();
-                        e.printStackTrace();
-                    }
-                }
-
                 // REMOVE_ORDER from the database
                 case "remove_order" ->{
-                    String query = "DELETE FROM Orders WHERE OrderId='" + event.getOption("order_id").getAsString() + "'";
                     try {
-                        statement.executeUpdate(query);
+                        SQLConnection.removeOrder(event.getOption("order_id").getAsString());
                         event.getHook().sendMessage("Order successfully removed from the database!").setEphemeral(true).queue();
                     } catch (SQLException e) {
                         event.getHook().sendMessage("**[ERROR]** There was an error with removing the order from the database").queue();

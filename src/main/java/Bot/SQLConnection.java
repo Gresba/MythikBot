@@ -5,11 +5,13 @@ import CustomObjects.Response;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.Scanner;
 
 public class SQLConnection {
-    private static Statement statement;
     private static Connection connection;
 
     /**
@@ -17,18 +19,17 @@ public class SQLConnection {
      *
      * @return Statement The SQL statement
      */
-    public static Statement getStatement() {
+    public static Connection getConnection() {
         try {
             String SQLUsername = System.getenv("MYTHIK_BOT_SQL_USER");
             String SQLPassword = System.getenv("MYTHIK_BOT_SQL_PASSWORD");
 
             connection = DriverManager.getConnection("jdbc:mysql://91.134.110.57:3306/mythikdb", SQLUsername, SQLPassword);
 
-            statement = connection.createStatement();
         }catch (Exception e){
             e.printStackTrace();
         }
-        return statement;
+        return connection;
     }
 
     /**
@@ -75,7 +76,7 @@ public class SQLConnection {
             // Executing the query to get the product
             ResultSet resultSet = retrieveProductQuery.executeQuery();
 
-            statement.close();
+            connection.close();
 
             // Loop through the result set to get the product
             while (resultSet.next()) {
@@ -90,7 +91,7 @@ public class SQLConnection {
             // Delete the accounts retrieved from the database
             deleteProductQuery.executeUpdate();
 
-            statement.close();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -135,7 +136,7 @@ public class SQLConnection {
         java.util.Date date = new java.util.Date();
         long time = date.getTime();
 
-        PreparedStatement insertOrder = statement.getConnection().prepareStatement(
+        PreparedStatement insertOrder = connection.prepareStatement(
         """
             INSERT INTO Orders (OrderID, MemberID, ClaimedDate)
             VALUES (?, ?, ?)
@@ -154,7 +155,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static ResultSet getOrder(String orderId) throws SQLException {
-        PreparedStatement getOrder = statement.getConnection().prepareStatement(
+        PreparedStatement getOrder = connection.prepareStatement(
         """
             SELECT * FROM Orders
             WHERE OrderID = ?
@@ -162,6 +163,23 @@ public class SQLConnection {
         getOrder.setString(1, orderId);
 
         return getOrder.executeQuery();
+    }
+
+    /**
+     * Remove an order record from a database
+     *
+     * @param orderId The order ID for the record to remove
+     * @throws SQLException Common SQL issues that need to be caught
+     */
+    public static void removeOrder(String orderId) throws SQLException {
+        PreparedStatement removeOrder = connection.prepareStatement(
+          """
+          DELETE FROM Orders
+          WHERE OrderId = ?
+          """);
+
+        removeOrder.setString(1, orderId);
+        removeOrder.executeUpdate();
     }
 
     /**
@@ -252,7 +270,6 @@ public class SQLConnection {
     public static void updateGuildInfo(GuildObject guild) throws SQLException, IllegalAccessException {
         PreparedStatement updateGuildQuery = connection.prepareStatement(
         """
-            
             UPDATE Guilds
             SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?, StaffId = ?, LogChannelId = ?,
                 CustomerRoleId = ?, MemberRoleId = ?, JoinChannelId = ?, LeaveChannelId = ?
@@ -261,51 +278,21 @@ public class SQLConnection {
 
         int counter = 1;
 
-        System.out.println("GUILDS HASH MAP BEFORE");
-        BotProperty.guildsHashMap.forEach((s, guildObject) -> {
-            System.out.println(guildObject);
-        });
-        System.out.println(guild);
         // Loops through the fields in the guilds class
         for (Field field : guild.getClass().getDeclaredFields()) {
+            // Allow access
             field.setAccessible(true);
 
-            // Gets the type of field and checks
-            switch (field.getType().toString())
-            {
-                // If the datatype is a String then do the appropriate for a string
-                case "class java.lang.String" -> {
-                    // Store the value
-                    String fieldValue = String.valueOf(field.get(guild));
+            var fieldValue = field.get(guild);
 
-                    // If the value isn't set then use the current value
-                    if(fieldValue.equalsIgnoreCase("null")) {
-                        System.out.println("Field Title: " + field.getName() + " | Value: " + field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
-                        fieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
-                    }else{
-                        field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
-                    }
-                    updateGuildQuery.setString(counter++, fieldValue);
-                }
-
-                // If the datatype is an int then do the appropriate for an int
-                case "int" -> {
-
-                    int fieldValue = (int) field.get(guild);
-                    if(fieldValue == 0) {
-                        fieldValue = (int) field.get(BotProperty.guildsHashMap.get(guild.getGuildId()));
-                    }else{
-                        field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
-                    }
-                    updateGuildQuery.setInt(counter++, fieldValue);
-                }
+            // If the value isn't set then use the current value
+            if(fieldValue.equals("null") || fieldValue.equals(0)) {
+                fieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
+            }else{
+                field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
             }
+            updateGuildQuery.setObject(counter++, fieldValue);
         }
-        System.out.println("GUILDS HASH MAP AFTER");
-
-        BotProperty.guildsHashMap.forEach((s, guildObject) -> {
-            System.out.println(guildObject);
-        });
 
         updateGuildQuery.executeUpdate();
     }
@@ -434,4 +421,50 @@ public class SQLConnection {
         // Executing the query
         deleteResponseQuery.executeUpdate();
     }
+
+    /**
+     * Uploads data from an inputFile to the database by iterating through every line.
+     *
+     * @param guildId The guild the account belongs to
+     * @param productType The type of product that is being uploaded
+     * @param inputFile The input file containing the products
+     * @return The amount of products uploaded
+     * @throws FileNotFoundException File may not be found so catch that error
+     * @throws SQLException Common SQL exceptions the must be caught
+     */
+    public static int uploadProducts(String guildId, String productType, File inputFile) throws FileNotFoundException, SQLException {
+        Scanner input = new Scanner(inputFile);
+
+        PreparedStatement insertRecord = connection.prepareStatement("INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES (?, ?, ?)");
+        int productCounter = 1;
+
+        // Build the query
+        while (input.hasNext()) {
+            String productInfo = input.nextLine();
+
+            insertRecord.setString(1, productInfo);
+            insertRecord.setString(2, productType);
+            insertRecord.setString(3, guildId);
+
+            insertRecord.addBatch();
+
+            productCounter++;
+        }
+
+        insertRecord.executeBatch();
+
+        return productCounter;
+    }
+
+    public static ResultSet getInvites(String guildId) throws SQLException {
+        PreparedStatement getInvites = connection.prepareStatement(
+                """
+                SELECT * FROM Invites
+                WHERE GuildId = ?
+                """);
+        getInvites.setString(1, guildId);
+
+        return getInvites.executeQuery();
+    }
+
 }

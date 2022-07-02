@@ -30,31 +30,5 @@ public class MemberLeaveGuildEvent extends ListenerAdapter {
         joinEmbed.setFooter("Member ID: " + member.getId());
 
         botProperty.storeLog(event.getGuild(), joinEmbed, "Left");
-
-        // Check the inviter associated with the user and decrement the count of that user in the database
-        String getInviterIDQuery = "SELECT Inviter FROM Users WHERE MemberId = '" + member.getId() + "'";
-
-        // Get the inviter of the user
-
-        try {
-            ResultSet inviterIDResult = SQLConnection.getStatement().executeQuery(getInviterIDQuery);
-            String inviterId = "";
-            while (inviterIDResult.next())
-            {
-                inviterId = inviterIDResult.getString(1);
-            }
-
-            String incrementInviterInviteCount = "Update Users SET Invites = Invites - 1 WHERE MemberID = '" + inviterId + "'";
-
-            SQLConnection.getStatement().executeUpdate(incrementInviterInviteCount);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        // Get the inviters invite count
-
-            // Decrement the invite count
-
-            // Assign the new value into the database
-
     }
 }

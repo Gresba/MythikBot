@@ -13,10 +13,7 @@ public class GuildObject {
     private String leaveChannelId;
     private final String guildId;
     public String getOwnerId() { return ownerId; }
-    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
     public String getStaffId() { return staffId; }
-    public void setStaffId(String staffId) { this.staffId = staffId; }
-
     public GuildObject(
             String prefix,
             int ticketLimit,
