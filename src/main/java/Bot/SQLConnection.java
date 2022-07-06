@@ -40,13 +40,12 @@ public class SQLConnection {
      * @param amount The amount to get
      * @return The product(s)
      */
-    public static String getProductByName(String guildId, String productType, int amount)
-    {
+    public static String getProductByName(String guildId, String productType, int amount){
         StringBuilder product = new StringBuilder();
 
         try {
             // Building the query
-            PreparedStatement retrieveProductQuery = connection.prepareStatement(
+            PreparedStatement retrieveProductQuery = getConnection().prepareStatement(
             """
                 SELECT AccountInfo
                 FROM Accounts
@@ -54,7 +53,7 @@ public class SQLConnection {
                 LIMIT ?
                 """);
 
-            PreparedStatement deleteProductQuery = connection.prepareStatement(
+            PreparedStatement deleteProductQuery = getConnection().prepareStatement(
             """
                 DELETE FROM Accounts
                 WHERE (AccountType = ? AND GuildId = ?)
@@ -94,6 +93,13 @@ public class SQLConnection {
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing the connection");
+                e.printStackTrace();
+            }
         }
 
         return product.toString();
@@ -109,7 +115,7 @@ public class SQLConnection {
      * @throws SQLException  Common SQL exceptions to be dealt with
      */
     public static void insertPunishment(String punishmentType, Member member, String reason, String staffMemberId) throws SQLException {
-        PreparedStatement updatePunishmentQuery = connection.prepareStatement(
+        PreparedStatement updatePunishmentQuery = getConnection().prepareStatement(
         """
             INSERT INTO Punishments (Type, Reason, MemberId, StaffMemberId)
             VALUES (?, ?, ?, ?)
@@ -136,7 +142,7 @@ public class SQLConnection {
         java.util.Date date = new java.util.Date();
         long time = date.getTime();
 
-        PreparedStatement insertOrder = connection.prepareStatement(
+        PreparedStatement insertOrder = getConnection().prepareStatement(
         """
             INSERT INTO Orders (OrderID, MemberID, ClaimedDate)
             VALUES (?, ?, ?)
@@ -155,7 +161,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static ResultSet getOrder(String orderId) throws SQLException {
-        PreparedStatement getOrder = connection.prepareStatement(
+        PreparedStatement getOrder = getConnection().prepareStatement(
         """
             SELECT * FROM Orders
             WHERE OrderID = ?
@@ -172,7 +178,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL issues that need to be caught
      */
     public static void removeOrder(String orderId) throws SQLException {
-        PreparedStatement removeOrder = connection.prepareStatement(
+        PreparedStatement removeOrder = getConnection().prepareStatement(
           """
           DELETE FROM Orders
           WHERE OrderId = ?
@@ -195,7 +201,7 @@ public class SQLConnection {
         try {
 
             // The SQL query to add the user into the database
-            PreparedStatement insertUserIntoDb = connection.prepareStatement(
+            PreparedStatement insertUserIntoDb = getConnection().prepareStatement(
             """
                 INSERT INTO Users
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -251,7 +257,7 @@ public class SQLConnection {
             query = "SELECT * FROM Guilds WHERE GuildID = ?";
 
         // Get the query ready
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        PreparedStatement preparedStatement = getConnection().prepareStatement(query);
 
         // Fill in the query if needed
         if(guildId.length != 0)
@@ -268,7 +274,7 @@ public class SQLConnection {
      * @throws SQLException Exception that must be caught when calling this method
      */
     public static void updateGuildInfo(GuildObject guild) throws SQLException, IllegalAccessException {
-        PreparedStatement updateGuildQuery = connection.prepareStatement(
+        PreparedStatement updateGuildQuery = getConnection().prepareStatement(
         """
             UPDATE Guilds
             SET Prefix = ?, TicketLimit = ?, OwnerID = ?, TicketCategoryId = ?, StaffId = ?, LogChannelId = ?,
@@ -286,7 +292,7 @@ public class SQLConnection {
             var fieldValue = field.get(guild);
 
             // If the value isn't set then use the current value
-            if(fieldValue.equals("null") || fieldValue.equals(0)) {
+            if(fieldValue == null || fieldValue.equals(0)) {
                 fieldValue = String.valueOf(field.get(BotProperty.guildsHashMap.get(guild.getGuildId())));
             }else{
                 field.set(BotProperty.guildsHashMap.get(guild.getGuildId()), fieldValue);
@@ -304,7 +310,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertGuild(Guild guild) throws SQLException {
-        PreparedStatement insertGuildQuery = connection.prepareStatement(
+        PreparedStatement insertGuildQuery = getConnection().prepareStatement(
         """
             INSERT INTO Guilds
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -345,7 +351,7 @@ public class SQLConnection {
      * @throws SQLException Common exception to be dealt with
      */
     public static void insertTicket(String ticketChannelId, String memberId) throws SQLException {
-        PreparedStatement insertTicketQuery = connection.prepareStatement(
+        PreparedStatement insertTicketQuery = getConnection().prepareStatement(
         """
             INSERT INTO Tickets
             VALUES (?, ?)
@@ -364,7 +370,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL error which must be caught
      */
     public static void deleteTicket(String ticketChannelId) throws SQLException {
-        PreparedStatement deleteTicketQuery = connection.prepareStatement(
+        PreparedStatement deleteTicketQuery = getConnection().prepareStatement(
         """
             DELETE FROM Tickets
             WHERE TicketId = ?
@@ -383,7 +389,7 @@ public class SQLConnection {
      * @throws SQLException Common SQL exceptions to be dealt with
      */
     public static void insertResponse(String guildId, Response response) throws SQLException {
-        PreparedStatement insertResponseQuery = connection.prepareStatement(
+        PreparedStatement insertResponseQuery = getConnection().prepareStatement(
         """
             INSERT INTO Responses
             VALUES (?, ?, ?, ?, ?)
@@ -407,7 +413,7 @@ public class SQLConnection {
      */
     public static void deleteResponse(String guildId, String triggerWord) throws SQLException {
         // Building the query
-        PreparedStatement deleteResponseQuery = connection.prepareStatement(
+        PreparedStatement deleteResponseQuery = getConnection().prepareStatement(
         """
             DELETE FROM Responses
             WHERE TriggerWord = ?
@@ -435,7 +441,7 @@ public class SQLConnection {
     public static int uploadProducts(String guildId, String productType, File inputFile) throws FileNotFoundException, SQLException {
         Scanner input = new Scanner(inputFile);
 
-        PreparedStatement insertRecord = connection.prepareStatement("INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES (?, ?, ?)");
+        PreparedStatement insertRecord = getConnection().prepareStatement("INSERT INTO Accounts (AccountInfo, AccountType, GuildID) VALUES (?, ?, ?)");
         int productCounter = 1;
 
         // Build the query
@@ -457,7 +463,7 @@ public class SQLConnection {
     }
 
     public static ResultSet getInvites(String guildId) throws SQLException {
-        PreparedStatement getInvites = connection.prepareStatement(
+        PreparedStatement getInvites = getConnection().prepareStatement(
                 """
                 SELECT * FROM Invites
                 WHERE GuildId = ?

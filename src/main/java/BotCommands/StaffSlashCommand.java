@@ -152,7 +152,7 @@ public class StaffSlashCommand extends ListenerAdapter {
                 }
 
                 case "card_check" -> event.reply("Your order was marked as fraud. To verify you're the owner of the card we need to see the card with the last 4 digits of: " + event.getOption("last_four_digits").getAsString() + "\n" +
-                                "You can blur everything else out we just need to see the last 4 digits. If this cannot be done, we can provide a full refund. Just let us know.\n" +
+                                "You can blur everything else out we just need to see the last 4 digits. If there is an issue with this please let us know\n" +
                                 "Example: https://cdn.discordapp.com/attachments/859129620493369367/987782981684985896/IMG_6438.jpg")
                         .queue();
 

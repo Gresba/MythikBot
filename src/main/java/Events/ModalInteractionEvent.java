@@ -105,7 +105,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                         e.printStackTrace();
                     }
                     
-                    if((now.toEpochSecond(ZoneOffset.UTC) - claimedDate.toEpochSecond(ZoneOffset.UTC) > 86400) && claimedDate != null)
+                    if((claimedDate != null && now.toEpochSecond(ZoneOffset.UTC) - claimedDate.toEpochSecond(ZoneOffset.UTC) > 86400))
                     {
                         event.getHook().sendMessage("""
                         Thank you for submitting your information and choosing Better Alts.
@@ -134,7 +134,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             } catch (IllegalArgumentException | NullPointerException e){
-                event.getHook().sendMessage("That is not a valid order ID. Make sure you copy and paste only and the full order ID!").queue();
+                event.getHook().sendMessage(String.format("%s is not a valid order Id. Make sure you remove all spaced and just put in the 36 character Id", orderId)).queue();
                 e.printStackTrace();
             }
         }else{
@@ -158,6 +158,8 @@ public class ModalInteractionEvent extends ListenerAdapter {
                             .queue();
                     if(!purchasePaymentMethod.toLowerCase().contains("cashapp") && (purchasePaymentMethod.toLowerCase().contains("pp") || purchasePaymentMethod.toLowerCase().contains("paypal"))){
 
+                        customChannel.openTicket(guild.getRoleById(938905340001542235l));
+
                         EmbedBuilder paypalClaim = new EmbedBuilder()
                                 .setTitle("**PayPal Order**")
                                 .setDescription("A PayPaler will claim this order soon. Please be patient!");
@@ -165,9 +167,7 @@ public class ModalInteractionEvent extends ListenerAdapter {
                                 Button.primary("paypal-claim-order", "PayPal Claim")
                         ).queue();
 
-                        customChannel.openTicket(guild.getRoleById("938905340001542235"));
-
-                        channel.sendMessage(guild.getRoleById("938905340001542235").getAsMention() + " there is a PayPal order!").queue();
+                        channel.sendMessage(guild.getMemberById(BotProperty.guildsHashMap.get(guild.getId()).getOwnerId()).getAsMention() + " there is a PayPal order!").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("steam")){
                         channel.sendMessage(member.getMember().getAsMention() + " we do not accept steam as a payment method! Close the ticket when you see this.").queue();
                     }else if(purchasePaymentMethod.toLowerCase().contains("paysafe")){

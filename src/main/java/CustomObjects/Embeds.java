@@ -123,6 +123,8 @@ public class Embeds {
                 .addField("**Reason**", """
                         Channel is nuked because staff members can't always moderate the chat and this is the best way to keep the chat completely clean so we do not get punished by discord.
                         
+                        We have tried to keep the chat un-nuked; however, people take advantage of it so it will be nuked.
+                        
                         If you have an issue with an order give us a chance to resolve it.
                         Leaving any negative feedback before that in any form will result in your order getting revoked.
             

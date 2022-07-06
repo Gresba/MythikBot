@@ -14,7 +14,7 @@ import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class DeleteMessageEvent extends ListenerAdapter {
+public class DeleteMessagesEvent extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {

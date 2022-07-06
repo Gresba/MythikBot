@@ -41,7 +41,6 @@ public class BetterBot {
             String joinChannelId = guildInfo.getString(10);
             String leaveChannelId = guildInfo.getString(11);
 
-
             GuildObject guildObject = new GuildObject(
                     guildPrefix,
                     guildTicketLimit,
@@ -57,7 +56,6 @@ public class BetterBot {
 
             // Adding the guild for future usage
             BotProperty.guildsHashMap.put(guildId, guildObject);
-
         }
 
         connection.close();
@@ -71,9 +69,9 @@ public class BetterBot {
                 new DeleteChannelEvent(),
                 new MemberJoinGuildEvent(),
                 new MessageAutoResponse(),
-                new DeleteMessageEvent(),
                 new JoinGuildEvent(),
                 new MemberLeaveGuildEvent(),
+                new DeleteMessagesEvent(),
                 new StaffSlashCommand(),
                 new ButtonClick(),
                 new UserSlashCommand(),
