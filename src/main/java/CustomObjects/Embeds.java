@@ -34,15 +34,11 @@ public class Embeds {
                     """
                             **1.1)** No talking about selling/buying products not related to Better Alts
                             **1.2)** No spamming/ghost pinging
-                            **1.3)** No releasing anyone's information without consent
-                            **1.4)** No sending NSFW or gore contents.
-                            **1.5)** No comments that will discourage another user from buying.
-                            **1.6)** No advertising unless you have permission.
-                            **1.7)** No pinging staff members unless it's about an order.
-                            **1.8)** No mass pinging.
-                            **1.9)** Use channels according to their purpose.
-                            **1.10)** Don't ask for free stuff.
-                            **1.11)** Making threats will get you banned and will get your order revoked.
+                            **1.3)** No comments that will discourage another user from buying.
+                            **1.4)** No advertising unless you have permission.
+                            **1.5)** No mass pinging.
+                            **1.6)** Don't ask for free stuff.
+                            **1.7)** Any threats will get you banned and will get your order revoked.
                             """, false)
             .addField("**Invites**",
                     """
@@ -123,11 +119,11 @@ public class Embeds {
                 .addField("**Reason**", """
                         Channel is nuked because staff members can't always moderate the chat and this is the best way to keep the chat completely clean so we do not get punished by discord.
                         
-                        We have tried to keep the chat un-nuked; however, people take advantage of it so it will be nuked.
-                        
-                        If you have an issue with an order give us a chance to resolve it.
-                        Leaving any negative feedback before that in any form will result in your order getting revoked.
-            
+                        We have tried to keep the chat un-nuked; however, people take advantage of it so it will be nuked.        
+                        """, false)
+                .addField("**Important**", """
+                        If you have any issues regarding your order or questions make a #ticket
+                        Leaving any negative feedback or comments anywhere before talking to a staff member will result in your order being revoked.
                         """, false)
                 .setColor(Color.BLACK);
     /**

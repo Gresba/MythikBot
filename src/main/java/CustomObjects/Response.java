@@ -19,14 +19,7 @@ public class Response {
     public String getResponse() {
         return response;
     }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
     public String getTriggerString() {return triggerString; }
-    public void setDeleteTriggerMsg(boolean deleteTriggerMsg) {
-        this.deleteTriggerMsg = deleteTriggerMsg;
-    }
     public void setContains(boolean contains) {
         this.contains = contains;
     }

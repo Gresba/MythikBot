@@ -91,28 +91,23 @@ public class BetterBot {
 
             // USER accessible slash commands
             commands.addCommands(
-                    Commands.slash("eth", "Get Mythik's Ethereum Address"),
+                Commands.slash("payment", "Get a Mythik's payment method").addSubcommands(
+                    new SubcommandData("eth", "Ethereum address"),
+                    new SubcommandData("btc", "Bitcoin address"),
+                    new SubcommandData("ltc", "Litecoin address"),
+                    new SubcommandData("bch", "Bitcoin Cash address"),
+                    new SubcommandData("sol", "Solano address"),
+                    new SubcommandData("ada", "Bitcoin Cash address"),
+                    new SubcommandData("venmo", "Venmo user tag"),
+                    new SubcommandData("cashapp", "Cashapp tag"),
+                    new SubcommandData("paypal", "PayPal email")
+                        .addOptions(new OptionData(INTEGER, "price", "The amount to send", false))
+                ),
 
-                    Commands.slash("btc", "Get Mythik's Bitcoin Address"),
-
-                    Commands.slash("ltc", "Get Mythik's Lite coin Address"),
-
-                    Commands.slash("bch", "Get Mythik's Bitcoin Cash Address"),
-
-                    Commands.slash("sol", "Get Mythik's Solana Address"),
-
-                    Commands.slash("ada", "Get Mythik's Cardano Address"),
-
-                    Commands.slash("venmo", "Get Mythik's Venmo Tag"),
-
-                    Commands.slash("cash_app", "Get Mythik's CashApp Tag"),
-
-                    Commands.slash("paypal", "Get Mythik's PayPal email"),
-
-                    // HELP command
-                    Commands.slash("help", "How to use the discord bot")
-                            .addOptions(new OptionData(STRING, "category", "The category for help")
-                                    .setRequired(false))
+                // HELP command
+                Commands.slash("help", "How to use the discord bot")
+                        .addOptions(new OptionData(STRING, "category", "The category for help")
+                                .setRequired(false))
             );
 
             // STAFF accessible commands

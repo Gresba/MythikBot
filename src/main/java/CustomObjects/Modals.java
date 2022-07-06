@@ -6,6 +6,17 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 public class Modals {
+
+    public static Modal CLAIM_ORDER = Modal.create("claim-order-modal", "Claim Order")
+            .addActionRow(
+                TextInput.create("order-id", "Order ID", TextInputStyle.SHORT)
+                    .setPlaceholder("Ex. ha6d6876-4875-4c63-883e-036c55b0b338")
+                    .setRequired(true)
+                    .setMinLength(36)
+                    .setMaxLength(36)
+                    .build()
+            ).build();
+
     public static Modal PARTNERSHIP_MODAL = Modal.create("sponsorship-partnership", "Sponsorship/Partnership")
             .addActionRows(
                     ActionRow.of(

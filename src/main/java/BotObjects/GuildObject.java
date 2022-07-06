@@ -63,27 +63,6 @@ public class GuildObject {
         return memberRoleId;
     }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-    public void setTicketLimit(int ticketLimit) {
-        this.ticketLimit = ticketLimit;
-    }
-    public void setTicketCategoryId(String ticketCategoryId) {this.ticketCategoryId = ticketCategoryId; }
-    public void setLogChannelId(String logChannelId) {
-        this.logChannelId = logChannelId;
-    }
-    public void setCustomerRoleId(String customerRoleId) { this.customerRoleId = customerRoleId; }
-    public void setMemberRoleId(String memberRoleId) {
-        this.memberRoleId = memberRoleId;
-    }
-    public void setJoinChannelId(String joinChannelId) {
-        this.joinChannelId = joinChannelId;
-    }
-    public void setLeaveChannelId(String leaveChannelId) {
-        this.leaveChannelId = leaveChannelId;
-    }
-
     @Override
     public String toString() {
         return "GuildObject{" +

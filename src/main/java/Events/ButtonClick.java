@@ -121,18 +121,8 @@ public class ButtonClick extends ListenerAdapter {
             }
 
             // ORDER CLAIM button for tickets
-            case "order-claim" -> {
-                TextInput claimOrderID = TextInput.create("order-id", "Order ID", TextInputStyle.SHORT)
-                        .setPlaceholder("Ex. ha6d6876-4875-4c63-883e-036c55b0b338")
-                        .setRequired(true)
-                        .setMinLength(36)
-                        .setMaxLength(36)
-                        .build();
-                Modal orderClaimModal = Modal.create("claim-order-modal", "Claim Order")
-                        .addActionRows(ActionRow.of(claimOrderID))
-                        .build();
-                event.replyModal(orderClaimModal).queue();
-            }
+            case "order-claim" -> event.replyModal(Modals.CLAIM_ORDER).queue();
+
             case "order-replacement" -> {
                 event.replyModal(Modals.REPLACEMENT_MODAL).queue();
 
@@ -162,13 +152,14 @@ public class ButtonClick extends ListenerAdapter {
             case "paypal-claim-order" -> {
                 Role paypalRole = guild.getRoleById("938905340001542235");
 
+                customChannel.openTicket(member);
+
                 if (member.getRoles().contains(paypalRole)) {
                     customChannel.muteTicket(paypalRole);
                     event.reply(guild.getMemberById(customChannel.getChannel().getTopic()).getAsMention() + ", " + event.getMember().getAsMention() + " will be in charge of your PayPal order. Talk to him in this ticket!").queue();
                 } else {
                     event.reply("You are not a PayPal exchanger so click that button does not do anything!").queue();
                 }
-                customChannel.openTicket(member);
             }
 
             // Add the member role to a user
