@@ -50,11 +50,12 @@ public class OwnerSlashCommand extends ListenerAdapter {
 
                 // UPLOAD a product into the database
                 case "upload" -> {
+                    event.deferReply().queue();
                     String productType = event.getOption("product_type").getAsString();
                     try {
                         File inputFile = event.getOption("input_file").getAsAttachment().downloadToFile().get();
 
-                        event.reply(SQLConnection.uploadProducts(guild.getId(), productType, inputFile) + " " + productType + " successfully uploaded!")
+                        event.getHook().sendMessage(SQLConnection.uploadProducts(guild.getId(), productType, inputFile) + " " + productType + " successfully uploaded!")
                                 .setEphemeral(true).queue();
                     } catch (InterruptedException e) {
                         event.getHook().sendMessage("**[ERROR]** Interrupted exception").setEphemeral(true).queue();

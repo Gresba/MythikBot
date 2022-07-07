@@ -75,8 +75,6 @@ public class SQLConnection {
             // Executing the query to get the product
             ResultSet resultSet = retrieveProductQuery.executeQuery();
 
-            connection.close();
-
             // Loop through the result set to get the product
             while (resultSet.next()) {
 
@@ -447,6 +445,7 @@ public class SQLConnection {
         // Build the query
         while (input.hasNext()) {
             String productInfo = input.nextLine();
+            System.out.println(productInfo);
 
             insertRecord.setString(1, productInfo);
             insertRecord.setString(2, productType);
@@ -455,9 +454,17 @@ public class SQLConnection {
             insertRecord.addBatch();
 
             productCounter++;
+            if(productCounter % 1000 == 0)
+            {
+                insertRecord.executeBatch();
+            }
         }
 
-        insertRecord.executeBatch();
+        System.out.println(insertRecord);
+
+        insertRecord.execute();
+
+        connection.close();
 
         return productCounter;
     }
