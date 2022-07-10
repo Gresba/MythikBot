@@ -8,12 +8,12 @@ C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\CustomObjects\CustomChannel.
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\DeleteChannelEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\InviteCreateEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Bot\BotProperty.java
+C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\DeleteMessagesEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\CustomObjects\Modals.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\JoinGuildEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Bot\SQLConnection.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Shoppy\ShoppyConnection.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\CustomObjects\CustomMember.java
-C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\DeleteMessageEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\CustomObjects\Embeds.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\Events\ModalInteractionEvent.java
 C:\Users\paulk\IdeaProjects\MythikBot\src\main\java\BotCommands\MessageAutoResponse.java
