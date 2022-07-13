@@ -245,12 +245,14 @@ public class CustomMember {
             return "Thank you for ordering " + productType + "\n" +
                     """
                             **Format:** email:emailPassword:MinecraftPassword
-                            "Use a clean IP to avoid getting them security banned";    
+                            "Use a clean IP to avoid getting them security banned"
+                              
                             **Mail Site:** rambler.ru (Check the domain of your account)
-                            **How to change email for Mojang Account:** https://www.youtube.com/watch?v=AAQFrR0ShNE
+
                             **How to change email for Microsoft Account:** https://www.youtube.com/watch?v=duowaqDnwdM
+                            
                             *If the minecraft password or security questions are incorrect then reset it since you have access to the email*
-                            *If the account requires migration, then migrate it.*
+                            *If the account is a Mojang account or requires migration, then migrate it.*
                             """;
         }else if(productType.toLowerCase().contains("unbanned") ){
             return "Thank you for ordering " + productType + "\n" +

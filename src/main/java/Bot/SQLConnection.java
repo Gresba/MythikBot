@@ -460,8 +460,6 @@ public class SQLConnection {
             }
         }
 
-        System.out.println(insertRecord);
-
         insertRecord.executeBatch();
 
         connection.close();

@@ -15,14 +15,6 @@ public class DropDowns {
                             .withDescription("MFAs banned on Hypixel")
                             .withEmoji(Emoji.fromUnicode("U+1F9E1")))
 
-                    .addOptions(SelectOption.of("Unbanned NFA", "unbanned-nfa")
-                            .withDescription("NFAs unbanned on Hypixel")
-                            .withEmoji(Emoji.fromUnicode("U+1F49B")))
-
-                    .addOptions(SelectOption.of("Banned NFA", "banned-nfa")
-                            .withDescription("NFAs banned on Hypixel")
-                            .withEmoji(Emoji.fromUnicode("U+1F49A")))
-
                     .addOptions(SelectOption.of("Microsoft Unbanned NFA", "microsoft-unbanned-nfa")
                             .withDescription("Microsoft NFAs unbanned on Hypixel")
                             .withEmoji(Emoji.fromUnicode("U+1F499")))
@@ -34,10 +26,6 @@ public class DropDowns {
                     .addOptions(SelectOption.of("Minecon NFA", "minecon-nfa")
                             .withDescription("NFAs with Minecon capes on them")
                             .withEmoji(Emoji.fromUnicode("U+1F90E")))
-
-                    .addOptions(SelectOption.of("Hypixel Ranked/LvL", "hypixel-ranked-lvl")
-                            .withDescription("NFAs with ranks, levels or both on them")
-                            .withEmoji(Emoji.fromUnicode("U+1F5A4")))
 
                     .addOptions(SelectOption.of("Ranked MFAs", "ranked-mfa")
                             .withDescription("MFAs with a rank on Hypixel")
@@ -55,9 +43,6 @@ public class DropDowns {
                             .withDescription("VPN")
                             .withEmoji(Emoji.fromUnicode("U+1F4AB")))
 
-                    .addOptions(SelectOption.of("Gaming Email Access", "gaming-email-access")
-                            .withDescription("Emails with emails from gaming companies such as Steam, Discord, Riot Games and Epic Games")
-                            .withEmoji(Emoji.fromUnicode("U+1F4A5")))
                     .setPlaceholder("Select Roles")
                     .build();
 }

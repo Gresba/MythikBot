@@ -13,11 +13,6 @@ import org.jetbrains.annotations.NotNull;
 public class UserSlashCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        Member sender = event.getMember();
-
-        TextChannel channel = event.getTextChannel();
-
         switch (event.getName())
         {
             case "payment" -> {
@@ -28,10 +23,10 @@ public class UserSlashCommand extends ListenerAdapter {
                     case "bch" -> event.reply("**Bitcoin Cash Address:** qqmcveumtz5adcxj85yu37808nzyx7w7ag28sljpc2").queue();
                     case "sol" -> event.reply("**Solana Address:** CwTGK46ng2ygQpQXrCVdWynaEwPDXa3Lpfckx4zDMjpY").queue();
                     case "ada" -> event.reply("**Cardano Address:** addr1v939psedcu5swmwltlmdveq0gxn69jd7w9k26mmmsq9lwsg55hl7g").queue();
-                    case "cash_app" -> event.reply("**Cash App:** $UFACapital").queue();
+                    case "cashapp" -> event.reply("**Cash App:** $UFACapital").queue();
                     case "venmo" -> event.reply("**Venmo:** pkvenmo11").queue();
                     case "paypal" ->
-                        event.reply("Send " + event.getOption("price").getAsInt() + " to betteralts01@gmail.com\n" +
+                        event.reply("Send $" + event.getOption("price").getAsInt() + " USD to betteralts01@gmail.com\n" +
                                 "Make sure the payment is **PayPal Friends and Family**.\n\n" +
                                 "If not, you will **NOT** receive the product. A refund will require a refund fee to be paid.\n" +
                                 "**NOTE:** If you did not specifically click *friends and family* option that means you did not send using friends and family\n" +
